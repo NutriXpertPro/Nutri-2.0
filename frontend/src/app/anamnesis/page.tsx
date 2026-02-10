@@ -1,0 +1,600 @@
+"use client"
+
+import * as React from "react"
+import { DashboardLayout } from "@/components/layout"
+import { StatCard } from "@/components/dashboard/StatCard"
+import { IconWrapper } from "@/components/ui/IconWrapper"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { anamnesisService, AnamnesisTemplate } from "@/services/anamnesis-service"
+import { usePatients } from "@/hooks/usePatients"
+import {
+    Plus,
+    Search,
+    FileText,
+    Clock,
+    CheckCircle2,
+    Loader2,
+    LayoutTemplate,
+    Users,
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    User,
+    Moon,
+    Activity,
+    Heart,
+    TrendingUp,
+    Ruler,
+    Camera,
+    Sparkles,
+    AlertCircle,
+    List,
+    Star,
+    Copy,
+    Trash2,
+} from "lucide-react"
+import { cn } from "@/lib/utils"
+import { TemplateBuilder } from "@/components/anamnesis/TemplateBuilder"
+import { AnamnesisList } from "@/components/anamnesis/AnamnesisList"
+import { WizardAnamnesisForm } from "@/components/anamnesis/WizardAnamnesisForm"
+import { CsvTemplateImporter } from "@/components/anamnesis/CsvTemplateImporter"
+import { AnamnesisReportView } from "@/components/anamnesis/AnamnesisReportView"
+import { StandardAnamnesisData } from "@/types/anamnesis"
+import {
+    Dialog,
+    DialogContent,
+    DialogTitle,
+} from "@/components/ui/dialog"
+
+// Tipo para as seções da anamnese padrão
+interface StandardSection {
+    id: string
+    title: string
+    icon: React.ElementType
+    description: string
+    fields: string[]
+    color: string
+    variant: "blue" | "indigo" | "emerald" | "rose" | "amber" | "violet" | "pink"
+}
+
+// Seções da anamnese padrão baseadas no modelo do backend
+const STANDARD_SECTIONS: StandardSection[] = [
+    {
+        id: "identificacao",
+        title: "1. Identificação",
+        icon: User,
+        description: "Dados pessoais e contato do paciente",
+        fields: ["Nome", "Idade", "Sexo", "Data de Nascimento", "Profissão", "Email", "Telefone"],
+        color: "from-blue-500/20 to-blue-500/5",
+        variant: "blue"
+    },
+    {
+        id: "rotina",
+        title: "2. Rotina",
+        icon: Moon,
+        description: "Horários de sono, treino e disponibilidade",
+        fields: ["Hora que acorda", "Hora que dorme", "Dificuldade para dormir", "Horário de treino", "Tempo disponível para treino", "Dias de treino por semana"],
+        color: "from-indigo-500/20 to-indigo-500/5",
+        variant: "indigo"
+    },
+    {
+        id: "nutricao",
+        title: "3. Nutrição e Hábitos",
+        icon: Activity,
+        description: "Peso, altura, restrições alimentares e preferências",
+        fields: ["Peso", "Altura", "Status do peso", "Alimentos restritos", "Já fez dieta antes?", "Resultado da dieta", "Funcionamento intestinal", "Litros de água/dia", "Vontade de doce (0-10)", "Horários de maior apetite", "Preferência de lanches", "Frutas preferidas"],
+        color: "from-emerald-500/20 to-emerald-500/5",
+        variant: "emerald"
+    },
+    {
+        id: "saude",
+        title: "4. Histórico de Saúde",
+        icon: Heart,
+        description: "Doenças, medicamentos, intolerâncias e hábitos",
+        fields: ["Doença familiar", "Problema de saúde atual", "Detalhes dos problemas", "Problema articular", "Uso de medicamentos", "Detalhes medicamentos", "Uso de cigarros", "Intolerância alimentar", "Detalhes intolerância", "Uso de anticoncepcional", "Termogênico utilizado", "Uso de álcool", "Frequência álcool", "Já usou anabolizante", "Problemas com anabolizante", "Pretende usar anabolizante"],
+        color: "from-rose-500/20 to-rose-500/5",
+        variant: "rose"
+    },
+    {
+        id: "objetivos",
+        title: "5. Objetivos",
+        icon: TrendingUp,
+        description: "Metas do tratamento e compromisso com acompanhamento",
+        fields: ["Objetivo principal", "Compromisso com relatórios semanais"],
+        color: "from-emerald-500/20 to-emerald-500/5",
+        variant: "emerald"
+    },
+    {
+        id: "medidas",
+        title: "6. Medidas",
+        icon: Ruler,
+        description: "Circunferências corporais em centímetros",
+        fields: ["Pescoço (cm)", "Cintura (cm)", "Quadril (cm) - Feminino"],
+        color: "from-violet-500/20 to-violet-500/5",
+        variant: "violet"
+    },
+    {
+        id: "fotos",
+        title: "7. Fotos",
+        icon: Camera,
+        description: "Registro fotográfico para acompanhamento visual",
+        fields: ["Foto de frente", "Foto de lado", "Foto de costas"],
+        color: "from-pink-500/20 to-pink-500/5",
+        variant: "pink"
+    },
+]
+
+export default function AnamnesisPage() {
+    const [searchQuery, setSearchQuery] = React.useState("")
+    const [expandedSections, setExpandedSections] = React.useState<string[]>(["identificacao"])
+    const [showTemplateBuilder, setShowTemplateBuilder] = React.useState(false)
+    const [viewMode, setViewMode] = React.useState<"list" | "form">("list")
+    const [viewingPatientId, setViewingPatientId] = React.useState<number | null>(null)
+
+    const queryClient = useQueryClient()
+
+    // Fetch Templates
+    const { data: templates, isLoading: templatesLoading } = useQuery({
+        queryKey: ['anamnesis-templates'],
+        queryFn: anamnesisService.listTemplates
+    })
+
+    const { patients } = usePatients()
+    const { data: standardAnamneses } = useQuery({
+        queryKey: ['anamnesis-standard-list'],
+        queryFn: anamnesisService.listStandardAnamneses
+    })
+
+    // Create Template Mutation
+    const createTemplateMutation = useMutation({
+        mutationFn: anamnesisService.createTemplate,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['anamnesis-templates'] })
+            setShowTemplateBuilder(false)
+        }
+    })
+
+    // Delete Template Mutation
+    const deleteTemplateMutation = useMutation({
+        mutationFn: anamnesisService.deleteTemplate,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['anamnesis-templates'] })
+        }
+    })
+
+    const filteredTemplates = templates?.filter(t =>
+        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || []
+
+    const toggleSection = (id: string) => {
+        setExpandedSections(prev =>
+            prev.includes(id)
+                ? prev.filter(s => s !== id)
+                : [...prev, id]
+        )
+    }
+
+    const handleSaveTemplate = (templateData: Omit<AnamnesisTemplate, "id" | "created_at" | "is_active">) => {
+        createTemplateMutation.mutate(templateData)
+    }
+
+    const handleDuplicateTemplate = (template: AnamnesisTemplate) => {
+        createTemplateMutation.mutate({
+            title: `${template.title} (Cópia)`,
+            description: template.description,
+            questions: template.questions
+        })
+    }
+
+    const handleNewAnamnesis = () => {
+        setViewMode("form")
+    }
+
+    const handleEditAnamnesis = (_id: number) => {
+        setViewMode("form")
+    }
+
+    const handleViewAnamnesis = (id: number) => {
+        setViewingPatientId(id)
+    }
+
+    const handleCancelForm = () => {
+        setViewMode("list")
+    }
+
+    if (showTemplateBuilder) {
+        return (
+            <DashboardLayout>
+                <div className="fixed inset-0 bg-linear-to-br from-primary/5 via-background to-secondary/5 -z-10" />
+                <TemplateBuilder
+                    onSave={handleSaveTemplate}
+                    onCancel={() => {
+                        setShowTemplateBuilder(false)
+                    }}
+                    isLoading={createTemplateMutation.isPending}
+                />
+            </DashboardLayout>
+        )
+    }
+
+    if (viewMode === "form") {
+        return (
+            <DashboardLayout>
+                <div className="fixed inset-0 bg-linear-to-br from-primary/5 via-background to-secondary/5 -z-10" />
+                <div className="max-w-4xl mx-auto py-6 px-4">
+                    <div className="flex items-center gap-4 mb-6">
+                        <Button variant="ghost" onClick={handleCancelForm} className="gap-2">
+                            <ChevronLeft className="h-4 w-4" />
+                            Voltar para Lista
+                        </Button>
+                        <div>
+                            <h1 className="text-2xl font-bold">Preencher Anamnese</h1>
+                            <p className="text-muted-foreground">
+                                Preencha as informações do paciente passo a passo
+                            </p>
+                        </div>
+                    </div>
+                    <WizardAnamnesisForm onCancel={handleCancelForm} />
+                </div>
+            </DashboardLayout>
+        )
+    }
+
+    const totalPatients = patients?.length || 0
+    const completedAnamneses = standardAnamneses?.filter((a: StandardAnamnesisData) => (a.progresso || 0) === 100).length || 0
+    const pendingAnamneses = totalPatients - completedAnamneses
+
+    return (
+        <DashboardLayout>
+            <div className="fixed inset-0 bg-linear-to-br from-primary/5 via-background to-secondary/5 -z-10" />
+
+            <div className="space-y-6 relative animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                        <div>
+                            <h1 className="text-3xl tracking-tight text-foreground">
+                                Central de <span className="text-primary">Anamneses</span>
+                            </h1>
+                            <p className="text-muted-foreground mt-1 flex items-center gap-2">
+                                <FileText className="h-4 w-4 text-orange-500" />
+                                Gerencie questionários, templates personalizados e respostas dos pacientes
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
+                        <CsvTemplateImporter
+                            onImport={(templateData) => {
+                                createTemplateMutation.mutate(templateData)
+                            }}
+                        />
+
+                        <Button onClick={handleNewAnamnesis} className="shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+                            Anamnese
+                        </Button>
+
+                        <Button onClick={() => setShowTemplateBuilder(true)} className="gap-2">
+                            <LayoutTemplate className="h-4 w-4" />
+                            Novo Template
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <StatCard
+                        title="Total Pacientes"
+                        value={totalPatients}
+                        icon={Users}
+                        variant="theme"
+                    />
+                    <StatCard
+                        title="Templates Criados"
+                        value={templates?.length || 0}
+                        icon={LayoutTemplate}
+                        variant="violet"
+                    />
+                    <StatCard
+                        title="Pendentes"
+                        value={pendingAnamneses}
+                        icon={Clock}
+                        variant="rose"
+                    />
+                    <StatCard
+                        title="Completas"
+                        value={completedAnamneses}
+                        icon={CheckCircle2}
+                        variant="green"
+                    />
+                </div>
+
+                <Tabs defaultValue="list" className="space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <TabsList className="bg-muted/30 backdrop-blur-sm p-1 rounded-xl">
+                            <TabsTrigger value="list" className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg font-normal">
+                                <List className="h-4 w-4" />
+                                Lista de Anamneses
+                            </TabsTrigger>
+                            <TabsTrigger value="standard" className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg font-normal">
+                                <Star className="h-4 w-4" />
+                                Anamnese Padrão
+                            </TabsTrigger>
+                            <TabsTrigger value="templates" className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg font-normal">
+                                <LayoutTemplate className="h-4 w-4" />
+                                Templates
+                                {(templates?.length || 0) > 0 && (
+                                    <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                                        {templates?.length}
+                                    </Badge>
+                                )}
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <div className="relative max-w-xs">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Buscar..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-10 bg-background/50 backdrop-blur-sm"
+                            />
+                        </div>
+                    </div>
+
+                    <TabsContent value="list" className="space-y-6 mt-6">
+                        <AnamnesisList
+                            onNewAnamnesis={handleNewAnamnesis}
+                            onEdit={handleEditAnamnesis}
+                            onView={handleViewAnamnesis}
+                        />
+                    </TabsContent>
+
+                    <TabsContent value="standard" className="space-y-6 mt-6">
+                        <Card className="bg-linear-to-br from-primary/10 via-card to-card border-primary/20 overflow-hidden relative">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                            <CardContent className="p-8 relative">
+                                <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+                                    <div className="h-20 w-20 rounded-3xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground shadow-2xl shadow-primary/30">
+                                        <Sparkles className="h-10 w-10" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <h2 className="text-2xl font-normal">Anamnese Padrão Completa</h2>
+                                            <Badge className="bg-primary/20 text-primary hover:bg-primary/30">Recomendado</Badge>
+                                        </div>
+                                        <p className="text-muted-foreground max-w-2xl">
+                                            Questionário completo com 7 seções e campos condicionais inteligentes que se adaptam às respostas do paciente. Inclui identificação, rotina, nutrição, histórico de saúde, objetivos, medidas e registro fotográfico.
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <Badge variant="outline" className="gap-1">
+                                            <FileText className="h-3 w-3" />
+                                            40+ campos
+                                        </Badge>
+                                        <Badge variant="outline" className="gap-1">
+                                            <Activity className="h-3 w-3" />
+                                            8 condicionais
+                                        </Badge>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <div className="grid gap-4">
+                            {STANDARD_SECTIONS.map((section) => (
+                                <Collapsible
+                                    key={section.id}
+                                    open={expandedSections.includes(section.id)}
+                                    onOpenChange={() => toggleSection(section.id)}
+                                >
+                                    <Card className={cn(
+                                        "transition-all duration-300 hover:shadow-lg group overflow-hidden",
+                                        expandedSections.includes(section.id) && "ring-2 ring-primary/20"
+                                    )}>
+                                        <div className={cn(
+                                            "absolute inset-0 bg-linear-to-r opacity-0 group-hover:opacity-100 transition-opacity -z-10",
+                                            section.color
+                                        )} />
+                                        <CollapsibleTrigger asChild>
+                                            <CardHeader className="cursor-pointer hover:bg-muted/20 transition-colors">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-4">
+                                                        <IconWrapper
+                                                            icon={section.icon}
+                                                            variant={section.variant}
+                                                            size="lg"
+                                                            className={cn(
+                                                                "ring-4 ring-background border border-white/10 dark:border-white/20 shadow-md transition-all",
+                                                                expandedSections.includes(section.id) ? "scale-110 shadow-lg" : ""
+                                                            )}
+                                                        />
+                                                        <div>
+                                                            <CardTitle className="text-lg flex items-center gap-2">
+                                                                {section.title}
+                                                                <Badge variant="secondary" className="text-xs font-normal">
+                                                                    {section.fields.length} campos
+                                                                </Badge>
+                                                            </CardTitle>
+                                                            <CardDescription>{section.description}</CardDescription>
+                                                        </div>
+                                                    </div>
+                                                    {expandedSections.includes(section.id) ? (
+                                                        <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform" />
+                                                    ) : (
+                                                        <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform" />
+                                                    )}
+                                                </div>
+                                            </CardHeader>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <CardContent className="pt-0 pb-6">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-4 border-t">
+                                                    {section.fields.map((field, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className={cn(
+                                                                "flex items-center gap-2 p-3 rounded-lg bg-muted/30 text-sm",
+                                                                field.includes("Condicional") || field.includes("Feminino") || field.includes("Detalhes") || field.includes("Resultado") || field.includes("Frequência")
+                                                                    ? "border-l-2 border-amber-500 bg-amber-500/5"
+                                                                    : ""
+                                                            )}
+                                                        >
+                                                            <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                                                            <span className="text-foreground/80">{field}</span>
+                                                            {(field.includes("Feminino") || field.includes("Detalhes") || field.includes("Resultado") || field.includes("Frequência")) && (
+                                                                <Badge variant="outline" className="text-[10px] px-1 py-0 text-amber-600 border-amber-300">
+                                                                    Condicional
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </CardContent>
+                                        </CollapsibleContent>
+                                    </Card>
+                                </Collapsible>
+                            ))}
+                        </div>
+
+                        <Card className="bg-muted/30 border-dashed">
+                            <CardContent className="p-6 flex items-start gap-4">
+                                <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+                                    <AlertCircle className="h-5 w-5 text-blue-500" />
+                                </div>
+                                <div>
+                                    <h4 className="font-medium mb-1">Como funciona?</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        A anamnese padrão é aplicada automaticamente a cada novo paciente. Ela contém <strong>campos condicionais</strong> que só aparecem quando necessário (ex: detalhes de medicamentos só aparecem se o paciente usa medicamentos). Os dados são salvos no prontuário do paciente e podem ser editados a qualquer momento.
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    <TabsContent value="templates" className="space-y-6 mt-6">
+                        {templatesLoading ? (
+                            <div className="flex items-center justify-center py-16">
+                                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                            </div>
+                        ) : filteredTemplates.length === 0 ? (
+                            <Card className="bg-card/60 backdrop-blur-xl border-dashed border-2">
+                                <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                                    <div className="h-20 w-20 rounded-full bg-linear-to-br from-muted to-muted/50 flex items-center justify-center mb-6">
+                                        <FileText className="h-10 w-10 text-muted-foreground" />
+                                    </div>
+                                    <h3 className="text-xl font-semibold mb-2">Nenhum template personalizado</h3>
+                                    <p className="text-muted-foreground mb-6 max-w-md">
+                                        Crie templates personalizados para diferentes tipos de consulta, acompanhamento ou especialidades.
+                                    </p>
+                                    <div className="flex gap-3">
+                                        <CsvTemplateImporter
+                                            onImport={(templateData) => {
+                                                createTemplateMutation.mutate(templateData)
+                                            }}
+                                        />
+                                        <Button onClick={() => setShowTemplateBuilder(true)}>
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Criar do Zero
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {filteredTemplates.map((template, index) => (
+                                    <Card
+                                        key={template.id}
+                                        className="bg-card/60 backdrop-blur-xl border-border/40 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 group overflow-hidden"
+                                        style={{ animationDelay: `${index * 100}ms` }}
+                                    >
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/10 transition-colors" />
+                                        <CardHeader className="pb-3 relative">
+                                            <div className="flex items-start justify-between">
+                                                <div className="h-12 w-12 rounded-xl bg-linear-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                    <FileText className="h-6 w-6 text-primary" />
+                                                </div>
+                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 hover:bg-primary/10"
+                                                        onClick={() => handleDuplicateTemplate(template)}
+                                                    >
+                                                        <Copy className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 hover:bg-destructive/10 text-destructive"
+                                                        onClick={() => {
+                                                            if (confirm("Excluir este template?")) {
+                                                                deleteTemplateMutation.mutate(template.id)
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            <CardTitle className="text-lg mt-4 group-hover:text-primary transition-colors">
+                                                {template.title}
+                                            </CardTitle>
+                                            <CardDescription className="line-clamp-2">
+                                                {template.description || "Sem descrição"}
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="flex items-center justify-between">
+                                                <Badge variant="secondary" className="gap-1">
+                                                    <FileText className="h-3 w-3" />
+                                                    {template.questions.length} questões
+                                                </Badge>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {new Date(template.created_at).toLocaleDateString('pt-BR')}
+                                                </span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+
+                                <Card
+                                    className="bg-card/30 border-dashed border-2 hover:border-primary/50 hover:bg-card/50 transition-all cursor-pointer group"
+                                    onClick={() => setShowTemplateBuilder(true)}
+                                >
+                                    <CardContent className="flex flex-col items-center justify-center h-full min-h-[200px] text-center">
+                                        <div className="h-14 w-14 rounded-full bg-muted/50 flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:scale-110 transition-all">
+                                            <Plus className="h-7 w-7 text-muted-foreground group-hover:text-primary" />
+                                        </div>
+                                        <p className="font-medium group-hover:text-primary transition-colors">Criar Novo Template</p>
+                                        <p className="text-sm text-muted-foreground mt-1">Personalize seu questionário</p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )}
+                    </TabsContent>
+                </Tabs>
+            </div>
+
+            {/* Modal de Visualização da Anamnese */}
+            <Dialog open={viewingPatientId !== null} onOpenChange={(open) => !open && setViewingPatientId(null)}>
+                <DialogContent className="sm:max-w-5xl w-full max-h-[95vh] overflow-y-auto p-0 bg-transparent border-none shadow-none">
+                    <DialogTitle className="sr-only">Visualização da Anamnese</DialogTitle>
+                    <div className="w-full px-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        {viewingPatientId && (
+                            <AnamnesisReportView
+                                patientId={viewingPatientId}
+                                onClose={() => setViewingPatientId(null)}
+                            />
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </DashboardLayout>
+    )
+}

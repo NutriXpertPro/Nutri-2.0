@@ -1,0 +1,87 @@
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.venv*/
+ENV/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.next/
+out/
+frontend/public/fallback-*.js
+frontend/public/sw.js
+frontend/public/workbox-*.js
+
+# IDEs
+
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+backend/env_fix_v2.txt
+
+# Maintenance and Legacy Scripts
+backend/scripts_manutencao/
+scripts_manutencao/
+legacy/
+
+# Others
+*.bak
+*.tmp
+.gemini/
+*.diff
+build.log
+
+# Debug and Audit Files
+backend/audit_*.py
+backend/debug_*.py
+backend/nutritional_data_audit.py
+backend/*.txt
+backend/nul
+nul
+
+# Security Vault
+_SECURITY_VAULT_/
+*.json_backup
+*.sql_backup
+error_diagnostics.log
+database_backup.json

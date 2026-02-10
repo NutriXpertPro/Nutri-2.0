@@ -1,0 +1,233 @@
+"use client"
+
+import * as React from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { User, MessageSquare, Target, TrendingUp, TrendingDown } from "lucide-react"
+import api from "@/services/api"
+import { useAuth } from "@/contexts/auth-context"
+import { IconWrapper } from "@/components/ui/IconWrapper"
+import { Patient } from "@/types/common"
+
+interface PacienteEmFocoProps {
+    patient?: Patient
+    className?: string
+}
+
+export function PacienteEmFoco({ patient, className }: PacienteEmFocoProps) {
+    const router = useRouter();
+    const { user } = useAuth();
+
+    if (!patient) {
+        return (
+            <Card className={cn(
+                "h-full relative overflow-hidden flex flex-col items-center justify-center text-center p-6",
+                "border-dashed border-2 border-muted-foreground/50 bg-muted/20",
+                className
+            )}>
+                <User className="h-10 w-10 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold text-muted-foreground">Nenhum paciente em foco</h3>
+                <p className="text-sm text-muted-foreground mt-1">Agende uma consulta para destacar o próximo paciente.</p>
+                <Button asChild className="mt-4">
+                    <Link href="/calendar">Agendar Consulta</Link>
+                </Button>
+            </Card>
+        )
+    }
+
+    const handleOpenMessage = async () => {
+        try {
+            // Primeiro, tentamos encontrar uma conversa existente com o paciente
+            interface Conversation {
+                id: number;
+                participants: Array<{ id: number }>;
+            }
+
+            const response = await api.get('/messages/conversations/');
+            const conversations: Conversation[] = response.data;
+
+            // Procurar uma conversa que contenha o paciente como participante
+            let conversation = conversations.find((conv) =>
+                conv.participants.some((p) => p.id === (isNaN(Number(patient.id)) ? patient.id : parseInt(patient.id)))
+            );
+
+            // Se não encontrar uma conversa existente, criamos uma nova
+            if (!conversation) {
+                // Criamos uma conversa com o paciente como participante
+                // O backend automaticamente adiciona o usuário autenticado como participante
+                const patientId = isNaN(Number(patient.id)) ? patient.id : parseInt(patient.id);
+
+                try {
+                    // Enviar o ID do paciente como participante
+                    const newConversationResponse = await api.post('/messages/conversations/', {
+                        participants: [patientId]
+                    });
+                    conversation = newConversationResponse.data;
+                } catch (err: unknown) {
+                    // Definir um tipo seguro para o objeto de erro
+                    const errorObj = err as { response?: { status?: number } };
+                    // Verificar se é um erro 400 e tentar uma abordagem alternativa
+                    if (errorObj.response?.status === 400) {
+                        // Se o erro for 400, pode ser um problema com a validação do ManyToManyField
+                        // Tentar criar uma conversa vazia e deixar o backend adicionar os participantes
+                        try {
+                            // Primeiro, vamos tentar encontrar o ID do usuário autenticado
+                            const currentUserId = user?.id || JSON.parse(localStorage.getItem('user') || '{}')?.id;
+
+                            if (currentUserId) {
+                                // Tentar criar uma conversa vazia e adicionar participantes separadamente
+                                // Mas como não temos um endpoint para isso, vamos tentar uma abordagem diferente
+                                // Vamos tentar criar a conversa com ambos os participantes explicitamente
+                                const newConversationResponse = await api.post('/messages/conversations/', {
+                                    participants: [currentUserId, patientId]
+                                });
+                                conversation = newConversationResponse.data;
+                            } else {
+                                throw errorObj; // Se não tivermos o ID do usuário, lançar o erro original
+                            }
+                        } catch (fallbackError) {
+                            throw fallbackError;
+                        }
+                    } else {
+                        throw errorObj; // Para outros tipos de erro, lançar o erro original
+                    }
+                }
+            }
+
+            // Navegar para a página de mensagens com o ID da conversa
+            if (conversation) {
+                router.push(`/messages?conversation=${conversation.id}`);
+            } else {
+                router.push('/messages');
+            }
+        } catch (error: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
+            // Se houver erro, redirecionar para a página de mensagens genérica
+            router.push('/messages');
+        }
+    };
+
+    return (
+        <Card className={cn(
+            "h-full relative overflow-hidden",
+            // Destaque visual
+            "border-primary/20 bg-linear-to-br from-primary/5 to-transparent",
+            className
+        )}>
+            {/* Gradient accent */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-bl from-primary/10 to-transparent rounded-bl-full" />
+
+            <CardHeader className="pb-3">
+                <div className="flex items-center gap-4">
+                    <IconWrapper
+                        icon={User}
+                        variant="amber"
+                        size="md"
+                        className="ring-4 ring-background border border-white/10 dark:border-white/20 shadow-md"
+                    />
+                    <CardTitle className="text-lg !font-normal">
+                        Próximo Paciente
+                    </CardTitle>
+                </div>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+                {/* Patient Info */}
+                <div className="flex items-center gap-4">
+                    <Avatar className="h-16 w-16 border-2 border-background shadow-md overflow-hidden">
+                        <AvatarImage src={patient.avatar} className="h-full w-full object-cover" />
+                        <AvatarFallback className="text-lg bg-primary/10 text-primary !font-normal">
+                            {patient.name.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="!font-normal text-lg truncate">{patient.name}</h3>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Target className="h-4 w-4 text-primary" />
+                            <span>{patient.goal}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-4 gap-2">
+                    {patient.metrics.map((metric) => (
+                        <div
+                            key={metric.label}
+                            className={cn(
+                                "text-center p-3 rounded-lg",
+                                "bg-background/50 border border-border/50"
+                            )}
+                        >
+                            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                                {metric.label}
+                            </p>
+                            <p className="!font-normal text-lg">{metric.value}</p>
+                            {metric.trend !== undefined && (
+                                <div className={cn(
+                                    "flex items-center justify-center gap-0.5 text-xs font-medium",
+                                    metric.isPositive ? "text-green-500" : "text-red-500"
+                                )}>
+                                    {metric.isPositive ? (
+                                        <TrendingDown className="h-3 w-3" />
+                                    ) : (
+                                        <TrendingUp className="h-3 w-3" />
+                                    )}
+                                    {metric.trend !== null && metric.trend > 0 ? "+" : ""}{metric.trend}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-center gap-2 pt-2">
+                    <Button size="sm" className="gap-2" asChild>
+                        <Link href={`/patients/${patient.id}`}>
+                            <User className="h-4 w-4" />
+                            Ver Perfil
+                        </Link>
+                    </Button>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-2 text-destructive border-destructive/20 hover:bg-destructive/5"
+                        onClick={handleOpenMessage}
+                    >
+                        <MessageSquare className="h-4 w-4" />
+                        Mensagem
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
+// Skeleton
+export function PacienteEmFocoSkeleton() {
+    return (
+        <Card>
+            <CardHeader className="pb-3">
+                <div className="h-6 w-40 bg-muted animate-pulse rounded" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 bg-muted animate-pulse rounded-full" />
+                    <div className="flex-1 space-y-2">
+                        <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+                        <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                    </div>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
