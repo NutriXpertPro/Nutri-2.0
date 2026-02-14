@@ -167,7 +167,7 @@ export function PatientAnalysisTab({ patientId }: PatientAnalysisTabProps) {
                             </CardHeader>
                             <CardContent className="p-0 pb-4">
                                 <div className="h-[180px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer width="99%" height={180}>
                                         <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
                                             <defs>
                                                 <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
@@ -199,7 +199,7 @@ export function PatientAnalysisTab({ patientId }: PatientAnalysisTabProps) {
                             </CardHeader>
                             <CardContent className="p-0 pb-4">
                                 <div className="h-[180px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer width="99%" height={180}>
                                         <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
                                             <defs>
                                                 <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
@@ -231,7 +231,7 @@ export function PatientAnalysisTab({ patientId }: PatientAnalysisTabProps) {
                             </CardHeader>
                             <CardContent className="p-0 pb-4">
                                 <div className="h-[180px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer width="99%" height={180}>
                                         <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
                                             <defs>
                                                 <linearGradient id="orangeGradient" x1="0" y1="0" x2="0" y2="1">

@@ -9,7 +9,12 @@ export function usePatients() {
     const { data: patients, isLoading, error } = useQuery({
         queryKey: ['patients'],
         queryFn: patientService.getAll,
-        enabled: isAuthenticated && !isAuthLoading
+        enabled: isAuthenticated && !isAuthLoading,
+        staleTime: 1000 * 60,         // 1 minuto
+        cacheTime: 1000 * 60 * 5,    // 5 minutos
+        refetchOnWindowFocus: true,   // Refetch quando a janela ganha foco
+        refetchOnMount: true,         // Refetch quando o componente monta
+        retry: 2                      // Tentar novamente em caso de falha
     })
 
     const createPatient = useMutation({
@@ -36,6 +41,11 @@ export function usePatients() {
         },
     })
 
+    // Função para forçar atualização dos dados
+    const refetchPatients = () => {
+        queryClient.invalidateQueries({ queryKey: ['patients'] });
+    };
+
     return {
         patients,
         isLoading,
@@ -43,6 +53,7 @@ export function usePatients() {
         createPatient,
         updatePatient,
         deletePatient,
+        refetchPatients,  // Adiciona a função para forçar atualização
     }
 }
 

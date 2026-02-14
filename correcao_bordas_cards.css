@@ -1,0 +1,46 @@
+/* Correção para tornar as bordas dos cards mais visíveis */
+
+/* Estilo para os cards principais */
+.glass-panel {
+  background: rgba(30, 30, 34, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  /* Aumentando a visibilidade da borda */
+  border: 1px solid rgba(255, 255, 255, 0.2) !important; /* Aumentando de 0.1 para 0.2 */
+}
+
+/* Estilo específico para os cards de métricas */
+.snap-center.flex-none.w-\[160px\].h-\[180px\].glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 1.5rem !important; /* 24px - garantindo consistência */
+}
+
+/* Estilo para os cards de refeição */
+.glass-panel.p-4.rounded-2xl {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Estilo para o card de dica do coach */
+.relative.overflow-hidden.rounded-3xl.bg-gradient-to-br {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Estilo para o card de refeição ativa */
+.bg-surface.border.border-primary\/20 {
+  border: 1px solid rgba(204, 255, 0, 0.4) !important; /* Mantendo cor primária mas aumentando visibilidade */
+}
+
+/* Garantir contraste em modo claro */
+.light .glass-panel {
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Estilo para os cards em diferentes contextos */
+.glass-card {
+  background: linear-gradient(145deg, rgba(30, 30, 34, 0.8) 0%, rgba(18, 18, 20, 0.9) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important; /* Ajuste para maior visibilidade */
+}

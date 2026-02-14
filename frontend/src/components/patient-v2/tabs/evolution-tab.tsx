@@ -122,7 +122,7 @@ export function EvolutionTab() {
                 </div>
 
                 <div className="h-[200px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="99%" height={200}>
                         <AreaChart data={getActiveData()}>
                             <defs>
                                 <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">

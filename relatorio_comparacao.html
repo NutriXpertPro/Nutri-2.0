@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Comparação - Página Alvo vs Modelos Padrão</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .finding {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #fff9e6;
+            border-left: 4px solid #f39c12;
+        }
+        .critical {
+            background-color: #ffeaea;
+            border-left: 4px solid #e74c3c;
+        }
+        .info {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .highlight {
+            background-color: #ffffcc;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Relatório de Comparação: Página Alvo vs Modelos Padrão</h1>
+        
+        <div class="section">
+            <h2>Visão Geral</h2>
+            <p>Este relatório compara a página <span class="highlight">http://localhost:3000/patient-dashboard-v2</span> com os modelos padrão encontrados na pasta <span class="highlight">C:\Nutri 4.0\Nova pasta\stitch</span>.</p>
+            <p>Data da Análise: 14 de fevereiro de 2026</p>
+        </div>
+        
+        <div class="section">
+            <h2>Modelos Padrão Analisados</h2>
+            <ul>
+                <li><strong>Agenda:</strong> C:\Nutri 4.0\Nova pasta\stitch\agenda_(booking)\code.html</li>
+                <li><strong>Dashboard:</strong> C:\Nutri 4.0\Nova pasta\stitch\home_(dashboard)\code.html</li>
+                <li><strong>Login:</strong> C:\Nutri 4.0\Nova pasta\stitch\login_nutri_xpert_pro\code.html</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>Principais Diferenças Identificadas</h2>
+            
+            <div class="finding critical">
+                <h3>1. Estrutura de Componentes</h3>
+                <p><strong>Página Alvo:</strong> Usa framework Next.js com componentes React e sistema de roteamento do App Router</p>
+                <p><strong>Modelos Padrão:</strong> HTML estático com Tailwind CSS inline</p>
+                <p><strong>Impacto:</strong> Arquitetura de desenvolvimento completamente diferente</p>
+            </div>
+            
+            <div class="finding">
+                <h3>2. Estilos e Cores</h3>
+                <table>
+                    <tr>
+                        <th>Elemento</th>
+                        <th>Página Alvo</th>
+                        <th>Modelos Padrão</th>
+                        <th>Diferença</th>
+                    </tr>
+                    <tr>
+                        <td>Cor Primária</td>
+                        <td>#CCFF00 (Volt Lime)</td>
+                        <td>#CCFF00 (Volt Lime) - consistente</td>
+                        <td>Compatível</td>
+                    </tr>
+                    <tr>
+                        <td>Cor Secundária</td>
+                        <td>#FF5500 (Blaze Orange)</td>
+                        <td>#FF5500 (Blaze Orange) - consistente</td>
+                        <td>Compatível</td>
+                    </tr>
+                    <tr>
+                        <td>Fundo Principal</td>
+                        <td>#121214 (Deep Charcoal)</td>
+                        <td>#121214 (Deep Charcoal) - consistente</td>
+                        <td>Compatível</td>
+                    </tr>
+                    <tr>
+                        <td>Tipografia</td>
+                        <td>Geist (personalizada)</td>
+                        <td>Poppins (padrão)</td>
+                        <td><span class="highlight">Diferente</span></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="finding">
+                <h3>3. Estrutura de Layout</h3>
+                <table>
+                    <tr>
+                        <th>Seção</th>
+                        <th>Página Alvo</th>
+                        <th>Modelos Padrão</th>
+                        <th>Diferença</th>
+                    </tr>
+                    <tr>
+                        <td>Cabeçalho (Header)</td>
+                        <td>Fixo no topo com classe glass-header</td>
+                        <td>Sticky no topo com classes Tailwind</td>
+                        <td>Estrutura semelhante mas classes diferentes</td>
+                    </tr>
+                    <tr>
+                        <td>Menu Inferior (Navigation)</td>
+                        <td>Fixo no fundo com ícones Lucide</td>
+                        <td>Sticky no fundo com ícones Material Symbols</td>
+                        <td><span class="highlight">Ícones diferentes</span></td>
+                    </tr>
+                    <tr>
+                        <td>Cartões de Métricas</td>
+                        <td>Layout horizontal com scroll</td>
+                        <td>Layout horizontal com snap</td>
+                        <td>Funcionalidade semelhante</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="finding">
+                <h3>4. Elementos de UI Específicos</h3>
+                <ul>
+                    <li><strong>Cartão de Dica do Coach:</strong> Ambos têm estrutura semelhante com avatar, título e mensagem</li>
+                    <li><strong>Gráfico de Calorias:</strong> Ambos usam SVG para representação circular</li>
+                    <li><strong>Barra de Progresso de Água:</strong> Ambos têm design semelhante com botão de adicionar</li>
+                    <li><strong>Lista de Refeições:</strong> Ambos mostram horário, status e detalhes da refeição</li>
+                    <li><strong>Botão de Ação Flutuante:</strong> Ambos têm botão primário no canto inferior direito</li>
+                </ul>
+            </div>
+            
+            <div class="finding critical">
+                <h3>5. Tecnologias e Frameworks</h3>
+                <p><strong>Página Alvo:</strong> Next.js 14+, React, Tailwind CSS, Framer Motion, Radix UI, Lucide Icons</p>
+                <p><strong>Modelos Padrão:</strong> HTML puro, Tailwind CSS via CDN, Material Symbols</p>
+                <p><strong>Impacto:</strong> Implementação técnica completamente diferente apesar de similaridade visual</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Elementos Visualmente Compatíveis</h2>
+            <ul>
+                <li>Paleta de cores principal mantida (#CCFF00, #FF5500, #121214)</li>
+                <li>Estilo "glassmorphism" em painéis e cartões</li>
+                <li>Tipografia limpa e moderna</li>
+                <li>Ícones intuitivos e consistentes</li>
+                <li>Layout responsivo e mobile-first</li>
+                <li>Hierarquia visual bem definida</li>
+                <li>Feedback visual para interações</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>Elementos que Divergem</h2>
+            <ul>
+                <li><strong>Ícones:</strong> Página alvo usa Lucide Icons enquanto modelos usam Material Symbols</li>
+                <li><strong>Tipografia:</strong> Página alvo usa Geist enquanto modelos usam Poppins</li>
+                <li><strong>Classes CSS:</strong> Página alvo usa sistema de componentes React com Tailwind, modelos usam classes inline</li>
+                <li><strong>Animacões:</strong> Página alvo tem integração mais profunda com Framer Motion</li>
+                <li><strong>Estrutura DOM:</strong> Página alvo tem estrutura otimizada para SSR/CSR do Next.js</li>
+            </ul>
+        </div>
+        
+        <div class="section info">
+            <h2>Considerações Finais</h2>
+            <p>A página <span class="highlight">http://localhost:3000/patient-dashboard-v2</span> mantém a identidade visual e a experiência do usuário dos modelos padrão, mas implementa uma arquitetura técnica mais avançada usando Next.js e tecnologias modernas de desenvolvimento frontend.</p>
+            <p>As diferenças principais são técnicas e de framework, enquanto os elementos visuais críticos (cores, layout geral, hierarquia de informação, experiência do usuário) permanecem consistentes com os modelos padrão.</p>
+            <p>Esta abordagem permite manter a identidade visual do produto enquanto aproveita os benefícios de um framework moderno de desenvolvimento web.</p>
+        </div>
+    </div>
+</body>
+</html>

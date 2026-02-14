@@ -36,14 +36,14 @@ export function PatientBottomNav({ activeTab, onTabChange }: PatientBottomNavPro
                             onClick={() => onTabChange(item.id)}
                             className={cn(
                                 "relative flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all duration-300",
-                                isActive ? "text-emerald-500" : "text-muted-foreground hover:text-foreground"
+                                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
                             )}
                         >
                             <div className="relative">
                                 {isActive && (
                                     <motion.div
                                         layoutId="nav-glow"
-                                        className="absolute -inset-2 bg-emerald-500/10 blur-md rounded-full"
+                                        className="absolute -inset-2 bg-primary/10 blur-md rounded-full"
                                         initial={false}
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                     />
@@ -55,7 +55,7 @@ export function PatientBottomNav({ activeTab, onTabChange }: PatientBottomNavPro
                             {isActive && (
                                 <motion.div
                                     layoutId="nav-indicator"
-                                    className="absolute top-0 w-8 h-0.5 bg-emerald-500 rounded-full"
+                                    className="absolute top-0 w-8 h-0.5 bg-primary rounded-full"
                                     initial={false}
                                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                 />

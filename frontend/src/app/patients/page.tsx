@@ -46,7 +46,7 @@ import patientService from "@/services/patient-service"
 export default function PatientsPage() {
     const router = useRouter()
     const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
-    const { patients, isLoading: isPatientsLoading, error } = usePatients()
+    const { patients, isLoading: isPatientsLoading, error, refetchPatients } = usePatients()
 
     const [searchQuery, setSearchQuery] = React.useState("")
     const [sortBy, setSortBy] = React.useState("recent")
@@ -243,6 +243,17 @@ export default function PatientsPage() {
                     </div>
 
                     <div className="flex items-center gap-2 px-2 border-l border-border/5">
+                        {/* Refresh Button */}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={refetchPatients}
+                            className="h-10 border-none bg-transparent hover:bg-muted/30 rounded-xl text-xs uppercase tracking-widest"
+                        >
+                            <Activity className="h-4 w-4 mr-2" />
+                            Atualizar
+                        </Button>
+
                         {/* Sort */}
                         <Select value={sortBy} onValueChange={setSortBy}>
                             <SelectTrigger className="h-10 border-none bg-transparent hover:bg-muted/30 rounded-xl text-xs uppercase tracking-widest min-w-40 focus:ring-0">

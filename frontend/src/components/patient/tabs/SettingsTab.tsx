@@ -17,10 +17,10 @@ import {
     Zap
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { AppearanceSettings } from "../AppearanceSettings"
 import { cn } from "@/lib/utils"
+import { usePatient } from "@/contexts/patient-context"
 
 const pageVariants = {
     initial: { opacity: 0, y: 20 },
@@ -29,6 +29,11 @@ const pageVariants = {
 }
 
 export function SettingsTab() {
+    const { patient } = usePatient()
+
+    const name = patient?.name || "Paciente"
+    const initials = name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+
     return (
         <motion.div
             variants={pageVariants}
@@ -38,26 +43,30 @@ export function SettingsTab() {
             className="flex flex-col min-h-screen pt-4 pb-28 relative"
         >
             {/* Profile Header */}
-            <div className="pt-12 pb-8 px-6 flex flex-col items-center text-center space-y-4 relative">
-                <div className="absolute top-0 inset-x-0 h-48 bg-gradient-to-b from-emerald-500/5 to-transparent -z-10" />
+            <div className="pt-4 pb-8 px-6 flex flex-col items-center text-center space-y-4 relative">
+                <div className="absolute top-0 inset-x-0 h-48 bg-gradient-to-b from-primary/5 to-transparent -z-10" />
 
                 <div className="relative group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity" />
-                    <div className="relative h-28 w-28 rounded-full border-2 border-emerald-500/20 p-1">
-                        <div className="h-full w-full rounded-full bg-muted flex items-center justify-center text-3xl font-black text-muted-foreground shadow-xl">
-                            PA
-                        </div>
-                        <button className="absolute bottom-0 right-0 h-9 w-9 bg-background border border-border rounded-full flex items-center justify-center text-emerald-500 shadow-lg hover:scale-110 active:scale-95 transition-all">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary to-blue-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity" />
+                    <div className="relative h-28 w-28 rounded-full border-2 border-primary/20 p-1">
+                        {patient?.avatar ? (
+                            <img src={patient.avatar} alt={name} className="h-full w-full rounded-full object-cover shadow-xl" />
+                        ) : (
+                            <div className="h-full w-full rounded-full bg-muted flex items-center justify-center text-3xl font-black text-muted-foreground shadow-xl">
+                                {initials}
+                            </div>
+                        )}
+                        <button className="absolute bottom-0 right-0 h-9 w-9 bg-background border border-border rounded-full flex items-center justify-center text-primary shadow-lg hover:scale-110 active:scale-95 transition-all">
                             <Camera className="h-4 w-4" />
                         </button>
                     </div>
                 </div>
 
                 <div className="space-y-1">
-                    <h2 className="text-2xl font-black tracking-tight">Paciente Teste</h2>
+                    <h2 className="text-2xl font-bold tracking-tight">{name}</h2>
                     <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center justify-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                        Membro Pro • Desde 2025
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.8)]" />
+                        {patient?.service_type === 'ONLINE' ? 'Plano Online' : patient?.service_type === 'PRESENCIAL' ? 'Plano Presencial' : 'Membro'} • {patient?.nutritionist_name ? `${patient.nutritionist_name.split(' ').slice(0, 2).join(' ')}` : 'NutriXpertPro'}
                     </div>
                 </div>
 
@@ -84,12 +93,12 @@ export function SettingsTab() {
                     <div className="glass-card rounded-[2.5rem] overflow-hidden border-none shadow-sm divide-y divide-white/[0.03]">
                         <div className="flex items-center justify-between p-5">
                             <div className="flex items-center gap-4">
-                                <div className="h-10 w-10 rounded-2xl bg-muted/40 flex items-center justify-center text-emerald-500">
+                                <div className="h-10 w-10 rounded-2xl bg-muted/40 flex items-center justify-center text-primary">
                                     <Bell className="h-5 w-5" />
                                 </div>
                                 <span className="text-sm font-bold">Notificações Push</span>
                             </div>
-                            <Switch checked className="data-[state=checked]:bg-emerald-500" />
+                            <Switch checked className="data-[state=checked]:bg-primary" />
                         </div>
 
                         <div className="p-5 space-y-4">

@@ -28,35 +28,35 @@ export function ProgressChart({ title, description, data, dataKeys }: ProgressCh
       </CardHeader>
       <CardContent>
         <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="99%" height={320}>
             <AreaChart data={data}>
               <defs>
                 {dataKeys.map((dataKey, index) => (
                   <linearGradient key={index} id={`color${index}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={dataKey.color} stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor={dataKey.color} stopOpacity={0}/>
+                    <stop offset="5%" stopColor={dataKey.color} stopOpacity={0.8} />
+                    <stop offset="95%" stopColor={dataKey.color} stopOpacity={0} />
                   </linearGradient>
                 ))}
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
               <XAxis dataKey="date" />
               <YAxis />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'white', 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'white',
                   borderRadius: '8px',
                   border: '1px solid #eee'
-                }} 
+                }}
               />
               <Legend />
               {dataKeys.map((dataKey, index) => (
-                <Area 
+                <Area
                   key={index}
-                  type="monotone" 
-                  dataKey={dataKey.key} 
-                  stroke={dataKey.color} 
-                  fillOpacity={1} 
-                  fill={`url(#color${index})`} 
+                  type="monotone"
+                  dataKey={dataKey.key}
+                  stroke={dataKey.color}
+                  fillOpacity={1}
+                  fill={`url(#color${index})`}
                   name={dataKey.name}
                 />
               ))}

@@ -37,6 +37,7 @@ class PatientProfileSerializer(serializers.ModelSerializer):
     initial_weight = serializers.SerializerMethodField()
     height = serializers.SerializerMethodField()
     is_active = serializers.BooleanField(read_only=True)
+    display_id = serializers.SerializerMethodField()
     
     notes = ClinicalNoteSerializer(many=True, read_only=True)
 
@@ -52,7 +53,7 @@ class PatientProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = PatientProfile
         fields = [
-            'id', 'user_id', 'name', 'email', 'gender', 'status', 'is_active',
+            'id', 'user_id', 'display_id', 'name', 'email', 'gender', 'status', 'is_active',
             'birth_date', 'phone', 'address', 'goal', 
             'service_type', 'start_date', 'created_at',
             'target_weight', 'target_body_fat', 'avatar', 'profile_picture', 'age', 
@@ -61,6 +62,19 @@ class PatientProfileSerializer(serializers.ModelSerializer):
             'anamnesis', 'notes', 'last_visit', 'progress', 'exams'
         ]
         read_only_fields = ['user_id', 'created_at']
+
+    def get_display_id(self, obj):
+        """
+        Calcula o número sequencial do paciente para o nutricionista atual.
+        O número é baseado na data de criação e apenas para pacientes ativos.
+        """
+        # Contar quantos pacientes ativos foram criados antes deste para o mesmo nutricionista
+        count = PatientProfile.objects.filter(
+            nutritionist=obj.nutritionist,
+            is_active=True,
+            created_at__lt=obj.created_at
+        ).count()
+        return f"{count + 1:02d}"
 
     def get_last_visit(self, obj):
         """

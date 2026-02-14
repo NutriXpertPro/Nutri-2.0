@@ -36,7 +36,7 @@ export default function PatientDashboardV2Page() {
             <PatientHeaderV2 />
 
             {/* Conteúdo Central (Scrollável) */}
-            <main className="relative z-0">
+            <main className="relative z-0 pt-16">
                 <AnimatePresence mode="wait">
                     {renderTab()}
                 </AnimatePresence>

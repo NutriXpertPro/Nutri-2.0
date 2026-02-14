@@ -14,7 +14,7 @@ export function PatientHeaderV2() {
                 <img src="/logo_final.svg" alt="NX" className="w-8 h-8 object-contain" />
                 <div className="flex items-baseline tracking-tighter">
                     <span className="text-sm font-bold text-foreground">Nutri</span>
-                    <span className="text-base font-black text-emerald-500 ml-0.5">Xpert</span>
+                    <span className="text-base font-black text-primary ml-0.5">Xpert</span>
                 </div>
             </div>
 
@@ -31,7 +31,7 @@ export function PatientHeaderV2() {
 
                 <Avatar className="h-8 w-8 border border-border/50 ml-1">
                     <AvatarImage src="" />
-                    <AvatarFallback className="bg-emerald-500/10 text-emerald-600 text-xs font-bold">AC</AvatarFallback>
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">AC</AvatarFallback>
                 </Avatar>
             </div>
         </header>

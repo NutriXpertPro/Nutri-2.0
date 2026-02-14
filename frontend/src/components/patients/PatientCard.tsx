@@ -145,6 +145,7 @@ export function PatientCard({ patient, className }: PatientCardProps) {
                             <div className="flex items-center gap-2 min-w-0">
                                 <User className="h-5 w-5 text-muted-foreground shrink-0" />
                                 <h3 className="text-lg tracking-tight truncate group-hover:text-primary transition-colors font-normal">
+                                    <span className="text-muted-foreground/60 mr-1.5 font-mono text-sm">#{patient.display_id}</span>
                                     {patient.name.startsWith('Paciente ') ? patient.name.substring(9) : patient.name}
                                 </h3>
                             </div>

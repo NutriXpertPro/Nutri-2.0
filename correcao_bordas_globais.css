@@ -1,0 +1,67 @@
+/* Estilos globais para corrigir a visibilidade das bordas dos cards em todas as abas */
+
+/* Ajuste para glass-panel - aumentando a visibilidade da borda */
+.glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Ajuste para glass-card - aumentando a visibilidade da borda */
+.glass-card {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Ajuste para bordas coloridas - mantendo a cor mas aumentando a visibilidade */
+.border-primary\/5, .border-primary\/10, .border-primary\/15 {
+  border-color: rgba(204, 255, 0, 0.3) !important; /* Volt Lime com maior visibilidade */
+}
+
+.border-secondary\/5, .border-secondary\/10, .border-secondary\/15 {
+  border-color: rgba(255, 85, 0, 0.3) !important; /* Blaze Orange com maior visibilidade */
+}
+
+.border-white\/5, .border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.border-zinc-600, .border-zinc-700 {
+  border-color: rgba(161, 161, 170, 0.4) !important; /* Ajuste para tons de cinza */
+}
+
+/* Ajuste para modo claro */
+.light .glass-panel,
+.light .glass-card {
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+}
+
+.light .border-primary\/5, 
+.light .border-primary\/10, 
+.light .border-primary\/15 {
+  border-color: rgba(0, 128, 128, 0.3) !important; /* Teal para modo claro */
+}
+
+/* Garantir que as bordas sejam visíveis em diferentes estados */
+.glass-panel:hover,
+.glass-card:hover {
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Estilo para diferentes níveis de profundidade */
+.deep-glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
+
+.superficy-glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Ajuste para bordas tracejadas */
+.border-dashed {
+  border: 1px dashed rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Estilo para bordas em diferentes contextos */
+.main-content .glass-panel,
+.sidebar .glass-panel,
+.modal .glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}

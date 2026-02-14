@@ -2,6 +2,7 @@ import api from './api'
 
 export interface Patient {
     id: number
+    display_id: string
     name: string
     email: string
     status: boolean
@@ -63,8 +64,11 @@ export interface CreatePatientDTO {
 
 const patientService = {
     getAll: async () => {
-        const response = await api.get<{ results: Patient[] }>('/patients/')
-        return response.data.results || []
+        const response = await api.get<any>('/patients/')
+        // Handle both paginated { count: X, results: [] } and straight list []
+        if (Array.isArray(response.data)) return response.data
+        if (response.data && response.data.results) return response.data.results
+        return []
     },
 
     getMe: async () => {
