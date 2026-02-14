@@ -25,7 +25,7 @@ export const getBaseURL = () => {
     return 'http://localhost:8000/api/v1/';
 }
 
-const api: AxiosInstance = axios.create({
+export const api: AxiosInstance = axios.create({
     baseURL: getBaseURL(),
     headers: {
         'Content-Type': 'application/json',

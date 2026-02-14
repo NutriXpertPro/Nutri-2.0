@@ -34,7 +34,7 @@ export default function FoodManagementContent() {
     const { data: searchResults, isLoading: isSearching } = useQuery({
         queryKey: ['foods-manage', debouncedSearch, sourceFilter, page],
         queryFn: () => foodService.search(debouncedSearch, {
-            source: sourceFilter === 'ALL' ? '' : (sourceFilter === 'SUA TABELA' ? 'PERSONAL' : sourceFilter),
+            source: sourceFilter === 'ALL' ? '' : (sourceFilter === 'SUA TABELA' ? 'Sua Tabela' : sourceFilter),
             grupo: 'NOT_SUPPLEMENTS', // Sinalização para o backend ignorar suplementos se necessário
             limit: 50,
             page: page

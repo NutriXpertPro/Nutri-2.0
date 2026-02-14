@@ -1,0 +1,7 @@
+export { HomeTab } from "./HomeTab"
+export { DietTab } from "./DietTab"
+export { EvolutionTab } from "./EvolutionTab"
+export { AgendaTab } from "./AgendaTab"
+export { MessagesTab } from "./MessagesTab"
+export { ExamsTab } from "./ExamsTab"
+export { SettingsTab } from "./SettingsTab"

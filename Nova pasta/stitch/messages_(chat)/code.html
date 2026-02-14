@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+<title>NutriXpertPro - Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#c4f20d",
+                        "primary-content": "#000000",
+                        "secondary": "#FF5500",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#121214",
+                        "surface": "#1E1E22",
+                        "surface-highlight": "#27272a",
+                        "text-muted": "#A1A1AA",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "2xl": "2.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-panel {
+            background: rgba(30, 30, 34, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white overflow-hidden h-screen flex flex-col">
+<header class="fixed top-0 left-0 right-0 z-50 glass-panel pt-12 pb-3 px-4 flex items-center justify-between transition-all duration-300">
+<div class="flex items-center gap-3">
+<button aria-label="Voltar" class="text-text-muted hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[28px]">arrow_back</span>
+</button>
+<div class="relative">
+<div class="h-10 w-10 rounded-full overflow-hidden border border-white/10">
+<img alt="Coach Sarah" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkOcaIwLRs23w3XQux1JMgkVQci15_Ny3nz1a7ip_ZB5RCCmo6Mjk0r5tmfjLYXJDYpufMz4NMcv3zpT_IYgArZ-lUVPUo0gVnChpucAIFYO5WVaBdycvnnJsiF2hbzXhUKzjCuUkHZKnYN6lyVc1PKwPCLW4GT1kdMTDdO9nxL9JWLXH3IxeD_rBdnfm0PtjCv6MyOauZB7WHqt6_nhLCpxYkc-4m9FcimKBDOQtfbdW5Jg4AQtyzQfYs-ktZERNLWRXaJttpMqV1"/>
+</div>
+<div class="absolute bottom-0 right-0 h-3 w-3 bg-primary rounded-full border-2 border-surface"></div>
+</div>
+<div class="flex flex-col">
+<h1 class="text-base font-bold leading-tight">Coach Sarah</h1>
+<span class="text-xs text-primary font-medium">Online</span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="h-10 w-10 flex items-center justify-center rounded-full bg-surface-highlight text-white hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[20px]">videocam</span>
+</button>
+<button class="h-10 w-10 flex items-center justify-center rounded-full bg-surface-highlight text-white hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto no-scrollbar pt-32 pb-24 px-4 w-full max-w-lg mx-auto flex flex-col gap-4">
+<div class="flex justify-center py-2">
+<span class="bg-surface-highlight/50 px-3 py-1 rounded-full text-[11px] font-semibold text-text-muted uppercase tracking-wider">Ontem</span>
+</div>
+<div class="flex gap-3 max-w-[85%] self-start group">
+<div class="h-8 w-8 rounded-full overflow-hidden shrink-0 mt-auto opacity-0 group-hover:opacity-100 transition-opacity">
+<img alt="Coach Sarah" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU1PmcMjr5POtqJ3EYRHm0kr3SWHGCnmV0ua7edsIDkDzZsntwY_HAEK8d1F5YoaIAAZuZF9EctK4EcbzKZprLSHWSNemRCJ8R-GbiPzHc5JjE0rkWOuKEjA2OqDOBJsqrKbGzhthO0IaNUKQsfkBReWiwnoeAJtTt92_OsXRFjhwolrWI9zDpmnC55iVVyBjJGhponsJoqzZFoQ2T8Z9CA7pLGC3j-ld-Ki1_4klEPJLPWULPTQthslr2MgBVJog96FyuvKbpvoLQ"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="bg-surface text-white p-3.5 rounded-2xl rounded-bl-none shadow-sm border border-white/5">
+<p class="text-[15px] leading-relaxed">Ótimo trabalho batendo suas metas de proteína ontem! 🔥</p>
+</div>
+<span class="text-[10px] text-text-muted ml-2">09:41</span>
+</div>
+</div>
+<div class="flex gap-3 max-w-[85%] self-start group">
+<div class="h-8 w-8 rounded-full overflow-hidden shrink-0 mt-auto">
+<img alt="Coach Sarah" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwDnirn_VrbhAeICKJqki8JnxveERdsYXkih5nwMSVrpOCTxIpEQSwJ31Lk9CGPuMMguPJn7XzX8hssxCbcCMqlLdbJi3n07VI0FTHP8BFmgbgEmDI7KNfKKXQ658EqYR67l5zIwUypxW5TM7GLsHvX1Wub8a9y8vzCCYOOguzIzCUYDFSBiAzJ6W_y1lOQFbiuoKNDSYOf5xr7sZkwl65C0deytvt5Jen5TrQg982-5r8tGawWnTBdCJItLrzlyv6z6CTlbRFvphn"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="bg-surface text-white p-3.5 rounded-2xl rounded-bl-none shadow-sm border border-white/5">
+<p class="text-[15px] leading-relaxed">Notei que você registrou o almoço um pouco tarde. Tudo bem por aí?</p>
+</div>
+<span class="text-[10px] text-text-muted ml-2">09:42</span>
+</div>
+</div>
+<div class="flex justify-center py-4">
+<span class="bg-surface-highlight/50 px-3 py-1 rounded-full text-[11px] font-semibold text-text-muted uppercase tracking-wider">Hoje</span>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%] self-end items-end">
+<div class="bg-primary text-primary-content p-3.5 rounded-2xl rounded-br-none shadow-md">
+<p class="text-[15px] leading-relaxed font-medium">Oi Sarah! Sim, o trabalho estava uma loucura. Tive que adiar o almoço para as 14h.</p>
+</div>
+<span class="text-[10px] text-text-muted mr-2">10:15</span>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%] self-end items-end">
+<div class="bg-primary text-primary-content p-3.5 rounded-2xl rounded-br-none shadow-md">
+<p class="text-[15px] leading-relaxed font-medium">Mas troquei o frango por tofu na salada. Tem algum problema?</p>
+</div>
+<div class="flex items-center gap-1 mr-1">
+<span class="text-[10px] text-text-muted">10:16</span>
+<span class="material-symbols-outlined text-[14px] text-primary">done_all</span>
+</div>
+</div>
+<div class="flex gap-3 max-w-[85%] self-start group">
+<div class="h-8 w-8 rounded-full overflow-hidden shrink-0 mt-auto">
+<img alt="Coach Sarah" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaiaKqLAtoNhjwLAZu12E756bVuZZmKHask694BdaKMznmbPDBE1m6jy7pienuXtC-P1JQMms4RZqpnqDHJKycttZDI3F7GJgB8AKpJLUDOaYqGK3j_KI9YoEhMTKO2syzabNKdEYGBaHbtpshP9uB9NKdsQddr9INEPF_hoMSzgM1QNDcAw2ryGKX8oHVsRrta6X47-upCh9FPDL0DrDI66Ppd7nltmRdasIbeGf7YInGXf4UmVOYv3W01ncd4YSLdG5nULWv0JvM"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="bg-surface text-white p-3.5 rounded-2xl rounded-bl-none shadow-sm border border-white/5">
+<p class="text-[15px] leading-relaxed">Totalmente tranquilo! Só certifique-se de adicionar algumas sementes extras para equilibrar as gorduras. 🥑</p>
+</div>
+<span class="text-[10px] text-text-muted ml-2">10:20</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%] self-end items-end">
+<div class="bg-primary p-1 rounded-2xl rounded-br-none shadow-md overflow-hidden">
+<div class="relative h-32 w-48 rounded-xl overflow-hidden mb-1">
+<img alt="Foto da refeição" class="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1FWVdjV36IRZPBg8lhZonr1V4hzKX5I0OOg-a0IyYiP7LgbdgguXypeT_OMq195ZjpktcmUUmI0Yubgg6czF0pS72CbpQRAeMS31E8vTmbDhhFwIwYcj57aqxK6ETm6nFK-8L48MfQmqNNc5Mt8VwMzdBPCm2A_qWOj7KRz0m1ikY5DJGZqessk_tbsiLtxFfvfjICUDkaFTtpTcEtoWpB1QlIZRGNTn5PPU30gylKIPOJvj2x7bBnZOm7dnIAVzOURQFkVcN7yip"/>
+</div>
+<p class="text-[15px] leading-relaxed font-medium text-primary-content px-2.5 pb-2.5 pt-1">Aqui está uma foto!</p>
+</div>
+<div class="flex items-center gap-1 mr-1">
+<span class="text-[10px] text-text-muted">Visto 14:02</span>
+<span class="material-symbols-outlined text-[14px] text-primary">done_all</span>
+</div>
+</div>
+<div class="flex gap-3 max-w-[85%] self-start">
+<div class="h-8 w-8 rounded-full overflow-hidden shrink-0 mt-auto">
+<img alt="Coach Sarah" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX47h7s_tIP-TIGN6AZqu4anuOLYWTPkGFOj1p32xLmQ7cBhiSBbs2STnqmO19ujPxT4xInTv8qKkOzwW0GQFzXIeqb5Ly6THf-6xb-EZxHurjA2l783Cxm3-z5PNlFT9EDkIESOrDY04zY0MdiiTWbnupQiGaZFgPhonyM7YvrIIr2m2_YmTog1AWXGu2hzCBWHh8wjW1R1xIHuZSES0BwAjZv40PINcYZssg8d-Dwl0O9nG5vrh4pNAdstrMZBs5HwYFop6Vwlkf"/>
+</div>
+<div class="bg-surface text-text-muted px-4 py-3 rounded-2xl rounded-bl-none border border-white/5 flex items-center gap-2">
+<div class="flex items-center gap-1">
+<div class="w-1.5 h-1.5 bg-text-muted rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+<div class="w-1.5 h-1.5 bg-text-muted rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+<div class="w-1.5 h-1.5 bg-text-muted rounded-full animate-bounce"></div>
+</div>
+<span class="text-xs font-medium">Digitando...</span>
+</div>
+</div>
+</main>
+<footer class="fixed bottom-[80px] left-0 right-0 z-40 px-4 py-3 bg-gradient-to-t from-background-dark via-background-dark to-transparent">
+<div class="flex items-end gap-2 bg-surface rounded-3xl p-1.5 pr-2 shadow-lg border border-white/10 ring-1 ring-black/5">
+<button class="h-10 w-10 shrink-0 flex items-center justify-center rounded-full text-text-muted hover:text-white hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-[24px] rotate-45">attach_file</span>
+</button>
+<div class="flex-1 py-2.5 min-h-[44px]">
+<textarea class="w-full bg-transparent border-0 p-0 text-white placeholder-text-muted focus:ring-0 resize-none max-h-32 text-[15px] leading-relaxed no-scrollbar" placeholder="Digite uma mensagem..." rows="1"></textarea>
+</div>
+<button class="h-10 w-10 shrink-0 flex items-center justify-center rounded-full bg-primary text-primary-content shadow-[0_0_15px_rgba(196,242,13,0.3)] hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px] ml-0.5">send</span>
+</button>
+</div>
+</footer>
+<nav class="fixed bottom-0 z-50 w-full bg-[#1e2210] border-t border-[#414922] pb-safe">
+<div class="flex w-full items-center justify-between px-2 pt-2 pb-4">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#bfcb90] opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-medium">Início</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#bfcb90] opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-[24px]">restaurant</span>
+<span class="text-[10px] font-medium">Dieta</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#bfcb90] opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-[24px]">show_chart</span>
+<span class="text-[10px] font-medium">Evolução</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#bfcb90] opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-[24px]">calendar_month</span>
+<span class="text-[10px] font-medium">Agenda</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary animate-pulse" href="#">
+<div class="relative">
+<span class="material-symbols-outlined text-[24px] fill-current">chat_bubble</span>
+<span class="absolute -top-0.5 -right-0.5 h-2 w-2 bg-secondary rounded-full"></span>
+</div>
+<span class="text-[10px] font-medium text-white">Chat</span>
+</a>
+</div>
+</nav>
+<div class="h-6 w-full fixed bottom-0 bg-[#1e2210] z-[-1]"></div>
+
+</body></html>

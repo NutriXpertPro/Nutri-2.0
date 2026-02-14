@@ -11,6 +11,7 @@ from .models_patient_data import (
     PatientMetric,
     MealCheckIn,
     ProgressPhoto,
+    BodyMeasurement,
     AppointmentConfirmation,
     ClinicalNote,
     MealPhoto,

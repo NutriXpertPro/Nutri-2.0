@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import logoImg from "@/assets/logo.png";
+import logoImg from "@/assets/logo.png"; // Usando .png que é o arquivo existente em assets
 
 export default function Logo() {
   const [error, setError] = useState(false);

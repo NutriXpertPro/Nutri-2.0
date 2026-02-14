@@ -191,6 +191,71 @@ def nutricionista_register_view(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
+def login_view(request):
+    """
+    API endpoint genérico para login (Nutritionist ou Patient).
+    """
+    email = request.data.get("email")
+    password = request.data.get("password")
+
+    if not email or not password:
+        return Response(
+            {"error": "Email e senha são obrigatórios"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    user = authenticate(request=request, username=email, password=password)
+
+    if user is None:
+        time.sleep(0.5)
+        return Response(
+            {"error": "Credenciais inválidas. Tente novamente."},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    # Registrar log
+    from .models import AuthenticationLog
+    AuthenticationLog.objects.create(
+        user=user,
+        ip_address=request.META.get('REMOTE_ADDR'),
+        user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+    )
+
+    refresh = RefreshToken.for_user(user)
+    response = Response({
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+        'user': {
+            'id': user.id,
+            'email': user.email,
+            'name': user.name,
+            'user_type': user.user_type
+        }
+    })
+    
+    # Cookies
+    is_secure = settings.SECURE_SSL_REDIRECT or (not settings.DEBUG)
+    response.set_cookie(
+        'accessToken',
+        str(refresh.access_token),
+        httponly=True,
+        secure=is_secure,
+        samesite='Lax',
+        max_age=3600
+    )
+    response.set_cookie(
+        'refreshToken',
+        str(refresh),
+        httponly=True,
+        secure=is_secure,
+        samesite='Lax',
+        max_age=7 * 24 * 3600
+    )
+    return response
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
 def paciente_login_view(request):
     """
     API endpoint para login de paciente.

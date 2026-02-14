@@ -1,126 +1,109 @@
 from django.core.management.base import BaseCommand
-from diets.models import FoodSubstitutionRule
+from diets.models import FoodSubstitutionRule, AlimentoTACO
 from users.models import User
-
+from diets.nutritional_substitution import (
+    NutricaoAlimento, 
+    identificar_grupo_nutricional, 
+    calcular_substituicao,
+    alimento_taco_para_nutricao
+)
+from django.db import transaction
+import random
 
 class Command(BaseCommand):
-    help = "Cria substituições baseadas em alimentos existentes"
+    help = "Cria substituições inteligentes baseadas em grupos nutricionais reais"
 
     def handle(self, *args, **options):
-        self.stdout.write("Criando substituições baseadas em alimentos existentes...")
+        self.stdout.write("Limpando regras de substituição antigas e arbitrárias...")
+        FoodSubstitutionRule.objects.filter(notes__icontains="Substituição base").delete()
+        FoodSubstitutionRule.objects.filter(notes__icontains="Substituição reversa").delete()
 
         admin_user = User.objects.first()
-
         if not admin_user:
-            self.stdout.write("Erro: Nenhum usuário encontrado!")
+            self.stdout.write("Erro: Nenhum usuário encontrado para atribuir as regras!")
             return
 
-        from diets.models import AlimentoTACO
-
-        # Buscar alguns alimentos existentes
-        foods = list(AlimentoTACO.objects.all()[:20])
-
-        if len(foods) < 2:
-            self.stdout.write("Erro: Menos de 2 alimentos encontrados!")
+        self.stdout.write("Buscando alimentos da base TACO...")
+        foods = list(AlimentoTACO.objects.all())
+        if not foods:
+            self.stdout.write("Erro: Base TACO vazia!")
             return
 
-        self.stdout.write(f"Encontrados {len(foods)} alimentos TACO")
+        # Agrupar alimentos por grupo nutricional real
+        grouped_foods = {}
+        for f in foods:
+            group = identificar_grupo_nutricional(f.nome, f.grupo)
+            if group not in grouped_foods:
+                grouped_foods[group] = []
+            grouped_foods[group].append(f)
 
-        # Criar substituições simples
-        created = 0
+        self.stdout.write(f"Grupos identificados: {list(grouped_foods.keys())}")
 
-        # Substituição 1
-        if len(foods) >= 2:
-            FoodSubstitutionRule.objects.get_or_create(
-                original_source="TACO",
-                original_food_id=str(foods[0].id),
-                substitute_source="TACO",
-                substitute_food_id=str(foods[1].id),
-                diet_type="normocalorica",
-                defaults={
-                    "original_food_name": foods[0].nome,
-                    "substitute_food_name": foods[1].nome,
-                    "nutrient_predominant": "carb",
-                    "similarity_score": 0.85,
-                    "conversion_factor": 1.0,
-                    "suggested_quantity": 100,
-                    "priority": 10,
-                    "notes": "Substituição base",
-                    "created_by": admin_user,
-                    "is_active": True,
-                },
-            )
-            created += 1
+        created_count = 0
+        
+        with transaction.atomic():
+            for group, items in grouped_foods.items():
+                if group == "OTHER" or len(items) < 2:
+                    continue
+                
+                self.stdout.write(f"Gerando regras para o grupo: {group} ({len(items)} alimentos)")
+                
+                # Para cada grupo, pegamos alguns alimentos para criar regras de exemplo
+                # Não queremos criar regras para todos contra todos (N^2), seria demais.
+                # Vamos pegar até 10 alimentos do grupo e criar 3 substitutos para cada.
+                sample_size = min(len(items), 20)
+                sample_items = random.sample(items, sample_size)
+                
+                for original in sample_items:
+                    orig_nutri = alimento_taco_para_nutricao(original)
+                    if not orig_nutri: continue
+                    
+                    # Tenta encontrar 3 substitutos no mesmo grupo
+                    substitutos_potenciais = [i for i in items if i.id != original.id]
+                    if not substitutos_potenciais: continue
+                    
+                    # Pega até 3 aleatórios
+                    num_subst = min(len(substitutos_potenciais), 3)
+                    subst_items = random.sample(substitutos_potenciais, num_subst)
+                    
+                    for substitute in subst_items:
+                        subst_nutri = alimento_taco_para_nutricao(substitute)
+                        if not subst_nutri: continue
+                        
+                        # Calcular a substituição real usando o motor
+                        res = calcular_substituicao(
+                            orig_nutri, 
+                            subst_nutri, 
+                            group, 
+                            100.0  # Base 100g
+                        )
+                        
+                        # Só criar se a similaridade for razoável (> 0.6)
+                        if res.similarity_score >= 0.6:
+                            rule, created = FoodSubstitutionRule.objects.get_or_create(
+                                original_source="TACO",
+                                original_food_id=str(original.id),
+                                substitute_source="TACO",
+                                substitute_food_id=str(substitute.id),
+                                diet_type="normocalorica",
+                                defaults={
+                                    "original_food_name": original.nome,
+                                    "substitute_food_name": substitute.nome,
+                                    "nutrient_predominant": res.macronutriente_igualizado[:4].lower(),
+                                    "similarity_score": res.similarity_score,
+                                    "conversion_factor": res.quantidade_substituto_g / 100.0,
+                                    "suggested_quantity": res.quantidade_substituto_g,
+                                    "priority": int(res.similarity_score * 100),
+                                    "notes": f"Gerado via Inteligência Nutricional: {group}",
+                                    "created_by": admin_user,
+                                    "is_active": True,
+                                    "is_vegan": "animal" not in substitute.nome.lower() and "carne" not in substitute.nome.lower(),
+                                    "is_vegetarian": "carne" not in substitute.nome.lower(),
+                                    "is_gluten_free": True,
+                                },
+                            )
+                            if created:
+                                created_count += 1
 
-        # Substituição 2 (reversa)
-        FoodSubstitutionRule.objects.get_or_create(
-            original_source="TACO",
-            original_food_id=str(foods[1].id),
-            substitute_source="TACO",
-            substitute_food_id=str(foods[0].id),
-            diet_type="normocalorica",
-            defaults={
-                "original_food_name": foods[1].nome,
-                "substitute_food_name": foods[0].nome,
-                "nutrient_predominant": "carb",
-                "similarity_score": 0.85,
-                "conversion_factor": 1.0,
-                "suggested_quantity": 100,
-                "priority": 10,
-                "notes": "Substituição reversa",
-                "created_by": admin_user,
-                "is_active": True,
-            },
-        )
-        created += 1
-
-        # Substituição 3 (Low Carb)
-        if len(foods) >= 2:
-            FoodSubstitutionRule.objects.get_or_create(
-                original_source="TACO",
-                original_food_id=str(foods[0].id),
-                substitute_source="TACO",
-                substitute_food_id=str(foods[1].id),
-                diet_type="low_carb",
-                defaults={
-                    "original_food_name": foods[0].nome,
-                    "substitute_food_name": foods[1].nome,
-                    "nutrient_predominant": "carb",
-                    "similarity_score": 0.75,
-                    "conversion_factor": 1.2,
-                    "suggested_quantity": 120,
-                    "priority": 10,
-                    "notes": "Low carb option",
-                    "created_by": admin_user,
-                    "is_active": True,
-                },
-            )
-            created += 1
-
-        # Substituição 4 (Cetogênica)
-        if len(foods) >= 2:
-            FoodSubstitutionRule.objects.get_or_create(
-                original_source="TACO",
-                original_food_id=str(foods[0].id),
-                substitute_source="TACO",
-                substitute_food_id=str(foods[1].id),
-                diet_type="cetogenica",
-                defaults={
-                    "original_food_name": foods[0].nome,
-                    "substitute_food_name": foods[1].nome,
-                    "nutrient_predominant": "protein",
-                    "similarity_score": 0.90,
-                    "conversion_factor": 1.0,
-                    "suggested_quantity": 100,
-                    "priority": 10,
-                    "notes": "Opção cetogênica",
-                    "created_by": admin_user,
-                    "is_active": True,
-                },
-            )
-            created += 1
-
-        self.stdout.write(f"Sucesso! {created} substituições criadas.")
-        self.stdout.write(
-            f"Total de substituições no banco: {FoodSubstitutionRule.objects.count()}"
-        )
+        self.stdout.write(f"\nSucesso! {created_count} novas regras inteligentes criadas!")
+        self.stdout.write(f"Total de regras no banco: {FoodSubstitutionRule.objects.count()}")

@@ -142,9 +142,6 @@ class AppointmentConfirmation(models.Model):
     
     def __str__(self):
         return f"{self.appointment} - {self.status}"
-    
-    def __str__(self):
-        return f"{self.patient} - {self.date}"
 
 class ClinicalNote(models.Model):
     """

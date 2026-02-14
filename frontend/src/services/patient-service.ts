@@ -63,8 +63,8 @@ export interface CreatePatientDTO {
 
 const patientService = {
     getAll: async () => {
-        const response = await api.get<Patient[]>('/patients/')
-        return response.data
+        const response = await api.get<{ results: Patient[] }>('/patients/')
+        return response.data.results || []
     },
 
     getMe: async () => {
@@ -147,8 +147,9 @@ const patientService = {
 
     search: async (query: string): Promise<{ id: number; name: string; avatar?: string }[]> => {
         if (query.length < 2) return Promise.resolve([]);
-        const response = await api.get<{ id: number; name: string; avatar?: string }[]>(`/patients/search/?q=${encodeURIComponent(query)}`);
-        return response.data;
+        const response = await api.get<{ results: { id: number; name: string; avatar?: string }[] }>(`/patients/search/?q=${encodeURIComponent(query)}`);
+        // O search também pode estar paginado se o backend usar a mesma ViewSet ou BaseView
+        return response.data.results || (Array.isArray(response.data) ? response.data : []);
     },
 
     createClinicalNote: async (patientId: number, content: string, title?: string) => {

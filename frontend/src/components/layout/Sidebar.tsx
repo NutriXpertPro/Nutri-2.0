@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-// import logo from "@/assets/logo.svg"; // Arquivo não existe
+import logoImg from "@/assets/logo.png"
 import {
     Home,
     Users,
@@ -101,7 +101,7 @@ export function Sidebar({ className, collapsed, onToggle }: SidebarProps) {
             if (localStorage.getItem('access_token')) {
                 fetchNotificationCount();
             }
-        }, 30000); 
+        }, 30000);
 
         return () => clearInterval(interval);
     }, []);
@@ -234,7 +234,7 @@ export function Sidebar({ className, collapsed, onToggle }: SidebarProps) {
                     <Link href="/dashboard" className="flex items-center group">
                         <div className="relative w-28 h-28 flex-shrink-0">
                             <img
-                                src="/logo.png"
+                                src={logoImg.src}
                                 alt="Logo"
                                 className="w-full h-full object-contain group-hover:scale-110 transition-transform"
                                 style={{ filter: 'contrast(110%) brightness(105%)' }}

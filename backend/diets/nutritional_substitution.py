@@ -7,17 +7,22 @@ from typing import List, Optional
 from dataclasses import dataclass
 from django.db.models import Q
 from .models import UnifiedFood, AlimentoTACO, AlimentoTBCA, AlimentoUSDA
+import logging
+import time
+
+logger = logging.getLogger(__name__)
 
 # Constantes de configuração da substituição nutricional
-MIN_CAL_VAL = 1.0  # Valor mínimo para evitar divisão por zero em calorias/macros
-MAX_VOL_FACTOR = 2.8 # Fator máximo de volume antropométrico (substituto pode ter até 2.8x o volume do original)
-MIN_VOL_FACTOR = 0.2 # Fator mínimo de volume antropométrico (substituto deve ter pelo menos 0.2x o volume do original)
-CAL_DESVIO_MAX = 0.35 # Desvio calórico máximo permitido (35%)
-PERFIL_DESVIO_MAX = 0.7 # Desvio máximo de perfil macro-nutricional (70%)
-SCORE_CAL_WEIGHT = 0.4 # Peso do desvio calórico no score composto
-SCORE_PERFIL_WEIGHT = 0.6 # Peso do desvio de perfil no score composto
-MIN_SIMILARITY_SCORE = 0.1 # Score mínimo de similaridade
-MAX_SIMILARITY_SCORE = 0.99 # Score máximo de similaridade
+MIN_CAL_VAL = 1.0
+MAX_VOL_FACTOR = 2.8
+MIN_VOL_FACTOR = 0.2
+CAL_DESVIO_MAX = 0.35
+PERFIL_DESVIO_MAX = 0.7
+SCORE_CAL_WEIGHT = 0.4
+SCORE_PERFIL_WEIGHT = 0.6
+MIN_SIMILARITY_SCORE = 0.1
+MAX_SIMILARITY_SCORE = 0.99
+
 
 @dataclass
 class NutricaoAlimento:
@@ -30,6 +35,7 @@ class NutricaoAlimento:
     grupo: str = ""
     diet_type: str = "balanced"
     fonte: str = "OFFICIAL"
+
 
 @dataclass
 class ResultadoSubstituicao:
@@ -50,11 +56,382 @@ class ResultadoSubstituicao:
     fibra_substituto: float = 0.0
     similarity_score: float = 0.0
 
+
+# =========================================================================
+# CLASSIFICAÇÃO NUTRICIONAL UNIVERSAL
+# Aplica-se a TODOS os alimentos de TODAS as tabelas (TACO, TBCA, USDA)
+# =========================================================================
+
+# Keywords para classificação por nome — ordem importa (mais específico primeiro)
+_CLASSIFICATION_RULES = [
+    # PROTEIN_LEAN: carnes magras, aves, peixes, ovos
+    ("PROTEIN_LEAN", [
+        "frango", "peito de frango", "sobrecoxa", "coxa de frango",
+        "peixe", "tilapia", "tilápia", "salmao", "salmão", "atum", "sardinha",
+        "bacalhau", "merluza", "pescada", "camarao", "camarão",
+        "ovo", "clara de ovo", "omelete",
+        "patinho", "maminha", "file mignon", "filé mignon", "alcatra",
+        "lagarto", "coxao mole", "coxão mole", "coxao duro", "coxão duro",
+        "contrafile", "contrafilé", "acém", "acem", "músculo", "musculo",
+        "peru", "chester",
+        "carne bovina", "carne de boi",
+    ]),
+    # LEGUME: leguminosas
+    ("LEGUME", [
+        "feijao", "feijão",
+        "lentilha",
+        "grao de bico", "grão-de-bico", "grao-de-bico", "grão de bico",
+        "soja", "edamame",
+        "ervilha",
+    ]),
+    # DAIRY: laticínios
+    ("DAIRY", [
+        "leite", "iogurte", "yogurte",
+        "queijo", "requeijao", "requeijão", "ricota", "cottage",
+        "cream cheese", "creme de leite",
+        "coalhada", "kefir",
+        "nata",
+    ]),
+    # FAT: gorduras e oleaginosas
+    ("FAT", [
+        "azeite", "oleo", "óleo",
+        "manteiga", "margarina",
+        "castanha", "amendoim", "nozes", "noz",
+        "amêndoa", "amendoa", "macadamia", "macadâmia",
+        "pistache", "semente de girassol", "semente de linhaça",
+        "linhaça", "linhaca", "chia",
+        "coco ralado", "coco seco",
+        "banha", "gordura",
+        "maionese",
+        "bacon", "toucinho",
+        "creme de leite",
+        "pasta de amendoim",
+    ]),
+    # CARB: carboidratos complexos, cereais, tubérculos
+    ("CARB", [
+        "arroz", "macarrao", "macarrão", "espaguete", "talharim", "lasanha",
+        "batata", "mandioca", "aipim", "macaxeira",
+        "inhame", "cará", "cara",
+        "cuscuz", "couscous",
+        "aveia", "granola",
+        "milho", "polenta", "fubá", "fuba", "angu",
+        "quinoa", "quinua",
+        "trigo", "farinha", "farelo",
+        "pão", "pao", "bisnaga", "torrada",
+        "tapioca", "beiju",
+        "polvilho",
+        "batata doce", "batata-doce",
+        "centeio",
+        "cevada", "cevadinha",
+    ]),
+    # FRUIT: frutas
+    ("FRUIT", [
+        "banana", "maçã", "maca",
+        "laranja", "tangerina", "mexerica", "limao", "limão",
+        "abacaxi", "manga",
+        "uva", "morango", "framboesa", "amora", "mirtilo", "blueberry",
+        "pera", "pêra", "pêssego", "pessego", "nectarina",
+        "mamão", "mamao", "papaia", "papaya",
+        "melancia", "melão", "melao",
+        "kiwi", "goiaba", "jabuticaba",
+        "acerola", "caju", "graviola", "maracuja", "maracujá",
+        "abacate",
+        "caqui", "ameixa", "figo", "tâmara", "tamara",
+        "carambola", "pitaya", "lichia",
+        "jaca", "mangaba",
+        "açaí", "acai",
+    ]),
+    # VEGGIE: hortaliças, verduras, legumes (hortícola)
+    ("VEGGIE", [
+        "alface", "rucula", "rúcula", "agriao", "agrião",
+        "couve", "espinafre", "escarola", "acelga", "chicória", "chicoria",
+        "tomate", "pepino", "rabanete",
+        "abóbora", "abobora", "abobrinha", "moranga",
+        "brócolis", "brocolis", "couve-flor", "couve flor",
+        "vagem", "quiabo",
+        "cenoura", "beterraba", "nabo",
+        "chuchu", "berinjela", "jiló", "jilo",
+        "pimentão", "pimentao",
+        "repolho", "cebola", "alho", "alho-poró", "alho poro",
+        "palmito", "aspargo", "aspargos",
+        "salsa", "salsinha", "cebolinha", "coentro", "manjericao", "manjericão",
+        "maxixe",
+    ]),
+]
+
+# Alimentos ultraprocessados que devem ser excluídos de substituições
+_ULTRAPROCESSED_KEYWORDS = [
+    "biscoito", "bolacha", "refrigerante", "sorvete",
+    "salgadinho", "pizza", "nugget", "empanado",
+    "salsicha", "linguiça", "linguica", "mortadela", "presunto",
+    "hamburguer", "hambúrguer",
+    "miojo", "macarrao instantaneo", "macarrão instantâneo",
+    "achocolatado", "toddy", "nescau",
+    "chocolate ao leite", "chocolate branco",
+    "bala", "pirulito", "chiclete",
+    "gelatina", "pudim",
+    "wafer",
+]
+
+
+def identificar_grupo_nutricional(nome, grupo_original=""):
+    """
+    Classifica um alimento em seu grupo nutricional usando:
+    1. Keywords (match por nome) - alta precisão
+    2. Grupo original da tabela (TACO/TBCA) - média precisão
+    3. Fallback: retorna grupo_original se nada casar
+    """
+    if not nome:
+        return grupo_original or "OTHER"
+
+    nome_lower = nome.lower().strip()
+
+    # Verificar ultraprocessados primeiro
+    if any(kw in nome_lower for kw in _ULTRAPROCESSED_KEYWORDS):
+        # Exceção: 'batata doce' não é doce ultraprocessado
+        if "doce" in nome_lower and "batata" not in nome_lower and "fruta" not in nome_lower:
+            return "OTHER"
+
+    # Match por keywords (mais específico primeiro)
+    for group_name, keywords in _CLASSIFICATION_RULES:
+        if any(kw in nome_lower for kw in keywords):
+            return group_name
+
+    # Fallback pelo grupo da tabela TACO/TBCA
+    grupo_lower = (grupo_original or "").lower()
+    if "fruta" in grupo_lower:
+        return "FRUIT"
+    if "verdura" in grupo_lower or "hortali" in grupo_lower or "leguminosa" in grupo_lower:
+        return "VEGGIE"
+    if "carne" in grupo_lower or "pescado" in grupo_lower or "ave" in grupo_lower:
+        return "PROTEIN_LEAN"
+    if "cereal" in grupo_lower or "farináceo" in grupo_lower or "farinaceo" in grupo_lower:
+        return "CARB"
+    if "leite" in grupo_lower or "laticínio" in grupo_lower or "laticinio" in grupo_lower:
+        return "DAIRY"
+    if "gordura" in grupo_lower or "óleo" in grupo_lower or "oleo" in grupo_lower:
+        return "FAT"
+    if "leguminosa" in grupo_lower:
+        return "LEGUME"
+
+    return grupo_original or "OTHER"
+
+
+def identificar_subgrupo(nome):
+    """Identifica subgrupo dentro do grupo principal."""
+    if not nome:
+        return ""
+
+    nome_lower = nome.lower().strip()
+
+    # Proteínas
+    if any(kw in nome_lower for kw in ["frango", "peru", "chester"]):
+        return "AVES"
+    if any(kw in nome_lower for kw in ["peixe", "salmao", "salmão", "tilapia", "tilápia", "atum", "sardinha", "camarao", "camarão"]):
+        return "PESCADOS"
+    if any(kw in nome_lower for kw in ["ovo", "clara"]):
+        return "OVOS"
+    if any(kw in nome_lower for kw in ["patinho", "maminha", "alcatra", "filé", "file", "coxao", "coxão", "acém", "acem"]):
+        return "CARNE_BOVINA"
+
+    # Carboidratos
+    if any(kw in nome_lower for kw in ["arroz"]):
+        return "ARROZ"
+    if any(kw in nome_lower for kw in ["batata", "mandioca", "inhame", "cará", "cara", "aipim"]):
+        return "TUBERCULOS"
+    if any(kw in nome_lower for kw in ["pão", "pao", "torrada", "bisnaga"]):
+        return "PAES"
+    if any(kw in nome_lower for kw in ["macarrao", "macarrão", "espaguete"]):
+        return "MASSAS"
+
+    # Frutas
+    if any(kw in nome_lower for kw in ["açaí", "acai", "banana", "manga"]):
+        return "FRUTAS_TROPICAIS"
+    if any(kw in nome_lower for kw in ["maçã", "maca", "pera", "pêra", "pêssego"]):
+        return "FRUTAS_TEMPERADAS"
+    if any(kw in nome_lower for kw in ["morango", "framboesa", "amora", "mirtilo"]):
+        return "FRUTAS_VERMELHAS"
+    if any(kw in nome_lower for kw in ["laranja", "limao", "limão", "tangerina"]):
+        return "CITRICOS"
+
+    # Vegetais
+    if any(kw in nome_lower for kw in ["alface", "rucula", "rúcula", "agriao", "agrião", "espinafre", "couve"]):
+        return "FOLHOSOS"
+    if any(kw in nome_lower for kw in ["cenoura", "beterraba", "abóbora", "abobora"]):
+        return "RAIZES_LEGUMES"
+
+    return ""
+
+
+# =========================================================================
+# CONVERTERS: ORM Model → NutricaoAlimento
+# =========================================================================
+
+def alimento_taco_para_nutricao(obj):
+    """Converte AlimentoTACO para NutricaoAlimento."""
+    if obj is None:
+        return None
+    try:
+        return NutricaoAlimento(
+            nome=obj.nome,
+            energia_kcal=float(obj.energia_kcal or 0),
+            proteina_g=float(obj.proteina_g or 0),
+            lipidios_g=float(obj.lipidios_g or 0),
+            carboidrato_g=float(obj.carboidrato_g or 0),
+            fibra_g=float(obj.fibra_g or 0),
+            grupo=obj.grupo or "",
+            fonte="TACO"
+        )
+    except Exception:
+        return None
+
+
+def alimento_tbca_para_nutricao(obj):
+    """Converte AlimentoTBCA para NutricaoAlimento."""
+    if obj is None:
+        return None
+    try:
+        return NutricaoAlimento(
+            nome=obj.nome,
+            energia_kcal=float(obj.energia_kcal or 0),
+            proteina_g=float(obj.proteina_g or 0),
+            lipidios_g=float(obj.lipidios_g or 0),
+            carboidrato_g=float(obj.carboidrato_g or 0),
+            fibra_g=float(obj.fibra_g or 0),
+            grupo=obj.grupo or "",
+            fonte="TBCA"
+        )
+    except Exception:
+        return None
+
+
+def alimento_usda_para_nutricao(obj):
+    """Converte AlimentoUSDA para NutricaoAlimento."""
+    if obj is None:
+        return None
+    try:
+        return NutricaoAlimento(
+            nome=obj.nome,
+            energia_kcal=float(obj.energia_kcal or 0),
+            proteina_g=float(obj.proteina_g or 0),
+            lipidios_g=float(obj.lipidios_g or 0),
+            carboidrato_g=float(obj.carboidrato_g or 0),
+            fibra_g=float(obj.fibra_g or 0),
+            grupo=getattr(obj, 'categoria', '') or "",
+            fonte="USDA"
+        )
+    except Exception:
+        return None
+
+
+# =========================================================================
+# CÁLCULO DE EQUIVALÊNCIA
+# =========================================================================
+
+def _determinar_macro_ancora(grupo):
+    """Determina o macro-âncora pelo grupo nutricional."""
+    mapping = {
+        "PROTEIN_LEAN": "proteina",
+        "CARB": "carboidrato",
+        "LEGUME": "carboidrato",
+        "FRUIT": "carboidrato",
+        "VEGGIE": "carboidrato",
+        "FAT": "lipidios",
+        "DAIRY": "proteina",
+    }
+    return mapping.get(grupo, "calorias")
+
+
+def calcular_substituicao(original, substituto, grupo, quantidade_original):
+    """
+    Calcula a equivalência nutricional entre dois alimentos.
+    
+    Args:
+        original: NutricaoAlimento do alimento original
+        substituto: NutricaoAlimento do alimento substituto
+        grupo: grupo nutricional do alimento (PROTEIN_LEAN, CARB, etc.)
+        quantidade_original: quantidade em gramas do original
+    
+    Returns:
+        ResultadoSubstituicao com a quantidade equivalente e métricas
+    """
+    macro_ancora = _determinar_macro_ancora(grupo)
+
+    # Selecionar o valor do macro-âncora
+    macro_map_orig = {
+        "proteina": original.proteina_g,
+        "carboidrato": original.carboidrato_g,
+        "lipidios": original.lipidios_g,
+        "calorias": original.energia_kcal,
+    }
+    macro_map_subst = {
+        "proteina": substituto.proteina_g,
+        "carboidrato": substituto.carboidrato_g,
+        "lipidios": substituto.lipidios_g,
+        "calorias": substituto.energia_kcal,
+    }
+
+    val_orig = macro_map_orig.get(macro_ancora, original.energia_kcal)
+    val_subst = macro_map_subst.get(macro_ancora, substituto.energia_kcal)
+
+    # Proteção contra zeros
+    if val_orig < MIN_CAL_VAL:
+        val_orig = max(original.energia_kcal, MIN_CAL_VAL)
+    if val_subst < MIN_CAL_VAL:
+        val_subst = max(substituto.energia_kcal, MIN_CAL_VAL)
+
+    # Calcular quantidade equivalente
+    total_macro_orig = (val_orig * quantidade_original) / 100
+    fator = total_macro_orig / val_subst
+    quantidade_substituto = round(fator * 100, 1)
+
+    # Calcular calorias
+    cal_orig = (original.energia_kcal * quantidade_original) / 100
+    cal_subst = (substituto.energia_kcal * quantidade_substituto) / 100
+
+    # Calcular similarity score
+    desvio_cal = abs(cal_subst - cal_orig) / max(cal_orig, MIN_CAL_VAL)
+
+    def get_ratio(p, c, f, en):
+        e = max(en, MIN_CAL_VAL)
+        return (p * 4 / e), (c * 4 / e), (f * 9 / e)
+
+    r_orig = get_ratio(original.proteina_g, original.carboidrato_g, original.lipidios_g, original.energia_kcal)
+    r_subst = get_ratio(substituto.proteina_g, substituto.carboidrato_g, substituto.lipidios_g, substituto.energia_kcal)
+
+    desvio_perfil = sum(abs(a - b) for a, b in zip(r_orig, r_subst)) / 2.0
+
+    score = round(1.0 - (desvio_cal * SCORE_CAL_WEIGHT + desvio_perfil * SCORE_PERFIL_WEIGHT), 2)
+    score = max(MIN_SIMILARITY_SCORE, min(MAX_SIMILARITY_SCORE, score))
+
+    return ResultadoSubstituicao(
+        alimento_original=original.nome,
+        alimento_substituto=substituto.nome,
+        quantidade_original_g=quantidade_original,
+        quantidade_substituto_g=quantidade_substituto,
+        grupo=grupo,
+        macronutriente_igualizado=macro_ancora,
+        calorias_original=round(cal_orig, 1),
+        calorias_substituto=round(cal_subst, 1),
+        diferenca_calorica=round(abs(cal_subst - cal_orig), 1),
+        calorias_por_100g_original=original.energia_kcal,
+        calorias_por_100g_substituto=substituto.energia_kcal,
+        proteina_substituto=substituto.proteina_g,
+        carboidrato_substituto=substituto.carboidrato_g,
+        lipidios_substituto=substituto.lipidios_g,
+        fibra_substituto=substituto.fibra_g,
+        similarity_score=score
+    )
+
+
+# =========================================================================
+# MOTOR PRINCIPAL V2026 (Hub UnifiedFood)
+# =========================================================================
+
 def calcular_quantidade_equivalente(orig: UnifiedFood, subst: UnifiedFood, qtd_orig: float) -> float:
     """
     Calcula a quantidade do substituto baseada no Macro-Âncora do alimento original.
     """
-    # Determina qual macro manda na substituição
     macro = orig.anchor_macro
     
     val_orig = {
@@ -71,7 +448,6 @@ def calcular_quantidade_equivalente(orig: UnifiedFood, subst: UnifiedFood, qtd_o
         'CALORIES': subst.energy_kcal
     }.get(macro, subst.energy_kcal)
 
-    # Proteção contra zeros e dados ruins
     if val_orig < MIN_CAL_VAL: val_orig = max(orig.energy_kcal, MIN_CAL_VAL)
     if val_subst < MIN_CAL_VAL: val_subst = max(subst.energy_kcal, MIN_CAL_VAL)
 
@@ -80,55 +456,59 @@ def calcular_quantidade_equivalente(orig: UnifiedFood, subst: UnifiedFood, qtd_o
     
     return round(fator * 100, 1)
 
-def sugerir_substituicoes_v2026(orig_id: int, original_source: str, qtd_orig: float, limite: int = 15) -> List[ResultadoSubstituicao]:
+def sugerir_substituicoes_v2026(orig_id: str, original_source: str, qtd_orig: float, limite: int = 15) -> List[ResultadoSubstituicao]:
     """
     Motor Principal: Realiza a busca no Hub UnifiedFood e aplica as travas de 2026.
     """
+    start_time = time.time()
     try:
         orig = UnifiedFood.objects.get(source_id=str(orig_id), source_name=original_source)
     except UnifiedFood.DoesNotExist:
+        logger.warning(f"[V2026] Alimento original {orig_id} ({original_source}) não encontrado no Hub UnifiedFood")
         return []
 
-    # --- 🛡️ TRAVAS DE SEGURANÇA 2026 (REGRAS DE OURO) ---
+    logger.info(f"[V2026] Buscando substitutos para: {orig.name} (Source: {original_source}, ID: {orig_id})")
+    logger.info(f"[V2026] Atributos Hub: Pureza={orig.purity_index}, Prep={orig.prep_method}, Clan={orig.custom_category}, Anchor={orig.anchor_macro}")
+
+    # --- TRAVAS DE SEGURANÇA 2026 ---
     
-    # 1. Trava de Pureza Absoluta: Staple só troca por Staple.
-    # Se o original é Comida de Verdade (1), o substituto TEM que ser Comida de Verdade (1).
+    # 1. Trava de Pureza Absoluta
     query = UnifiedFood.objects.filter(purity_index=orig.purity_index)
     query = query.filter(processing_level=orig.processing_level)
+    count_purity = query.count()
 
     # 2. Trava de Preparo
     if orig.is_cooked:
         query = query.exclude(prep_method='RAW')
         if orig.prep_method == 'GRILLED':
             query = query.filter(prep_method__in=['GRILLED', 'BOILED', 'ROASTED'])
+    count_prep = query.count()
 
-    # 3. Trava de Cla Biologico (Blindagem de Categoria)
+    # 3. Trava de Clã Biológico
     if orig.custom_category:
         query = query.filter(custom_category=orig.custom_category)
+    count_clan = query.count()
 
-    # 4. Trava de Bio-Similaridade (Mesmos Macronutrientes Dominantes)
+    # 4. Trava de Bio-Similaridade
     query = query.filter(anchor_macro=orig.anchor_macro)
+    count_anchor = query.count()
 
-    # Executa a busca e limpa candidatos
+    logger.info(f"[V2026] Funil de filtragem: Hub={UnifiedFood.objects.count()} -> Purity={count_purity} -> Prep={count_prep} -> Clan={count_clan} -> Anchor={count_anchor}")
+
     candidatos = query.exclude(id=orig.id).order_by('?')[:100]
 
     resultados = []
     for cand in candidatos:
         qtd_subst = calcular_quantidade_equivalente(orig, cand, qtd_orig)
         
-        # Filtro de Volume Antropométrico (Evitar quantidades absurdas)
         if qtd_subst > qtd_orig * MAX_VOL_FACTOR or qtd_subst < qtd_orig * MIN_VOL_FACTOR:
             continue
             
-        # Cálculo de Similaridade Biológica (Padrão 2026)
         cal_orig = (orig.energy_kcal * qtd_orig) / 100
         cal_subst = (cand.energy_kcal * qtd_subst) / 100
         
-        # 1. Desvio Calórico
         desvio_cal = abs(cal_subst - cal_orig) / max(cal_orig, MIN_CAL_VAL)
         
-        # 2. Desvio de Perfil (Proporção P/C/G) - Impede que Gordura pareça Carboidrato
-        # Medimos a diferença absoluta das porcentagens de macros/kcal
         def get_ratio(p, c, f, en):
             e = max(en, MIN_CAL_VAL)
             return (p*4/e), (c*4/e), (f*9/e)
@@ -138,11 +518,9 @@ def sugerir_substituicoes_v2026(orig_id: int, original_source: str, qtd_orig: fl
         
         desvio_perfil = sum(abs(a - b) for a, b in zip(r_orig, r_cand)) / 2.0
         
-        # Score Composto: 40% Caloria, 60% Perfil Nutricional
         score = round(1.0 - (desvio_cal * SCORE_CAL_WEIGHT + desvio_perfil * SCORE_PERFIL_WEIGHT), 2)
         score = max(MIN_SIMILARITY_SCORE, min(MAX_SIMILARITY_SCORE, score))
         
-        # Filtro de precisão: Se o desvio calórico for > 35% ou o perfil for muito diferente, descartamos
         if desvio_cal > CAL_DESVIO_MAX or desvio_perfil > PERFIL_DESVIO_MAX:
             continue
 
@@ -165,8 +543,11 @@ def sugerir_substituicoes_v2026(orig_id: int, original_source: str, qtd_orig: fl
             similarity_score=score
         ))
 
-    # Ordenar por melhor score e limitar
     resultados.sort(key=lambda x: x.similarity_score, reverse=True)
+    
+    elapsed = time.time() - start_time
+    logger.info(f"[V2026] Finalizado em {elapsed:.3f}s. Encontrados {len(resultados)} substitutos válidos.")
+    
     return resultados[:limite]
 
 # --- FUNÇÕES DE COMPATIBILIDADE (LEGACY HELPERS) ---
@@ -174,15 +555,6 @@ def sugerir_substituicoes_v2026(orig_id: int, original_source: str, qtd_orig: fl
 def sugerir_substitucoes(orig, candidates, qtd_orig: float, limite: int = 15, diet_type: str = "balanced"):
     """Alias para manter compatibilidade com views antigas."""
     return []
-
-def identificar_grupo_nutricional(nome, grupo_original=""):
-    """Helper de redundância para mapeamento de grupos."""
-    return grupo_original
-
-def identificar_subgrupo(nome): return ""
-def alimento_taco_para_nutricao(obj): return None
-def alimento_tbca_para_nutricao(obj): return None
-def alimento_usda_para_nutricao(obj): return None
 
 # Aliases para compatibilidade de grafia (Português/Typo)
 sugerir_substitucoes_v2026 = sugerir_substituicoes_v2026

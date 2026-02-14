@@ -16,6 +16,7 @@ urlpatterns = [
     path("me/change-password/", views.ChangePasswordView.as_view(), name="change_password"),
 
     # Traditional endpoints
+    path("login/", views.login_view, name="generic_login"),
     path("login/nutricionista/", views.nutricionista_login_view, name="nutricionista_login"),
     path("login/paciente/", views.paciente_login_view, name="patient_login"),
     path("register/nutricionista/", views.nutricionista_register_view, name="nutricionista_register"),

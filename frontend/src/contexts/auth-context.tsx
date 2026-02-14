@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
-import { getBaseURL } from "@/services/api"
+import { getBaseURL, api } from "@/services/api"
 
 interface User {
     id: number
@@ -38,37 +38,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const router = useRouter()
-    const fetchUserProfile = async (token: string): Promise<User | boolean> => {
+
+    const fetchUserProfile = async (token?: string): Promise<User | boolean> => {
         try {
-            // Use dynamic base URL
-            const response = await fetch(`${getBaseURL()}users/me/`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
-            if (response.ok) {
-                const userData = await response.json()
-                setUser(userData)
-                return userData
-            }
-            // Somente retorna false para 401/403 (token inválido)
-            if (response.status === 401 || response.status === 403) {
+            // Se um token for passado explicitamente (ex: no login), 
+            // garantimos que o axios o use
+            const config = token ? {
+                headers: { Authorization: `Bearer ${token}` }
+            } : {}
+
+            const response = await api.get('users/me/', config)
+            const userData = response.data
+            setUser(userData)
+            return userData
+        } catch (error: any) {
+            // Silencioso se for erro de autenticação esperado durante init
+            if (error.response?.status === 401 || error.response?.status === 403) {
                 return false
             }
-            // Para outros erros (500, etc), assumimos que o token ainda pode ser válido
+            // Para outros erros de rede/servidor, retornamos true para não deslogar o usuário em falhas temporárias
             return true
-        } catch (_error) {
-            // Erro de rede - não significa que o token é inválido
-            // Error silenciado", error)
-            return true // Manter autenticado em caso de erro de rede
         }
     }
 
     const refreshUser = async () => {
-        const token = Cookies.get("accessToken")
-        if (token) {
-            await fetchUserProfile(token)
-        }
+        await fetchUserProfile()
     }
 
     useEffect(() => {
@@ -78,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // Keep token sync in case it's valid, but verify first
                 localStorage.setItem('access_token', token)
 
-                const isValid = await fetchUserProfile(token)
+                const isValid = await fetchUserProfile()
 
                 if (isValid) {
                     setIsAuthenticated(true)

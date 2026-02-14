@@ -1,0 +1,13 @@
+FROM node:20-slim
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+# Ignorar Telemetria e Garantir permissão de execução para binários do npm
+ENV NEXT_TELEMETRY_DISABLED 1
+RUN chmod -R +x node_modules/.bin
+RUN npm run build
+# O Next.js com output: export gera os arquivos em /app/out
+RUN ls -la out && ls -la .next/static
+EXPOSE 3000
+CMD ["npm", "start"]

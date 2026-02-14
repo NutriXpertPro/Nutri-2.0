@@ -102,10 +102,17 @@ def calculate_suggestion_service(
                 },
                 "suggested_quantity": res.quantidade_substituto_g,
                 "similarity_score": res.similarity_score,
-                "notes": f"Inteligência 2026: Equivalência por {res.macronutriente_igualizado}"
+                "notes": f"Inteligência 2026: Equivalência por {res.macronutriente_igualizado}",
+                "source": "AUTO"
             })
     except Exception as e:
         logger.error(f"[SUGGEST ENGINE ERROR 2026] {str(e)}", exc_info=True)
+
+    # Fundir resultados e capturar status
+    v2026_count = 0
+    fixed_rules_count = 0
+    
+    v2026_count = len([r for r in results if r.get('source') == 'AUTO'])
 
     # 4. Somar Regras Fixas (FoodSubstitutionRule)
     parts = food_name.split(",")
@@ -129,17 +136,37 @@ def calculate_suggestion_service(
                 diet_type=diet_type
             )
             
-            res_sub = calcular_substituicao(current_nutri, sub_item, sub_item.grupo or original_group, original_quantity)
+            sub_group = identificar_grupo_nutricional(sub_data['nome'], sub_data.get('grupo', ''))
+            res_sub = calcular_substituicao(current_nutri, sub_item, group_name or sub_group, original_quantity)
             
             results.append({
                 "id": f"rule_{rule.id}",
-                "food": sub_data,
+                "food": {**sub_data, "source": rule.substitute_source},
                 "suggested_quantity": res_sub.quantidade_substituto_g,
                 "similarity_score": float(rule.similarity_score),
-                "notes": rule.notes or "Sugestão do Nutricionista"
+                "notes": rule.notes or "Sugestão Fixa do Nutricionista"
             })
+            fixed_rules_count += 1
 
-    # Ordenar por similarity_score
-    results.sort(key=lambda x: x.get('similarity_score', 0), reverse=True)
+    # Remover duplicatas mantendo a ordem (mesmo nome e quantidade)
+    seen = set()
+    cleaned_results = []
+    for r in results:
+        key = f"{r['food']['nome']}_{r['suggested_quantity']}"
+        if key not in seen:
+            cleaned_results.append(r)
+            seen.add(key)
     
-    return results, group_name or "mixed", 200
+    # Ordenar por similarity_score
+    cleaned_results.sort(key=lambda x: x.get('similarity_score', 0), reverse=True)
+    
+    engine_status = {
+        "v2026_count": v2026_count,
+        "fixed_rules_count": fixed_rules_count,
+        "total": len(cleaned_results)
+    }
+
+    return {
+        "substitutions": cleaned_results[:limite],
+        "engine_status": engine_status
+    }, group_name or "mixed", 200

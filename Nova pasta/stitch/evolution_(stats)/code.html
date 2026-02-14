@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" name="viewport"/>
+<title>NutriXpertPro - Evolução</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#c4f20d", // Volt Lime
+                        "secondary": "#FF5500", // Blaze Orange
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#121214", // Deep Charcoal
+                        "surface-dark": "#1E1E22", // Gunmetal
+                    },
+                    fontFamily: {
+                        "display": ["Poppins", "Manrope", "sans-serif"],
+                        "body": ["Poppins", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "1.5rem",
+                        "xl": "2rem",
+                        "2xl": "2.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "neon": "0 0 20px rgba(196, 242, 13, 0.3)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }.glass-panel {
+            background: rgba(30, 30, 34, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-active {
+            background: rgba(196, 242, 13, 0.15);
+            border: 1px solid rgba(196, 242, 13, 0.3);
+        }@keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in-up 0.5s ease-out forwards;
+        }.chart-gradient {
+            background: linear-gradient(180deg, rgba(196, 242, 13, 0.2) 0%, rgba(196, 242, 13, 0) 100%);
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-white font-display h-screen flex flex-col overflow-hidden selection:bg-primary selection:text-black">
+<header class="flex-none px-6 pt-12 pb-4 flex items-center justify-between bg-background-dark/95 backdrop-blur-md sticky top-0 z-50">
+<div>
+<h1 class="text-3xl font-bold tracking-tight">Evolução</h1>
+<p class="text-sm text-gray-400 font-medium">Mantenha o ritmo</p>
+</div>
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-surface-dark border border-white/10 text-primary hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+</header>
+<main class="flex-1 overflow-y-auto no-scrollbar pb-24 relative">
+<div class="px-6 mb-8">
+<div class="glass-panel rounded-full p-1.5 flex relative">
+<div class="absolute left-1.5 top-1.5 bottom-1.5 w-[calc(33.33%-4px)] bg-primary rounded-full shadow-neon z-0"></div>
+<button class="relative z-10 flex-1 py-2 text-sm font-bold text-black text-center rounded-full transition-all">
+                    Status
+                </button>
+<button class="relative z-10 flex-1 py-2 text-sm font-semibold text-gray-400 text-center rounded-full hover:text-white transition-all">
+                    Fotos
+                </button>
+<button class="relative z-10 flex-1 py-2 text-sm font-semibold text-gray-400 text-center rounded-full hover:text-white transition-all">
+                    Medidas
+                </button>
+</div>
+</div>
+<div class="animate-fade-in px-6 space-y-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-panel p-5 rounded-xl flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-16 h-16 bg-primary/10 rounded-bl-full -mr-2 -mt-2 transition-transform group-hover:scale-110"></div>
+<div class="relative z-10">
+<span class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Peso Atual</span>
+<div class="flex items-baseline mt-2 gap-1">
+<span class="text-3xl font-bold text-white tracking-tighter">78.5</span>
+<span class="text-sm text-gray-400">kg</span>
+</div>
+</div>
+<div class="relative z-10 mt-auto flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm">trending_down</span>
+<span class="text-sm font-bold">-0.8 kg</span>
+<span class="text-[10px] text-gray-500 ml-1">esta semana</span>
+</div>
+</div>
+<div class="glass-panel p-5 rounded-xl flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-16 h-16 bg-secondary/10 rounded-bl-full -mr-2 -mt-2 transition-transform group-hover:scale-110"></div>
+<div class="relative z-10">
+<span class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Perda Total</span>
+<div class="flex items-baseline mt-2 gap-1">
+<span class="text-3xl font-bold text-white tracking-tighter">4.2</span>
+<span class="text-sm text-gray-400">kg</span>
+</div>
+</div>
+<div class="relative z-10 mt-auto flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-sm">local_fire_department</span>
+<span class="text-sm font-bold">No Foco!</span>
+</div>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-2xl border border-white/5">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold">Tendência de Peso</h3>
+<div class="flex gap-2">
+<button class="text-xs font-semibold bg-white/10 text-white px-3 py-1 rounded-full hover:bg-white/20">1M</button>
+<button class="text-xs font-semibold bg-transparent text-gray-500 px-3 py-1 rounded-full hover:bg-white/5">3M</button>
+<button class="text-xs font-semibold bg-transparent text-gray-500 px-3 py-1 rounded-full hover:bg-white/5">YTD</button>
+</div>
+</div>
+<div class="h-48 w-full relative">
+<div class="absolute inset-0 flex flex-col justify-between text-xs text-gray-600 font-medium">
+<div class="border-b border-white/5 w-full h-0"></div>
+<div class="border-b border-white/5 w-full h-0"></div>
+<div class="border-b border-white/5 w-full h-0"></div>
+<div class="border-b border-white/5 w-full h-0"></div>
+<div class="border-b border-white/5 w-full h-0"></div>
+</div>
+<div class="absolute inset-0 flex items-end">
+<svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 300 100">
+<defs>
+<linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#c4f20d" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#c4f20d" stop-opacity="0"></stop>
+</linearGradient>
+</defs>
+<path d="M0,80 C50,75 80,60 120,50 C160,40 200,45 240,25 C270,10 300,15 300,15 L300,100 L0,100 Z" fill="url(#chartFill)"></path>
+<path d="M0,80 C50,75 80,60 120,50 C160,40 200,45 240,25 C270,10 300,15 300,15" fill="none" stroke="#c4f20d" stroke-linecap="round" stroke-width="3"></path>
+<circle cx="240" cy="25" fill="#121214" r="4" stroke="#c4f20d" stroke-width="2"></circle>
+<g transform="translate(240, -10)">
+<rect fill="#c4f20d" height="24" rx="6" width="50" x="-25" y="-30"></rect>
+<text fill="#000" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="-14">78.5kg</text>
+<path d="M-4,-6 L0,0 L4,-6 Z" fill="#c4f20d"></path>
+</g>
+</svg>
+</div>
+</div>
+<div class="flex justify-between mt-2 text-xs text-gray-500 font-medium px-1">
+<span>01 Out</span>
+<span>08 Out</span>
+<span>15 Out</span>
+<span>22 Out</span>
+<span>Hoje</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 pb-4">
+<div class="glass-panel p-4 rounded-xl flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+<span class="material-symbols-outlined">accessibility_new</span>
+</div>
+<div>
+<p class="text-xs text-gray-400 uppercase font-semibold">IMC</p>
+<p class="text-xl font-bold">22.4</p>
+</div>
+</div>
+<div class="glass-panel p-4 rounded-xl flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<div>
+<p class="text-xs text-gray-400 uppercase font-semibold">Gordura Corporal</p>
+<p class="text-xl font-bold">18.5%</p>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<h3 class="text-lg font-bold px-1">Conquistas</h3>
+<div class="glass-panel p-4 rounded-xl flex items-center gap-4 border-l-4 border-l-primary">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">trophy</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-white text-sm">Atingiu Meta 80kg</h4>
+<p class="text-xs text-gray-400">18 Out • 4 dias atrás</p>
+</div>
+<span class="text-xs font-bold text-primary px-2 py-1 bg-primary/10 rounded-lg">CONCLUÍDO</span>
+</div>
+<div class="glass-panel p-4 rounded-xl flex items-center gap-4 opacity-60">
+<div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-400 shrink-0">
+<span class="material-symbols-outlined">flag</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-white text-sm">Chegar a 75kg</h4>
+<p class="text-xs text-gray-400">Próxima Meta</p>
+</div>
+<span class="text-xs font-bold text-gray-400 px-2 py-1 bg-gray-700/50 rounded-lg">PENDENTE</span>
+</div>
+</div>
+</div>
+<div class="fixed bottom-24 right-6 z-40">
+<button class="h-14 w-14 rounded-full bg-primary text-black shadow-lg shadow-primary/30 flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined" style="font-size: 28px;">add</span>
+</button>
+</div>
+</main>
+<nav class="fixed bottom-0 w-full z-50 bg-surface-dark border-t border-white/5 pb-5 pt-2 px-4 shadow-2xl">
+<div class="flex justify-between items-end">
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<div class="text-gray-500 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">home</span>
+</div>
+<span class="text-[10px] font-medium text-gray-500 group-hover:text-white">Início</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<div class="text-gray-500 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">restaurant_menu</span>
+</div>
+<span class="text-[10px] font-medium text-gray-500 group-hover:text-white">Dieta</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<div class="w-12 h-12 -mt-6 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 border-4 border-background-dark">
+<span class="material-symbols-outlined text-black">show_chart</span>
+</div>
+<span class="text-[10px] font-bold text-primary">Evolução</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<div class="text-gray-500 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">calendar_month</span>
+</div>
+<span class="text-[10px] font-medium text-gray-500 group-hover:text-white">Agenda</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<div class="text-gray-500 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">chat_bubble</span>
+</div>
+<span class="text-[10px] font-medium text-gray-500 group-hover:text-white">Chat</span>
+</a>
+</div>
+</nav>
+
+</body></html>
