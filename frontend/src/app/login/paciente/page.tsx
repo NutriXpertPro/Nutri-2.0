@@ -1,276 +1,168 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import * as React from "react"
+import { motion } from "framer-motion"
+import { AppearanceSettings } from "@/components/patient/AppearanceSettings"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useTheme } from "next-themes"
-import { useColor } from "@/components/color-provider"
-import { Moon, Sun, Eye, EyeOff, Loader2, Palette, Check } from "lucide-react"
-import { FcGoogle } from "react-icons/fc"
-import Link from "next/link"
+import { LogIn, User, Lock, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
-import { getBaseURL } from "@/services/api"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
+import { getBaseURL, api } from "@/services/api"
+import { useRouter } from "next/navigation"
 
-export default function PatientLoginPage() {
-    const router = useRouter()
-    const { theme, setTheme } = useTheme()
-    const { color, setColor } = useColor()
-
+export default function PacienteLoginPage() {
     const { login } = useAuth()
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [showPassword, setShowPassword] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState("")
+    const router = useRouter()
+    const [isLoading, setIsLoading] = React.useState(false)
+    const [showPassword, setShowPassword] = React.useState(false)
+    const [email, setEmail] = React.useState("")
+    const [password, setPassword] = React.useState("")
+    const [error, setError] = React.useState("")
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setError("")
         setIsLoading(true)
+        setError("")
 
         try {
-            // Chamada para a API de autenticação JWT do Django - login específico para pacientes
-            const response = await fetch(`${getBaseURL()}auth/login/paciente/`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                }),
+            const loginResponse = await api.post("auth/login/paciente/", {
+                email: email,
+                password: password,
             })
 
-            if (!response.ok) {
-                throw new Error("Credenciais inválidas")
-            }
-
-            const data = await response.json()
-
-            // Usar o contexto para login (salva cookies e redireciona)
-            // Pacientes vão para o dashboard/paciente
-            login(data, false)
+            const data = loginResponse.data
+            await login({
+                access: data.access,
+                refresh: data.refresh
+            }, false)
             router.push("/patient-dashboard-v2")
-
-        } catch (_err) {
-            setError("Email ou senha incorretos. Tente novamente.")
+        } catch (err: any) {
+            setError(err.response?.data?.detail || "Erro ao conectar com o servidor.")
             setIsLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4">
-            {/* Theme Controls (canto superior direito) */}
-            <div className="fixed top-4 right-4 flex items-center gap-4">
-                {/* Dark/Light Toggle */}
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="rounded-full"
-                >
-                    {theme === "dark" ? (
-                        <Sun className="h-5 w-5" suppressHydrationWarning />
-                    ) : (
-                        <Moon className="h-5 w-5" suppressHydrationWarning />
-                    )}
-                </Button>
+        <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 bg-background relative overflow-hidden">
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full" />
 
-                {/* Color Selector - Mesmo padrão do Header com ícone de paleta */}
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full hover:bg-primary/10 hover:text-primary transition-all duration-300"
-                            title="Personalizar Cores"
-                        >
-                            <Palette className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        align="end"
-                        className="w-64 p-2 bg-background/80 backdrop-blur-xl border-border/40 shadow-2xl rounded-2xl overflow-hidden"
-                    >
-                        <DropdownMenuLabel className="px-3 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground opacity-70">
-                            Temas Profissionais
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-border/10" />
-                        <div className="grid grid-cols-1 gap-1 pt-1">
-                            {([
-                                { id: "monochrome", label: "Studio Minimal", color: "bg-zinc-500", desc: "Foco total no conteúdo" },
-                                { id: "teal", label: "Oceanic Zen", color: "bg-teal-400", desc: "Calma e equilíbrio" },
-                                { id: "blue", label: "Executive Blue", color: "bg-blue-400", desc: "Confiança e autoridade" },
-                                { id: "violet", label: "Royal Focus", color: "bg-violet-400", desc: "Criatividade e prestígio" },
-                                { id: "pink", label: "Vital Energy", color: "bg-pink-400", desc: "Vigor e proximidade" },
-                            ] as const).map((c) => (
-                                <DropdownMenuItem
-                                    key={c.id}
-                                    onClick={() => setColor(c.id)}
-                                    className={cn(
-                                        "flex items-center gap-3 p-2.5 cursor-pointer rounded-xl transition-all duration-200",
-                                        color === c.id ? "bg-primary/10 text-primary" : "hover:bg-muted/50"
-                                    )}
-                                >
-                                    <div className={cn("w-6 h-6 rounded-full border-2 border-white/20 shadow-sm flex items-center justify-center transition-transform", c.color, color === c.id && "scale-110")}>
-                                        {color === c.id && <Check className="w-3 h-3 text-white" />}
-                                    </div>
-                                    <div className="flex flex-col min-w-0">
-                                        <span className="text-xs font-semibold truncate">{c.label}</span>
-                                        <span className="text-[10px] text-muted-foreground truncate opacity-70">{c.desc}</span>
-                                    </div>
-                                </DropdownMenuItem>
-                            ))}
-                        </div>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+            <div className="absolute top-6 right-6 z-50">
+                <AppearanceSettings />
             </div>
 
-            {/* Login Card */}
-            <Card className="w-full max-w-md shadow-xl border border-border">
-                <CardHeader className="text-center space-y-4">
-                    {/* Logo/Brand */}
-                    <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-3xl">👤</span>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="w-full max-w-md space-y-8 z-10"
+            >
+                <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="relative w-28 h-28 mb-1">
+                        <img
+                            src="/logo_final.svg"
+                            alt="NutriXpertPro Logo"
+                            className="w-full h-full object-contain drop-shadow-2xl"
+                        />
                     </div>
-                    <div>
-                        <CardTitle className="text-2xl font-bold">NutriXpertPro</CardTitle>
-                        <CardDescription className="mt-2">
-                            Acompanhe sua evolução nutricional
-                        </CardDescription>
+                    <div className="flex items-center tracking-tighter">
+                        <h1 className="text-3xl font-bold tracking-tighter flex items-center">
+                            <span className="mr-1 text-foreground">
+                                <span style={{ fontSize: '1.3em' }}>N</span>utri
+                            </span>
+                            <span className="text-emerald-500">
+                                <span className="text-[1.3em] font-black">X</span>pert
+                            </span>
+                            <span className="ml-1 text-foreground">
+                                <span style={{ fontSize: '1.3em' }}>P</span>ro
+                            </span>
+                        </h1>
                     </div>
-                    <Badge variant="secondary" className="mx-auto">
-                        Acesso Paciente
-                    </Badge>
-                </CardHeader>
+                    <p className="text-muted-foreground text-sm font-medium">Sistema de Gestão Nutricional Avançada</p>
+                </div>
 
-                <form onSubmit={handleSubmit}>
-                    <CardContent className="space-y-4">
-                        {/* Email */}
-                        <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium">
-                                Email
-                            </label>
-                            <Input
-                                id="email"
-                                type="email"
-                                placeholder="seu@email.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                autoComplete="email"
-                                className="h-11"
-                            />
-                        </div>
+                <Card className="glass-card shadow-2xl border-white/10 dark:border-white/5">
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-bold text-center">Acesso do Paciente</CardTitle>
+                        <CardDescription className="text-center">Entre com suas credenciais para acessar seu dashboard</CardDescription>
+                    </CardHeader>
+                    <form onSubmit={handleSubmit}>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="email">E-mail</Label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="seu@email.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="pl-10 h-12 glass-card focus:ring-emerald-500/50"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="password">Senha</Label>
+                                    <Button variant="link" className="px-0 text-xs text-muted-foreground h-auto">Esqueceu a senha?</Button>
+                                </div>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="••••••••"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="pl-10 h-12 glass-card focus:ring-emerald-500/50 pr-10"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-3.5 text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
+                            </div>
 
-                        {/* Password */}
-                        <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium">
-                                Senha
-                            </label>
-                            <div className="relative">
-                                <Input
-                                    id="password"
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    autoComplete="current-password"
-                                    className="h-11 pr-10"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    className="text-xs text-red-500 bg-red-500/10 p-3 rounded-xl border border-red-500/20"
                                 >
-                                    {showPassword ? (
-                                        <EyeOff className="h-4 w-4" />
-                                    ) : (
-                                        <Eye className="h-4 w-4" />
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Error Message */}
-                        {error && (
-                            <div className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 p-3 rounded-md">
-                                {error}
-                            </div>
-                        )}
-                    </CardContent>
-
-                    <CardFooter className="flex flex-col gap-4">
-                        <Button
-                            type="submit"
-                            className="w-full h-11 text-base font-medium"
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Entrando...
-                                </>
-                            ) : (
-                                "Entrar"
+                                    {error}
+                                </motion.div>
                             )}
-                        </Button>
+                        </CardContent>
+                        <CardFooter className="flex flex-col gap-4">
+                            <Button
+                                className="w-full h-12 text-lg font-bold bg-emerald-600 hover:bg-emerald-500 transition-all shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] text-white"
+                                disabled={isLoading}
+                                type="submit"
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                    <span className="flex items-center gap-2">
+                                        Entrar <ArrowRight className="h-5 w-5" />
+                                    </span>
+                                )}
+                            </Button>
+                        </CardFooter>
+                    </form>
+                </Card>
 
-                        <div className="relative w-full">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t border-border" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-background px-2 text-muted-foreground">
-                                    Ou continue com
-                                </span>
-                            </div>
-                        </div>
-
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full h-11 text-base font-medium"
-                            disabled={isLoading}
-                        >
-                            <FcGoogle className="mr-2 h-5 w-5" />
-                            Entrar com Google
-                        </Button>
-
-                        <Link
-                            href="/auth/forgot-password"
-                            className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                        >
-                            Esqueceu sua senha?
-                        </Link>
-
-                        <div className="text-sm text-center text-muted-foreground">
-                            É nutricionista?{" "}
-                            <Link href="/login" className="text-primary hover:underline font-medium">
-                                Acesse aqui
-                            </Link>
-                        </div>
-                    </CardFooter>
-                </form>
-            </Card>
-
-            {/* Footer */}
-            <div className="fixed bottom-4 text-center text-xs text-muted-foreground">
-                © 2024 NutriXpertPro. Todos os direitos reservados.
-            </div>
+                <div className="text-center text-xs text-muted-foreground/60 p-4">
+                    <p>© 2026 NutriXpertPro - Todos os direitos reservados.</p>
+                </div>
+            </motion.div>
         </div>
     )
 }
