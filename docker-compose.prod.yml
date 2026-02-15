@@ -5,10 +5,10 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-900113Acps@}
       MYSQL_DATABASE: ${DB_NAME:-nutrixpert_db}
-      MYSQL_USER: ${DB_USER:-nutrixpert_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-nutrixpert_password}
+      MYSQL_USER: ${DB_USER:-nutri_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-nutri_password}
     volumes:
       - db_data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password --innodb-log-file-size=64M
@@ -29,9 +29,9 @@ services:
       dockerfile: Dockerfile
     restart: always
     env_file:
-      - .env.production
+      - .env
     environment:
-      - DATABASE_URL=mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}
+      - DATABASE_URL=mysql://${DB_USER:-nutri_user}:${DB_PASSWORD:-nutri_password}@db:3306/${DB_NAME:-nutrixpert_db}
       - REDIS_URL=redis://redis:6379/1
     volumes:
       - media_data:/app/media
@@ -52,7 +52,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=${BACKEND_URL:-https://api.yourdomain.com}/api/v1
+      - NEXT_PUBLIC_API_BASE_URL=${BACKEND_URL:-https://srv1354256.hstgr.cloud}/api/v1
     depends_on:
       - backend
     volumes:
@@ -84,6 +84,7 @@ volumes:
   static_data:
   media_data:
   frontend_build:
+
 
 networks:
   app-network:
