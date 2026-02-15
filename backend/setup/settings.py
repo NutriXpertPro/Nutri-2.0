@@ -9,31 +9,8 @@ logger = logging.getLogger(__name__)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Configuração do python-decouple
-from decouple import config, Csv
-
-# Tenta carregar .env local se existir
-# IMPORTANTE: Para SMTP do Google, adicione no seu .env:
-# EMAIL_HOST_USER=seu-email@gmail.com
-# EMAIL_HOST_PASSWORD=sua-senha-de-app (Gerada em Segurança > Senha de App na conta Google)
-# DEFAULT_FROM_EMAIL=Seu Nome <seu-email@gmail.com>
-try:
-    from decouple import Config, RepositoryEnv, undefined
-    env_path = BASE_DIR / '.env'
-    if env_path.exists():
-        logger.info(f"Loading .env from {env_path}")
-        file_config = Config(RepositoryEnv(env_path))
-        # Sobrescreve config apenas se .env existir
-        def config(key, default=undefined, cast=undefined, **kwargs):
-            # Prioriza env vars do sistema se setadas (opcional), ou usa arquivo
-            # Aqui mantemos comportamento do arquivo sobrescrever ou ser a fonte
-            # Se cast for undefined, não passamos ele para evitar sobrescrever o padrão da lib (que é undefined)
-            # Se default for undefined, idem.
-            return file_config(key, default=default, cast=cast)
-except Exception as e:
-    logger.warning(f"Erro ao carregar .env local: {e}. Usando variáveis de ambiente.")
-# Se não entrar no if acima ou der erro, 'config' continua sendo o importado de decouple
-# que lê nativamente de os.environ
+# Configuração do python-decouple (lê nativamente de .env ou os.environ)
+from decouple import config, Csv, undefined
 
 
 
@@ -181,15 +158,20 @@ print("DEBUG: Lendo configurações de banco de dados...")
 DATABASE_URL_FROM_ENV = config('DATABASE_URL', default=None)
 
 if not DATABASE_URL_FROM_ENV:
-    raise ImproperlyConfigured("DATABASE_URL must be set in environment variables!")
+    # Fallback para construção manual se DATABASE_URL falhar (útil em Docker)
+    DB_NAME = config('DB_NAME', default='nutrixpert_db')
+    DB_USER = config('DB_USER', default='nutri_user')
+    DB_PASSWORD = config('DB_PASSWORD', default='nutri_password')
+    DB_HOST = config('DB_HOST', default='db')
+    DB_PORT = config('DB_PORT', default='3306')
+    DATABASE_URL_FROM_ENV = f"mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    print(f"DEBUG: DATABASE_URL construída manualmente: mysql://{DB_USER}:****@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 else:
-    print(f"DEBUG: DATABASE_URL found: {DATABASE_URL_FROM_ENV[:15]}... (masked)")
+    print(f"DEBUG: DATABASE_URL encontrada no ambiente: {DATABASE_URL_FROM_ENV[:15]}... (masked)")
 
+# Limpeza do prefixo se necessário
 if DATABASE_URL_FROM_ENV.startswith('mysql+pymysql://'):
     DATABASE_URL_FROM_ENV = DATABASE_URL_FROM_ENV.replace('mysql+pymysql://','mysql://',1)
-elif DATABASE_URL_FROM_ENV.startswith('postgres://'):
-    # dj_database_url handles postgres:// fine, but it's good to be aware
-    pass
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -198,6 +180,8 @@ DATABASES = {
         conn_health_checks=True,
     )
 }
+print(f"DEBUG: Database User final: {DATABASES['default'].get('USER')}")
+print(f"DEBUG: Database Host final: {DATABASES['default'].get('HOST')}")
 
 # Redis Cache (with fallback to local memory for CI)
 REDIS_URL = config('REDIS_URL', default='')
