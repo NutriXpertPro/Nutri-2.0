@@ -22,10 +22,7 @@ const nextConfig = {
         // Ignora erros do TypeScript durante o build
         ignoreBuildErrors: true,
     },
-    eslint: {
-        // Ignora erros do ESLint durante o build
-        ignoreDuringBuilds: true,
-    },
+    turbopack: {},
 };
 
 export default withPWA(nextConfig);
