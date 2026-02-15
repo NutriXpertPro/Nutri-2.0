@@ -67,6 +67,9 @@ export interface StandardAnamnesisData {
     foto_lado: string | File | null
     foto_costas: string | File | null
     progresso?: number
+    updated_at?: string
+    target_weight?: number
+    target_body_fat?: number
 }
 
 export interface AnamnesisTemplate {
@@ -101,4 +104,63 @@ export interface AnamnesisResponse {
 
 export interface AnamnesisFormData {
     [key: string]: string | number | boolean | File | null | undefined;
+    // Campos específicos da anamnese padrão
+    nome?: string
+    idade?: number | null
+    sexo?: string
+    nascimento?: string
+    profissao?: string
+    email?: string
+    telefone?: string
+    hora_acorda?: string
+    hora_dorme?: string
+    dificuldade_dormir?: boolean
+    acorda_noite?: boolean
+    horario_treino?: string
+    tempo_disponivel_treino?: string
+    dias_treino_semana?: number | null
+    peso?: number | null
+    altura?: number | null
+    peso_status?: string
+    altura_status?: string
+    alimentos_restritos?: string
+    ja_fez_dieta?: boolean
+    resultado_dieta?: string
+    intestino?: string
+    dias_sem_banheiro?: string | null
+    vezes_banheiro_dia?: number | null
+    litros_agua_dia?: number | null
+    vontade_doce?: number
+    horarios_maior_apetite?: string
+    preferencia_lanches?: string
+    frutas_preferencia?: string
+    doenca_familiar?: string
+    problema_saude?: boolean
+    problemas_saude_detalhes?: string
+    problema_articular?: string
+    uso_medicamentos?: boolean
+    medicamentos_detalhes?: string
+    alergia_medicamento?: string
+    uso_cigarros?: boolean
+    intolerancia?: boolean
+    intolerancia_detalhes?: string
+    uso_anticoncepcional?: boolean
+    termogenico_usado?: string
+    uso_alcool?: boolean
+    alcool_frequencia?: string
+    ja_usou_anabolizante?: boolean
+    anabolizante_problemas?: string
+    pretende_usar_anabolizante?: boolean
+    objetivo?: string
+    compromisso_relatorios?: boolean
+    pescoco?: number | null
+    cintura?: number | null
+    quadril?: number | null
+    foto_frente?: string | File | null
+    foto_lado?: string | File | null
+    foto_costas?: string | File | null
+    progresso?: number
+    updated_at?: string
+    target_weight?: number
+    target_body_fat?: number
 }

@@ -156,6 +156,11 @@ export function PDFPreviewModal({ open, onOpenChange }: PDFPreviewModalProps) {
                     goal: patient.goal,
                     diet_type: dietType,
                     is_active: true,
+                    target_calories: 2000, // Valor padrão
+                    target_protein: 100, // Valor padrão
+                    target_carbs: 250, // Valor padrão
+                    target_fats: 80, // Valor padrão
+                    meals_rel: [], // Valor padrão
                     meals_data: mealsToDisplay.map(m => ({
                         name: m.name,
                         time: m.time,

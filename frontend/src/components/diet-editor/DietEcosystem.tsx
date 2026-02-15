@@ -9,7 +9,7 @@ import { DietTemplateWorkspace } from './DietTemplateWorkspace'
 import { useQuery } from '@tanstack/react-query'
 import patientService, { Patient } from '@/services/patient-service'
 import { evaluationService } from '@/services/evaluation-service'
-import { anamnesisService } from '@/services/anamnesis-service'
+import { anamnesisService, type StandardAnamnesisData } from '@/services/anamnesis-service'
 import api from '@/services/api'
 
 // Import Patient Tabs Components
@@ -137,7 +137,7 @@ export function DietEcosystem() {
                         restrictions: [],
                         allergies: [],
                         initial_weight: initialWeight || (latestEvaluation?.weight ? Number(latestEvaluation.weight) : 70),
-                        anamnesis: anamnesisData,
+                        anamnesis: (anamnesisData && 'nome' in anamnesisData) ? anamnesisData as StandardAnamnesisData : undefined,
                         exams: examsData,
                         notes: [],
                         // Mapped new fields
@@ -176,7 +176,7 @@ export function DietEcosystem() {
                         restrictions: [],
                         allergies: [],
                         initial_weight: 70,
-                        anamnesis: null,
+                        anamnesis: undefined,
                         exams: [],
                         notes: []
                     }

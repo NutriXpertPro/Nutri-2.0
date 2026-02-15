@@ -11,7 +11,7 @@ export function usePatients() {
         queryFn: patientService.getAll,
         enabled: isAuthenticated && !isAuthLoading,
         staleTime: 1000 * 60,         // 1 minuto
-        cacheTime: 1000 * 60 * 5,    // 5 minutos
+        gcTime: 1000 * 60 * 5,       // 5 minutos (garbage collection time substitui cacheTime)
         refetchOnWindowFocus: true,   // Refetch quando a janela ganha foco
         refetchOnMount: true,         // Refetch quando o componente monta
         retry: 2                      // Tentar novamente em caso de falha

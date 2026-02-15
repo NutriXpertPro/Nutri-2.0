@@ -13,16 +13,9 @@ const withPWA = withPWAInit({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone',
-    // Força o uso do Webpack em vez do Turbopack para resolver conflitos com PWA
-    webpack: (config, { isServer }) => {
-        return config;
+    images: {
+        unoptimized: true,
     },
-    typescript: {
-        // Ignora erros do TypeScript durante o build
-        ignoreBuildErrors: true,
-    },
-    turbopack: {},
 };
 
 export default withPWA(nextConfig);

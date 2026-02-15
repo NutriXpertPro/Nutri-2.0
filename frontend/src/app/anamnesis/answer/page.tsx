@@ -42,7 +42,12 @@ function AnamnesisAnswerContent() {
     const saveStandardMutation = useMutation({
         mutationFn: (data: StandardAnamnesisData) => {
             if (!patientId) throw new Error("Patient ID missing")
-            return anamnesisService.saveStandardAnamnesis(patientId, data)
+            // Converter StandardAnamnesisData para AnamnesisFormData para compatibilidade
+            const formData: any = { ...data }
+            if (formData.patient === undefined) {
+                formData.patient = patientId
+            }
+            return anamnesisService.saveStandardAnamnesis(patientId, formData)
         },
         onSuccess: () => {
             alert("Anamnese enviada com sucesso! Obrigado.")

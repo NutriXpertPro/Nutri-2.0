@@ -8,7 +8,7 @@ import {
     BarChart3,
     Utensils,
     Stethoscope,
-    LucideIcon
+    type LucideIcon
 } from 'lucide-react'
 import { useDietEditorStore } from '@/stores/diet-editor-store'
 import { cn } from '@/lib/utils'

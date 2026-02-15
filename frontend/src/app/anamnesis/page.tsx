@@ -52,11 +52,13 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 
-// Tipo para as seções da anamnese padrão
+// Tipo para as seções da anamnese padrão - usando LucideIcon
+import { LucideIcon } from "lucide-react"
+
 interface StandardSection {
     id: string
     title: string
-    icon: React.ElementType
+    icon: LucideIcon
     description: string
     fields: string[]
     color: string
@@ -247,7 +249,8 @@ export default function AnamnesisPage() {
         )
     }
 
-    const totalPatients = patients?.length || 0
+    const patientList = Array.isArray(patients) ? patients : []
+    const totalPatients = patientList.length
     const completedAnamneses = standardAnamneses?.filter((a: StandardAnamnesisData) => (a.progresso || 0) === 100).length || 0
     const pendingAnamneses = totalPatients - completedAnamneses
 
@@ -290,7 +293,7 @@ export default function AnamnesisPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <StatCard
                         title="Total Pacientes"
-                        value={totalPatients}
+                        value={Array.isArray(patients) ? patients.length : 0}
                         icon={Users}
                         variant="theme"
                     />

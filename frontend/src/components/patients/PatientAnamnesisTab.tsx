@@ -21,7 +21,10 @@ import {
     X,
     Edit,
     Download,
-    User
+    User,
+    Heart,
+    Target,
+    Ruler
 } from "lucide-react"
 import { AnamnesisShareDialog } from "@/components/patients/AnamnesisShareDialog"
 import { Patient } from "@/services/patient-service"
@@ -414,21 +417,21 @@ export function PatientAnamnesisTab() {
                                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 blur-2xl" />
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 relative z-10">
                                             <ClinicalSection title="1. Identificação" icon={User}>
-                                                <DataField label="Nome Completo" value={anamnesisData.nome} />
+                                                <DataField label="Nome Completo" value={anamnesisData.nome || "--"} />
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <DataField label="Idade" value={anamnesisData.idade ? `${anamnesisData.idade} anos` : "--"} />
-                                                    <DataField label="Sexo" value={anamnesisData.sexo} />
+                                                    <DataField label="Sexo" value={anamnesisData.sexo || "--"} />
                                                 </div>
                                                 <DataField label="Data de Nascimento" value={anamnesisData.nascimento ? new Date(anamnesisData.nascimento).toLocaleDateString('pt-BR') : "--"} />
-                                                <DataField label="Profissão" value={anamnesisData.profissao} />
-                                                <DataField label="E-mail" value={anamnesisData.email} />
-                                                <DataField label="Telefone" value={anamnesisData.telefone} />
+                                                <DataField label="Profissão" value={anamnesisData.profissao || "--"} />
+                                                <DataField label="E-mail" value={anamnesisData.email || "--"} />
+                                                <DataField label="Telefone" value={anamnesisData.telefone || "--"} />
                                             </ClinicalSection>
 
                                             <ClinicalSection title="2. Rotina & Estilo de Vida" icon={Moon}>
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <DataField label="Acorda" value={formatTime(anamnesisData.hora_acorda)} />
-                                                    <DataField label="Dorme" value={formatTime(anamnesisData.hora_dorme)} />
+                                                    <DataField label="Acorda" value={formatTime(anamnesisData.hora_acorda || '')} />
+                                                    <DataField label="Dorme" value={formatTime(anamnesisData.hora_dorme || '')} />
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <DataField label="Dificuldade p/ Dormir" value={anamnesisData.dificuldade_dormir ? "Sim" : "Não"} badge={anamnesisData.dificuldade_dormir ? "red" : "green"} />
@@ -442,11 +445,11 @@ export function PatientAnamnesisTab() {
                                             <ClinicalSection title="3. Nutrição & Hábitos" icon={Activity}>
                                                 <div className="grid grid-cols-2 gap-4 mb-4">
                                                     <div className="flex items-end gap-2">
-                                                        <span className="text-3xl font-light text-foreground">{formatNumber(anamnesisData.peso)}</span>
+                                                        <span className="text-3xl font-light text-foreground">{anamnesisData.peso !== undefined && anamnesisData.peso !== null ? formatNumber(anamnesisData.peso) : '--'}</span>
                                                         <span className="text-[10px] text-muted-foreground mb-1.5 tracking-widest">KG</span>
                                                     </div>
                                                     <div className="flex items-end gap-2">
-                                                        <span className="text-3xl font-light text-foreground">{formatNumber(anamnesisData.altura)}</span>
+                                                        <span className="text-3xl font-light text-foreground">{anamnesisData.altura !== undefined && anamnesisData.altura !== null ? formatNumber(anamnesisData.altura) : '--'}</span>
                                                         <span className="text-[10px] text-muted-foreground mb-1.5 tracking-widest">M</span>
                                                     </div>
                                                 </div>
@@ -462,18 +465,18 @@ export function PatientAnamnesisTab() {
                                                 <DataField label="Intestino" value={anamnesisData.intestino || "--"} badge={anamnesisData.intestino === 'Preso' ? 'amber' : 'green'} />
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <DataField label="Dias sem banheiro" value={anamnesisData.dias_sem_banheiro || "--"} />
-                                                    <DataField label="Vezes ao dia" value={anamnesisData.vezes_banheiro_dia || "--"} />
+                                                    <DataField label="Vezes ao dia" value={anamnesisData.vezes_banheiro_dia !== undefined && anamnesisData.vezes_banheiro_dia !== null ? anamnesisData.vezes_banheiro_dia.toString() : "--"} />
                                                 </div>
-                                                <DataField label="Ingestão de Água" value={anamnesisData.litros_agua_dia ? `${anamnesisData.litros_agua_dia}L / dia` : "--"} />
+                                                <DataField label="Ingestão de Água" value={anamnesisData.litros_agua_dia !== undefined && anamnesisData.litros_agua_dia !== null ? `${anamnesisData.litros_agua_dia}L / dia` : "--"} />
                                                 <div className="space-y-3 pt-2">
                                                     <div className="flex justify-between items-center">
                                                         <p className="text-[9px]  text-muted-foreground uppercase tracking-widest">Vontade de Doces</p>
-                                                        <span className="text-xs  text-amber-600">{anamnesisData.vontade_doce || 0}/10</span>
+                                                        <span className="text-xs  text-amber-600">{anamnesisData.vontade_doce !== undefined && anamnesisData.vontade_doce !== null ? anamnesisData.vontade_doce : 0}/10</span>
                                                     </div>
                                                     <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
                                                         <div
                                                             className="h-full bg-linear-to-r from-amber-400 to-amber-600"
-                                                            style={{ width: `${(anamnesisData.vontade_doce || 0) * 10}%` }}
+                                                            style={{ width: `${(anamnesisData.vontade_doce !== undefined && anamnesisData.vontade_doce !== null ? anamnesisData.vontade_doce : 0) * 10}%` }}
                                                         />
                                                     </div>
                                                 </div>
@@ -484,17 +487,17 @@ export function PatientAnamnesisTab() {
 
                                             <ClinicalSection title="4. Histórico de Saúde" icon={Heart}>
                                                 <DataField label="Doenças Familiares" value={anamnesisData.doenca_familiar || "Nenhuma relatada"} isLong />
-                                                <DataField label="Problema de Saúde" value={anamnesisData.problema_saude ? anamnesisData.problemas_saude_detalhes : "Não"} badge={anamnesisData.problema_saude ? "red" : "green"} isLong={anamnesisData.problema_saude} />
+                                                <DataField label="Problema de Saúde" value={anamnesisData.problema_saude ? (anamnesisData.problemas_saude_detalhes || "Detalhes não informados") : "Não"} badge={anamnesisData.problema_saude ? "red" : "green"} isLong={!!anamnesisData.problema_saude} />
                                                 <DataField label="Problema Articular" value={anamnesisData.problema_articular || "Não"} />
-                                                <DataField label="Uso de Medicamentos" value={anamnesisData.uso_medicamentos ? anamnesisData.medicamentos_detalhes : "Não"} badge={anamnesisData.uso_medicamentos ? "amber" : "green"} isLong={anamnesisData.uso_medicamentos} />
+                                                <DataField label="Uso de Medicamentos" value={anamnesisData.uso_medicamentos ? (anamnesisData.medicamentos_detalhes || "Detalhes não informados") : "Não"} badge={anamnesisData.uso_medicamentos ? "amber" : "green"} isLong={!!anamnesisData.uso_medicamentos} />
                                                 <DataField label="Alergia a Medicamento" value={anamnesisData.alergia_medicamento || "Nenhuma"} />
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <DataField label="Uso de Cigarros" value={anamnesisData.uso_cigarros ? "Sim" : "Não"} badge={anamnesisData.uso_cigarros ? "red" : "green"} />
-                                                    <DataField label="Intolerâncias" value={anamnesisData.intolerancia ? anamnesisData.intolerancia_detalhes : "Não"} badge={anamnesisData.intolerancia ? "amber" : "green"} />
+                                                    <DataField label="Intolerâncias" value={anamnesisData.intolerancia ? (anamnesisData.intolerancia_detalhes || "Detalhes não informados") : "Não"} badge={anamnesisData.intolerancia ? "amber" : "green"} />
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <DataField label="Anticoncepcional" value={anamnesisData.uso_anticoncepcional ? "Sim" : "Não"} />
-                                                    <DataField label="Uso de Álcool" value={anamnesisData.uso_alcool ? anamnesisData.alcool_frequencia : "Não"} badge={anamnesisData.uso_alcool ? "amber" : "green"} />
+                                                    <DataField label="Uso de Álcool" value={anamnesisData.uso_alcool ? (anamnesisData.alcool_frequencia || "Frequência não informada") : "Não"} badge={anamnesisData.uso_alcool ? "amber" : "green"} />
                                                 </div>
                                                 <DataField label="Termogênicos Usados" value={anamnesisData.termogenico_usado || "Nenhum"} />
                                                 <div className="grid grid-cols-2 gap-4">
@@ -507,17 +510,17 @@ export function PatientAnamnesisTab() {
                                             <ClinicalSection title="5. Objetivos & Compromisso" icon={Target}>
                                                 <DataField label="Objetivo Principal" value={anamnesisData.objetivo || "Não definido"} isLong />
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <DataField label="Meta de Peso" value={anamnesisData.target_weight ? `${formatNumber(anamnesisData.target_weight)} kg` : "--"} />
-                                                    <DataField label="Meta de Gordura" value={anamnesisData.target_body_fat ? `${formatNumber(anamnesisData.target_body_fat)} %` : "--"} />
+                                                    <DataField label="Meta de Peso" value={anamnesisData.target_weight !== undefined && anamnesisData.target_weight !== null ? `${formatNumber(anamnesisData.target_weight)} kg` : "--"} />
+                                                    <DataField label="Meta de Gordura" value={anamnesisData.target_body_fat !== undefined && anamnesisData.target_body_fat !== null ? `${formatNumber(anamnesisData.target_body_fat)} %` : "--"} />
                                                 </div>
                                                 <DataField label="Compromisso c/ Relatórios" value={anamnesisData.compromisso_relatorios ? "Comprometido" : "Não comprometido"} badge={anamnesisData.compromisso_relatorios ? "green" : "red"} />
                                             </ClinicalSection>
 
                                             <ClinicalSection title="6. Medidas Antropométricas" icon={Ruler}>
                                                 <div className="grid grid-cols-3 gap-4">
-                                                    <DataField label="Pescoço" value={anamnesisData.pescoco ? `${formatNumber(anamnesisData.pescoco)} cm` : "--"} />
-                                                    <DataField label="Cintura" value={anamnesisData.cintura ? `${formatNumber(anamnesisData.cintura)} cm` : "--"} />
-                                                    <DataField label="Quadril" value={anamnesisData.quadril ? `${formatNumber(anamnesisData.quadril)} cm` : "--"} />
+                                                    <DataField label="Pescoço" value={anamnesisData.pescoco !== undefined && anamnesisData.pescoco !== null ? `${formatNumber(anamnesisData.pescoco)} cm` : "--"} />
+                                                    <DataField label="Cintura" value={anamnesisData.cintura !== undefined && anamnesisData.cintura !== null ? `${formatNumber(anamnesisData.cintura)} cm` : "--"} />
+                                                    <DataField label="Quadril" value={anamnesisData.quadril !== undefined && anamnesisData.quadril !== null ? `${formatNumber(anamnesisData.quadril)} cm` : "--"} />
                                                 </div>
                                             </ClinicalSection>
                                         </div>

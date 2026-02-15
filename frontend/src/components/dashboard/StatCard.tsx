@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
-import { LucideIcon } from "lucide-react"
+import { type LucideIcon } from "lucide-react"
 import { IconWrapper } from "@/components/ui/IconWrapper"
 
 interface StatCardProps {

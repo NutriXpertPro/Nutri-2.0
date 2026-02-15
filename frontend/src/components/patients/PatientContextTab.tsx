@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { User, HeartPulse, Stethoscope, AlertCircle, Calendar, Heart, Users, Cake, Phone, Mail, Clock, Target, Moon, Activity, Brain, LucideIcon } from "lucide-react"
+import { User, HeartPulse, Stethoscope, AlertCircle, Calendar, Heart, Users, Cake, Phone, Mail, Clock, Target, Moon, Activity, Brain, type LucideIcon } from "lucide-react"
 import { IconWrapper } from "@/components/ui/IconWrapper"
 import { cn } from "@/lib/utils"
 import { useEffect } from "react"
@@ -206,21 +206,21 @@ export function PatientContextTab({ patientId }: PatientContextTabProps) {
                         <InfoItem
                             icon={Moon}
                             label="Hora que Dorme"
-                            value={sleepTime || '--'}
+                            value={Array.isArray(sleepTime) ? sleepTime.join(', ') : sleepTime || '--'}
                             className="bg-amber-500/5 border-amber-500/10"
                             iconColor="text-amber-500"
                         />
                         <InfoItem
                             icon={Activity}
                             label="Hora que Acorda"
-                            value={wakeTime || '--'}
+                            value={Array.isArray(wakeTime) ? wakeTime.join(', ') : wakeTime || '--'}
                             className="bg-amber-500/5 border-amber-500/10"
                             iconColor="text-amber-500"
                         />
                         <InfoItem
                             icon={Brain}
                             label="Dificuldade p/ Dormir"
-                            value={sleepDiff || 'Não relatado'}
+                            value={Array.isArray(sleepDiff) ? sleepDiff.join(', ') : sleepDiff || 'Não relatado'}
                             className="bg-amber-500/5 border-amber-500/10"
                             iconColor="text-amber-500"
                         />
@@ -228,21 +228,21 @@ export function PatientContextTab({ patientId }: PatientContextTabProps) {
                         <InfoItem
                             icon={Clock}
                             label="Horário de Treino"
-                            value={workoutTime || '--'}
+                            value={Array.isArray(workoutTime) ? workoutTime.join(', ') : workoutTime || '--'}
                             className="bg-emerald-500/5 border-emerald-500/10"
                             iconColor="text-emerald-500"
                         />
                         <InfoItem
                             icon={Activity}
                             label="Tempo Disponível de Treino"
-                            value={workoutDuration || '--'}
+                            value={Array.isArray(workoutDuration) ? workoutDuration.join(', ') : workoutDuration || '--'}
                             className="bg-emerald-500/5 border-emerald-500/10"
                             iconColor="text-emerald-500"
                         />
                         <InfoItem
                             icon={Calendar}
                             label="Frequência Semanal"
-                            value={workoutFreq || '--'}
+                            value={Array.isArray(workoutFreq) ? workoutFreq.join(', ') : workoutFreq || '--'}
                             className="bg-emerald-500/5 border-emerald-500/10"
                             iconColor="text-emerald-500"
                         />

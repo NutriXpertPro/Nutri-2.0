@@ -143,7 +143,7 @@ export function CsvTemplateImporter({ onImport }: CsvTemplateImporterProps) {
                 setPreview(result)
             }
         } catch (_error) {
-            setParseErrors([`Erro ao processar CSV: ${(error as Error).message}`])
+            setParseErrors([`Erro ao processar CSV: ${(_error as Error).message}`])
         } finally {
             setIsParsing(false)
         }

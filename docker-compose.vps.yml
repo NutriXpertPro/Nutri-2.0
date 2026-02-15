@@ -56,13 +56,15 @@ services:
     env_file:
       - .env.production
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=${BACKEND_URL}/api/v1
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
     depends_on:
       - backend
     volumes:
       - frontend_build:/app/out
     networks:
       - app-network
+    # This service builds the static files and stores them in the volume
+    command: sh -c "sleep infinity"
 
   nginx:
     container_name: nutrixpert-nginx
@@ -76,7 +78,7 @@ services:
       - ./ssl_certs:/etc/ssl/certs:ro
       - static_data:/var/www/static
       - media_data:/var/www/media
-      - frontend_build:/var/www/html
+      - frontend_build:/var/www/html:ro
     depends_on:
       - backend
       - frontend

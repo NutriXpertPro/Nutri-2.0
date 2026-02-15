@@ -79,7 +79,7 @@ export default function PatientsPage() {
 
     // Filtrar e ordenar pacientes
     const filteredPatients = React.useMemo(() => {
-        if (!patients) return []
+        if (!patients || !Array.isArray(patients)) return []
 
         let result = [...patients]
 
@@ -162,24 +162,24 @@ export default function PatientsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <StatCard
                     title="Total de Pacientes"
-                    value={isPatientsLoading ? "..." : (patients?.length || 0)}
+                    value={isPatientsLoading ? "..." : ((Array.isArray(patients) ? patients.length : 0) || 0)}
                     icon={Users}
                     variant="theme"
                 />
                 <StatCard
                     title="Ativos"
-                    value={isPatientsLoading ? "..." : (patients?.filter(p => p.status).length || 0)}
+                    value={isPatientsLoading ? "..." : ((Array.isArray(patients) ? patients.filter((p: any) => p.status).length : 0) || 0)}
                     icon={Activity}
                     variant="green"
                     subtitle="Em tratamento"
                 />
                 <StatCard
                     title="Novos este Mês"
-                    value={isPatientsLoading ? "..." : (patients?.filter(p => {
+                    value={isPatientsLoading ? "..." : ((Array.isArray(patients) ? patients.filter((p: any) => {
                         const date = new Date(p.created_at);
                         const today = new Date();
                         return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-                    }).length || 0)}
+                    }).length : 0) || 0)}
                     icon={Calendar}
                     variant="amber"
                     subtitle="Crescimento"

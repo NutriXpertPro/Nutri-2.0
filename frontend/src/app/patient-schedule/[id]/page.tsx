@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { } from "@/components/ui/badge"
@@ -8,7 +9,7 @@ import { Calendar, Clock, MapPin, Video, CheckCircle, User } from "lucide-react"
 import { format, setHours, setMinutes, isBefore, parseISO } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { toast } from "sonner"
-import api from "@/services/api" // Supondo que você tenha um arquivo de configuração para a API
+import api from "@/services/api"
 
 interface AppointmentSlot {
   id: number
@@ -28,7 +29,9 @@ interface ApiResponse {
   availableSlots: AppointmentSlot[]
 }
 
-export default function PatientSchedulePage({ params }: { params: { id: string } }) {
+export default function PatientSchedulePage() {
+  const params = useParams()
+  const id = params?.id as string
   const [selectedSlot, setSelectedSlot] = useState<AppointmentSlot | null>(null)
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<ApiResponse | null>(null)
@@ -37,7 +40,7 @@ export default function PatientSchedulePage({ params }: { params: { id: string }
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await api.get(`appointments/available-slots/${params.id}/`)
+        const response = await api.get(`appointments/available-slots/${id}/`)
         setData(response.data)
       } catch (_error) {
         toast.error("Erro ao carregar horários disponíveis")
@@ -47,7 +50,7 @@ export default function PatientSchedulePage({ params }: { params: { id: string }
     }
 
     fetchData()
-  }, [params.id])
+  }, [id])
 
   const handleSchedule = async () => {
     if (!selectedSlot) {
@@ -58,7 +61,7 @@ export default function PatientSchedulePage({ params }: { params: { id: string }
     try {
       // Enviar requisição para criar o agendamento
       const scheduleData = {
-        patient: parseInt(params.id),  // ID do paciente
+        patient: parseInt(id),  // ID do paciente
         date: selectedSlot.date,
         type: selectedSlot.type,
         status: 'agendada'  // Pode ser definido como 'agendada' inicialmente

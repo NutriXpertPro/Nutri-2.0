@@ -1097,6 +1097,7 @@ export const useDietEditorStore = create<DietEditorState>()(
                         gcdt: Math.round(state.get || 0),
                         calculation_method: state.calculationMethod,
                         meals_data: mealsPayload,
+                        meals_rel: [], // Campo obrigatório adicionado
                         is_active: true
                     }
 

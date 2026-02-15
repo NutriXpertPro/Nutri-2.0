@@ -79,6 +79,11 @@ backend/*.txt
 backend/nul
 nul
 
+# Large Files
+*.exe
+docker.tgz
+*.tar.gz
+
 # Security Vault
 _SECURITY_VAULT_/
 *.json_backup

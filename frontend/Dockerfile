@@ -11,15 +11,11 @@ RUN npm install --ignore-scripts
 # Copy the rest of the application
 COPY . .
 
-# Build the Next.js application
-RUN npm run build
+# Limpar build anterior e gerar exportação estática
+RUN rm -rf .next out && npm run build
 
-# Set production environment
-ENV NODE_ENV production
-ENV PORT 3000
-
-# Expose port
+# The build command with output: 'export' creates the 'out' directory
+# Expose port (not used when serving statically, but kept for compatibility)
 EXPOSE 3000
 
-# Start the application
-CMD ["node", ".next/standalone/server.js"]
+# The application files will be copied to Nginx in the docker-compose setup

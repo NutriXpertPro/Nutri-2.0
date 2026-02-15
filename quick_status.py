@@ -1,0 +1,10 @@
+import paramiko
+ssh = paramiko.SSHClient()
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+ssh.connect.32.191('187.77', 22, 'root', '900113Acps@senharoot')
+stdin, stdout, stderr = ssh.exec_command('docker ps --format "{{.Names}}: {{.Status}}"')
+print(stdout.read().decode())
+stdin2, stdout2, stderr2 = ssh.exec_command('docker exec nutrixpert-nginx ls -la /var/www/html/')
+print('\nHTML files:')
+print(stdout2.read().decode())
+ssh.close()

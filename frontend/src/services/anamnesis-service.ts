@@ -7,6 +7,8 @@ import {
     AnamnesisAnswer
 } from "@/types/anamnesis"
 
+export type { AnamnesisTemplate, Question, StandardAnamnesisData } from "@/types/anamnesis"
+
 export const anamnesisService = {
     // Templates
     listTemplates: async () => {
@@ -49,7 +51,7 @@ export const anamnesisService = {
         return data
     },
 
-    saveStandardAnamnesis: async (patientId: number, data: AnamnesisFormData) => {
+    saveStandardAnamnesis: async (patientId: number, data: AnamnesisFormData | StandardAnamnesisData) => {
         if (!patientId) throw new Error("Patient ID is required for saving anamnesis.");
 
         // Check if exists first
@@ -63,11 +65,11 @@ export const anamnesisService = {
         // Lista de campos de foto que precisam de tratamento especial
         const photoFields = ['foto_frente', 'foto_lado', 'foto_costas']
 
-        Object.keys(data).forEach(key => {
+        Object.keys(data as Record<string, any>).forEach(key => {
             // Skip the 'patient' key if it exists in data, we append it explicitly below
             if (key === 'patient') return;
 
-            const value = data[key];
+            const value = (data as Record<string, any>)[key];
 
             // Ignore null or undefined
             if (value === null || value === undefined) return;

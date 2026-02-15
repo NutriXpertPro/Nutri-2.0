@@ -84,7 +84,7 @@ export function AnamnesisList({ onNewAnamnesis, onEdit, onView }: AnamnesisListP
     const isLoading = isLoadingPatients || isLoadingAnamneses
 
     // Combinar dados
-    const anamnesisList: AnamnesisItem[] = patients?.map(patient => {
+    const anamnesisList: AnamnesisItem[] = patients?.map((patient: any) => {
         // Encontrar anamnese deste paciente
         const anamnesis = anamneses?.find((a: any) => a.patient === patient.id)
 
@@ -99,7 +99,7 @@ export function AnamnesisList({ onNewAnamnesis, onEdit, onView }: AnamnesisListP
             else if (completionPercentage > 0) status = 'incomplete'
             else status = 'pending'
 
-            lastUpdated = new Date(anamnesis.updated_at)
+            lastUpdated = anamnesis.updated_at ? new Date(anamnesis.updated_at) : new Date()
         }
 
         // Mapping objetivos do patient service para display friendlier se não tiver no anamnesis

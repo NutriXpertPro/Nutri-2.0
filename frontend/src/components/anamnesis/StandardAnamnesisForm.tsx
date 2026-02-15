@@ -36,6 +36,7 @@ import {
 import { IconWrapper } from "@/components/ui/IconWrapper"
 import { cn } from "@/lib/utils"
 import { StandardAnamnesisData } from "@/types/anamnesis"
+import { YesNoSelector } from "./YesNoSelector"
 
 interface StandardAnamnesisFormProps {
     patientId: number
@@ -782,7 +783,7 @@ export function StandardAnamnesisForm({ patientId, onBack, initialData, onSave }
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">
                                         <IconWrapper
-                                            {...getObjectiveConfig(formData.objetivo)}
+                                            icon={Target}
                                             size="lg"
                                             className={cn(
                                                 "ring-4 ring-background border border-white/10 dark:border-white/20 shadow-md transition-all",
@@ -1014,3 +1015,48 @@ export function StandardAnamnesisForm({ patientId, onBack, initialData, onSave }
         </div>
     )
 }
+
+// Função auxiliar para formatar entrada de tempo (HH:MM)
+export const formatTimeInput = (value: string): string => {
+    // Remove tudo que não é dígito
+    let digits = value.replace(/\D/g, '');
+    
+    // Limita a 4 dígitos
+    digits = digits.substring(0, 4);
+    
+    // Formata como HH:MM
+    if (digits.length > 2) {
+        return digits.substring(0, 2) + ':' + digits.substring(2, 4);
+    }
+    
+    return digits;
+};
+
+// Função para obter configurações específicas baseadas no objetivo
+export const getObjectiveConfig = (objective: string) => {
+    if (!objective) return {};
+    
+    const lowerObjective = objective.toLowerCase();
+    
+    // Exemplos de configurações baseadas no objetivo
+    if (lowerObjective.includes('emagrecimento') || lowerObjective.includes('perda') || lowerObjective.includes('peso')) {
+        return {
+            showWeightGoals: true,
+            showBodyFatGoals: true,
+            additionalQuestions: ['atividade_fisica_tipo', 'metabolismo']
+        };
+    } else if (lowerObjective.includes('ganho') || lowerObjective.includes('massa') || lowerObjective.includes('musculo')) {
+        return {
+            showWeightGoals: true,
+            showMuscleGoals: true,
+            additionalQuestions: ['treino_frequencia', 'suplementos']
+        };
+    } else if (lowerObjective.includes('saúde') || lowerObjective.includes('equilibrio')) {
+        return {
+            showHealthMetrics: true,
+            additionalQuestions: ['stress', 'qualidade_sono']
+        };
+    }
+    
+    return {};
+};
