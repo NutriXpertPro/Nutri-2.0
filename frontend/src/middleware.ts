@@ -5,6 +5,7 @@ import type { NextRequest } from 'next/server'
 const protectedRoutes = [
     '/dashboard',
     '/patients',
+    '/patient-dashboard-v2',
     '/anamnesis',
     '/diets',
     '/calendar',
@@ -45,20 +46,35 @@ export function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        // Rotas protegidas
+        // Rotas protegidas (inclui rotas exatas e com sub-paths)
+        '/dashboard',
         '/dashboard/:path*',
+        '/patients',
         '/patients/:path*',
+        '/patient-dashboard-v2',
+        '/patient-dashboard-v2/:path*',
+        '/anamnesis',
         '/anamnesis/:path*',
+        '/diets',
         '/diets/:path*',
+        '/calendar',
         '/calendar/:path*',
+        '/messages',
         '/messages/:path*',
+        '/evaluations',
         '/evaluations/:path*',
+        '/lab-exams',
         '/lab-exams/:path*',
+        '/notifications',
         '/notifications/:path*',
+        '/settings',
         '/settings/:path*',
         // Rotas públicas
+        '/login',
         '/login/:path*',
+        '/register',
         '/register/:path*',
+        '/auth',
         '/auth/:path*',
     ],
 }

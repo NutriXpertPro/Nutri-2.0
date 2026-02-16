@@ -82,13 +82,28 @@ export const markAsRead = async (id: number) => {
 };
 
 export const initializeNotificationService = async () => {
+  // NÃO solicita permissão automaticamente - apenas verifica status atual
+  // A permissão deve ser solicitada explicitamente via botão de UI
+  // quando o usuário clicar em "Ativar Notificações" nas configurações
   if (typeof window === 'undefined') return;
+  
+  // Apenas log do status atual, sem solicitar permissão
+  // console.log('Notification permission status:', Notification.permission);
+};
 
-  if ('Notification' in window && Notification.permission === 'default') {
-    try {
-      await Notification.requestPermission();
-    } catch (e) {
-    }
+// Solicita permissão de notificação explicitamente (deve ser chamada por botão de UI)
+export const requestNotificationPermission = async (): Promise<boolean> => {
+  if (typeof window === 'undefined') return false;
+  
+  if (!('Notification' in window)) {
+    return false;
+  }
+  
+  try {
+    const permission = await Notification.requestPermission();
+    return permission === 'granted';
+  } catch (e) {
+    return false;
   }
 };
 
@@ -102,7 +117,8 @@ const service = {
   fetchUnreadCount,
   notifyNewMessage,
   markAsRead,
-  initializeNotificationService
+  initializeNotificationService,
+  requestNotificationPermission
 };
 
 export const notificationService = service;
