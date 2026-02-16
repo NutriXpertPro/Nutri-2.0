@@ -53,10 +53,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     restart: always
-    env_file:
-      - .env.production
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+      - NEXT_PUBLIC_API_BASE_URL=https://srv1354256.hstgr.cloud/api/v1
     depends_on:
       - backend
     volumes:

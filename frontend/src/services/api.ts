@@ -1,27 +1,23 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios'
 
 export const getBaseURL = () => {
-    // Prioritize ENVIRONMENT VARIABLE (Next.js handles prefixing for browser automatically if defined)
+    // Check for environment variable first
     const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-    if (envUrl) {
+    if (envUrl && !envUrl.includes('localhost')) {
         return envUrl.endsWith('/') ? envUrl : `${envUrl}/`;
     }
 
-    // Fallback for local development
+    // Dynamic detection based on current hostname and protocol
     if (typeof window !== 'undefined') {
         const hostname = window.location.hostname;
-
-        // If we are accessing via IP (like 192.168.x.x), use that IP for the backend too
-        const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
-
-        if (isIP) {
-            return `http://${hostname}:8000/api/v1/`;
-        }
-
-        return 'http://localhost:8000/api/v1/';
+        const protocol = window.location.protocol; // 'http:' or 'https:'
+        
+        // If accessing via IP or domain, use same protocol and hostname for the API
+        return `${protocol}//${hostname}/api/v1/`;
     }
 
+    // Fallback for local development
     return 'http://localhost:8000/api/v1/';
 }
 
