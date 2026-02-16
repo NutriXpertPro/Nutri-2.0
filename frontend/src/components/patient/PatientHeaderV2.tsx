@@ -10,11 +10,12 @@ export function PatientHeaderV2() {
     return (
         <header className="fixed top-0 left-0 right-0 h-16 glass-header z-50 px-4 flex items-center justify-between">
             {/* Brand Logo & Name */}
-            <div className="flex items-center gap-2">
-                <img src="/logo_final.svg" alt="NX" className="w-8 h-8 object-contain" />
+            <div className="flex items-center gap-1">
+                <img src="/logo_final.svg" alt="NutriXpertPro" className="w-14 h-14 object-contain" />
                 <div className="flex items-baseline tracking-tighter">
-                    <span className="text-sm font-bold text-foreground">Nutri</span>
-                    <span className="text-base font-black text-primary ml-0.5">Xpert</span>
+                    <span className="text-lg font-bold text-foreground">Nutri</span>
+                    <span className="text-xl font-black text-emerald-500">Xpert</span>
+                    <span className="text-lg font-bold text-foreground">Pro</span>
                 </div>
             </div>
 

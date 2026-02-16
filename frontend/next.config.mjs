@@ -4,7 +4,7 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'export',
+    // output: 'export',  // Removido para habilitar middleware e SSR
     images: {
         unoptimized: true,
     },

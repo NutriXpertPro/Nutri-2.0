@@ -62,14 +62,10 @@ export function HomeTab() {
                         <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-[0.05em] mb-1">
                             {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}
                         </span>
-                        <h1 className="text-2xl font-bold leading-tight tracking-tight">
-                            {getGreeting()},<br /><span className="text-primary">{firstName}</span>
+                        <h1 className="text-2xl font-bold leading-tight tracking-tight text-foreground">
+                            {getGreeting()}, <span className="text-primary">{firstName}</span>
                         </h1>
                     </div>
-                    <button className="relative p-2 rounded-full bg-surface border border-white/20 hover:bg-white/5 transition-colors">
-                        <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-secondary rounded-full border border-background-dark"></span>
-                        <span className="material-symbols-outlined text-white">notifications</span>
-                    </button>
                 </div>
             </header>
 
