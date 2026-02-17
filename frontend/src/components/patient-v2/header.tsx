@@ -1,12 +1,12 @@
 "use client"
 
-import { Bell, Moon, Sun, Palette, User, LogOut, Volume2 } from "lucide-react"
+import { Moon, Sun, Palette, User, LogOut } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { usePatient } from "@/contexts/patient-context"
 import { useTheme } from "next-themes"
 import { useColorTheme } from "@/contexts/color-theme-context"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { useMessages } from "@/hooks/useMessages"
 import {
   DropdownMenu,
@@ -17,40 +17,34 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/contexts/auth-context"
-import { notificationService } from "@/services/notification-service"
+import { NotificationBell } from "./NotificationBell"
 
 export function PatientHeaderV2({ onNavigate }: { onNavigate?: (tab: string) => void }) {
   const { patient } = usePatient()
-  const { conversations } = useMessages()
   const { logout } = useAuth()
-  const [unreadNotifications, setUnreadNotifications] = useState(0)
-  const isFirstLoad = useRef(true)
-  const prevTotalRef = useRef(0)
 
-  // Carregar contagem de notificações não lidas e configurar polling
-  useEffect(() => {
-    const fetchCounts = async () => {
-      try {
-        const count = await notificationService.fetchUnreadCount()
-        setUnreadNotifications(count)
-
-        // Tocar som se houver aumento no total (inclui mensagens e outras notificações)
-        if (!isFirstLoad.current && count > prevTotalRef.current) {
-          notificationService.playNotificationSound()
-        }
-
-        isFirstLoad.current = false
-        prevTotalRef.current = count
-      } catch (_error) {
-      }
+  const handleNotificationClick = (notification: any) => {
+    // Navigate based on notification type
+    switch (notification.type) {
+      case 'message':
+        onNavigate?.('messages')
+        break
+      case 'appointment':
+        onNavigate?.('agenda')
+        break
+      case 'diet':
+        onNavigate?.('diet')
+        break
+      case 'evaluation':
+        onNavigate?.('evolution')
+        break
+      case 'lab_exam':
+        onNavigate?.('exams')
+        break
+      default:
+        onNavigate?.('notifications')
     }
-
-    fetchCounts()
-    const interval = setInterval(fetchCounts, 10000) // Poll cada 10s para agilidade
-    return () => clearInterval(interval)
-  }, [])
-
-  const hasUnread = unreadNotifications > 0
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-16 px-4 flex items-center justify-between
@@ -81,17 +75,8 @@ export function PatientHeaderV2({ onNavigate }: { onNavigate?: (tab: string) => 
         {/* Toggle Color */}
         <ColorToggle />
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onNavigate?.('notifications')}
-          className={`rounded-full w-9 h-9 relative ${hasUnread ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"}`}
-        >
-          <Bell className="w-5 h-5" />
-          {hasUnread && (
-            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-background shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-          )}
-        </Button>
+        {/* Notification Bell with Sound & Vibration */}
+        <NotificationBell onNotificationClick={handleNotificationClick} />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -110,10 +95,6 @@ export function PatientHeaderV2({ onNavigate }: { onNavigate?: (tab: string) => 
             <DropdownMenuItem onClick={() => onNavigate?.('profile')}>
               <User className="mr-2 h-4 w-4" />
               Meu Perfil
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => notificationService.playNotificationSound()}>
-              <Volume2 className="mr-2 h-4 w-4" />
-              Testar Som
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">

@@ -53,11 +53,12 @@ export const userService = {
             if (data.name !== undefined) formData.append('name', data.name);
             if (data.professional_title !== undefined) formData.append('professional_title', data.professional_title === null ? '' : data.professional_title);
             if (data.gender !== undefined) formData.append('gender', data.gender === null ? '' : data.gender);
+
             if (data.settings) {
-                formData.append('settings.theme', data.settings.theme || '');
-                formData.append('settings.language', data.settings.language || '');
-                formData.append('settings.notifications_email', String(data.settings.notifications_email));
-                formData.append('settings.notifications_push', String(data.settings.notifications_push));
+                if (data.settings.theme !== undefined) formData.append('settings.theme', data.settings.theme);
+                if (data.settings.language !== undefined) formData.append('settings.language', data.settings.language);
+                if (data.settings.notifications_email !== undefined) formData.append('settings.notifications_email', String(data.settings.notifications_email));
+                if (data.settings.notifications_push !== undefined) formData.append('settings.notifications_push', String(data.settings.notifications_push));
             }
 
             const response = await api.patch<UserProfile>("/users/me/", formData, {

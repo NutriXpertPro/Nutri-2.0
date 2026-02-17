@@ -4,10 +4,12 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // output: 'export',  // Removido para habilitar middleware e SSR
+    output: 'standalone',
     images: {
         unoptimized: true,
     },
+    poweredByHeader: false,
+    reactStrictMode: true,
 };
 
 export default nextConfig;

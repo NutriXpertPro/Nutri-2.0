@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useExams } from "@/hooks/useExams"
+import { examsAPI } from "@/services/api"
 
 import { ChevronRight } from "lucide-react"
 
@@ -52,15 +53,28 @@ export function ExamsTab({ onBack }: { onBack?: () => void }) {
         }
 
         setIsUploading(true)
-        // TODO: Implement actual file upload to API
-        // For now, simulate upload delay
-        setTimeout(() => {
-            setIsUploading(false)
+        try {
+            const formData = new FormData()
+            formData.append('file', selectedFile)
+            formData.append('file_name', selectedFile.name)
+            if (newExam.title) {
+                formData.append('title', newExam.title)
+            }
+            if (newExam.type) {
+                formData.append('file_type', newExam.type)
+            }
+            
+            await examsAPI.uploadExam(formData)
+            
             setIsDialogOpen(false)
             setNewExam({ title: "", type: "", date: "" })
             setSelectedFile(null)
             refetch() // Refresh exams list
-        }, 1500)
+        } catch (err: any) {
+            setError(err?.response?.data?.message || "Erro ao enviar exame. Tente novamente.")
+        } finally {
+            setIsUploading(false)
+        }
     }
 
     return (

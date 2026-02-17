@@ -5,7 +5,13 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAppointments } from "@/hooks/useAppointments"
+import { appointmentsAPI } from "@/services/api"
 
 interface AgendaTabProps {
     onNavigate?: (tab: string) => void
@@ -14,6 +20,14 @@ interface AgendaTabProps {
 export function AgendaTab({ onNavigate }: AgendaTabProps) {
     const [activeTab, setActiveTab] = useState<'upcoming' | 'history'>('upcoming')
     const [showConfirmation, setShowConfirmation] = useState(true)
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+    const [newAppointment, setNewAppointment] = useState({
+        date: '',
+        time: '',
+        type: 'online',
+        notes: ''
+    })
+    const [creating, setCreating] = useState(false)
 
     // Use API hook based on active tab
     const {
@@ -46,6 +60,31 @@ export function AgendaTab({ onNavigate }: AgendaTabProps) {
     const handleMessage = () => {
         if (onNavigate) {
             onNavigate('messages')
+        }
+    }
+
+    const handleCreateAppointment = async () => {
+        if (!newAppointment.date || !newAppointment.time) {
+            alert('Por favor, selecione a data e horário.')
+            return
+        }
+
+        setCreating(true)
+        try {
+            await appointmentsAPI.createAppointment({
+                date: newAppointment.date,
+                time: newAppointment.time,
+                appointment_type: newAppointment.type,
+                notes: newAppointment.notes,
+                status: 'pending'
+            })
+            alert('Solicitação de consulta enviada com sucesso! ✅\nAguarde a confirmação do seu nutritionist.')
+            setIsCreateDialogOpen(false)
+            setNewAppointment({ date: '', time: '', type: 'online', notes: '' })
+        } catch (err) {
+            alert('Erro ao solicitar consulta. Tente novamente.')
+        } finally {
+            setCreating(false)
         }
     }
 
@@ -249,10 +288,69 @@ export function AgendaTab({ onNavigate }: AgendaTabProps) {
             <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => setIsCreateDialogOpen(true)}
                 className="fixed bottom-24 right-4 w-14 h-14 bg-primary rounded-full shadow-lg shadow-primary/30 flex items-center justify-center text-primary-foreground z-40"
             >
                 <Plus className="w-6 h-6" />
             </motion.button>
+
+            {/* Create Appointment Dialog */}
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Solicitar Consulta</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Data</Label>
+                            <Input 
+                                type="date" 
+                                value={newAppointment.date}
+                                onChange={(e) => setNewAppointment({...newAppointment, date: e.target.value})}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Horário</Label>
+                            <Input 
+                                type="time" 
+                                value={newAppointment.time}
+                                onChange={(e) => setNewAppointment({...newAppointment, time: e.target.value})}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Tipo de Consulta</Label>
+                            <Select 
+                                value={newAppointment.type}
+                                onValueChange={(val) => setNewAppointment({...newAppointment, type: val})}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="online">📹 Online</SelectItem>
+                                    <SelectItem value="presencial">🏥 Presencial</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Observações (opcional)</Label>
+                            <Textarea 
+                                placeholder="Descreva o motivo da consulta ou alguma informação importante..."
+                                value={newAppointment.notes}
+                                onChange={(e) => setNewAppointment({...newAppointment, notes: e.target.value})}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                            Cancelar
+                        </Button>
+                        <Button onClick={handleCreateAppointment} disabled={creating}>
+                            {creating ? 'Enviando...' : 'Solicitar Consulta'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

@@ -15,6 +15,9 @@ const pageVariants = {
 export function HomeTab() {
     const { patient } = usePatient()
     const firstName = patient?.name?.split(" ")[0] || "Paciente"
+    const nutritionistInitials = patient?.nutritionist_name 
+        ? patient.nutritionist_name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
+        : null
     const { data: metrics } = useTodayMetrics()
     const { data: meals } = useTodayMeals()
     const checkInMeal = useCheckInMeal()
@@ -76,7 +79,13 @@ export function HomeTab() {
                         <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
                         <div className="flex items-center gap-4 relative z-10">
                             <div className="relative">
-                                <img alt="Nutricionista" className="w-14 h-14 rounded-full object-cover border-2 border-primary/30" src={patient?.nutritionist_avatar || "https://lh3.googleusercontent.com/aida-public/AB6AXuBnbUmk4xhtdo4mzV2sq6LLYfUNncXScqiFfCEcaUmxvLuo__eCbVCsN2TLPlSKC46DH37896VwBWlAGe6Yl0LimqnTPxPLfVq1kFpkce3A96nIC9oWRetZIUyUtB8caNcfM3GAge-9Ikg7RIg4djXHYhrVmZTQNYEcMAKqBLmjoqG6gnOOMklA7u-Yt748b8dHGUltyaZEM74mVwU_fbLQJ_FwtU6igPqZOqo_iRYs_oeuv-v4z3Y3R7rsIO5exKjiBPSLgL8JoS7l"} />
+                                {patient?.nutritionist_avatar ? (
+                                    <img alt="Nutricionista" className="w-14 h-14 rounded-full object-cover border-2 border-primary/30" src={patient.nutritionist_avatar} />
+                                ) : (
+                                    <div className="w-14 h-14 rounded-full object-cover border-2 border-primary/30 bg-primary/20 flex items-center justify-center">
+                                        <span className="text-primary font-bold text-sm">{nutritionistInitials || 'N'}</span>
+                                    </div>
+                                )}
                                 <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-[#1E1E22] rounded-full"></div>
                             </div>
                             <div className="flex-1">
@@ -101,9 +110,9 @@ export function HomeTab() {
                 <section className="py-2 pl-6">
                     <div className="flex gap-4 overflow-x-auto no-scrollbar pr-6 pb-4 snap-x snap-mandatory">
                         {/* KCAL CARD */}
-                        <div className="snap-center flex-none w-[160px] h-[180px] glass-panel rounded-3xl p-4 flex flex-col items-center justify-between relative border border-white/20">
+                        <div className="snap-center flex-none w-[160px] h-[180px] glass-panel rounded-3xl p-4 flex flex-col items-center justify-between relative border border-gray-300 dark:border-white/20">
                             <div className="absolute top-4 left-4 flex items-center gap-1">
-                                <span className="material-symbols-outlined text-primary text-lg font-bold">local_fire_department</span>
+                                <span className="material-symbols-outlined text-orange-500 text-lg font-bold">local_fire_department</span>
                                 <span className="text-[10px] font-bold text-zinc-400">KCAL</span>
                             </div>
                             <div className="relative w-20 h-20 mt-4 flex items-center justify-center">
@@ -112,7 +121,7 @@ export function HomeTab() {
                                     <circle cx="40" cy="40" fill="transparent" r="32" stroke="var(--primary-hex, #CCFF00)" strokeDasharray="201" strokeDashoffset={calorieStrokeDashoffset} strokeLinecap="round" strokeWidth="8" className="transition-all duration-1000"></circle>
                                 </svg>
                                 <div className="absolute text-center">
-                                    <span className="block text-lg font-bold text-white leading-none">{caloriesCurrent}</span>
+                                    <span className="block text-lg font-bold text-foreground leading-none">{caloriesCurrent}</span>
                                 </div>
                             </div>
                             <div className="text-center w-full">
@@ -121,7 +130,7 @@ export function HomeTab() {
                         </div>
 
                         {/* WATER CARD */}
-                        <div className="snap-center flex-none w-[160px] h-[180px] glass-panel rounded-3xl p-4 flex flex-col relative overflow-hidden border border-white/20">
+                        <div className="snap-center flex-none w-[160px] h-[180px] glass-panel rounded-3xl p-4 flex flex-col relative overflow-hidden border border-gray-300 dark:border-white/20">
                             <div className="absolute top-4 left-4 flex items-center gap-1 z-10">
                                 <span className="material-symbols-outlined text-blue-400 text-lg font-bold">water_drop</span>
                                 <span className="text-[10px] font-bold text-zinc-400 uppercase">ÁGUA</span>
@@ -130,7 +139,7 @@ export function HomeTab() {
                                 <div className="absolute top-0 left-0 right-0 h-2 bg-blue-500/30 blur-sm"></div>
                             </div>
                             <div className="flex-1 flex flex-col justify-end items-center z-10 pb-2 text-center w-full">
-                                <span className="text-3xl font-bold text-white leading-none">{waterCurrent}<span className="text-sm font-medium text-zinc-400 ml-1 uppercase">Copos</span></span>
+                                <span className="text-3xl font-bold text-foreground leading-none">{waterCurrent}<span className="text-sm font-medium text-zinc-400 ml-1 uppercase">Copos</span></span>
                                 <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mt-2">Meta: {waterGoal}</p>
                             </div>
                             <button className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform z-20">
@@ -139,13 +148,13 @@ export function HomeTab() {
                         </div>
 
                         {/* GOAL CARD */}
-                        <div className="snap-center flex-none w-[160px] h-[180px] glass-panel rounded-3xl p-4 flex flex-col justify-between border border-white/20">
+                        <div className="snap-center flex-none w-[160px] h-[180px] glass-panel rounded-3xl p-4 flex flex-col justify-between border border-gray-300 dark:border-white/20">
                             <div className="flex items-center gap-1 text-left w-full">
-                                <span className="material-symbols-outlined text-secondary text-lg font-bold">target</span>
+                                <span className="material-symbols-outlined text-purple-500 text-lg font-bold">target</span>
                                 <span className="text-[10px] font-bold text-zinc-400 uppercase">OBJETIVO</span>
                             </div>
                             <div className="flex flex-col gap-1 text-left w-full">
-                                <span className="text-lg font-bold text-white leading-tight">{patient?.goal || "Manter peso"}</span>
+                                <span className="text-lg font-bold text-foreground leading-tight">{patient?.goal || "Manter peso"}</span>
                                 <span className="text-[10px] text-zinc-500 uppercase font-bold">Meta Atual</span>
                             </div>
                             <div className="w-full bg-surface-light rounded-full h-2 overflow-hidden mb-2">

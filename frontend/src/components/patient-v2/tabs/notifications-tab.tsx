@@ -81,8 +81,12 @@ export function NotificationsTab({ onNavigate, onBack }: { onNavigate: (tab: str
             onNavigate('messages')
         } else if (notif.type === 'diet' || notif.message.toLowerCase().includes('dieta')) {
             onNavigate('diet')
-        } else if (notif.type === 'appointment' || notif.message.toLowerCase().includes('consulta')) {
+        } else if (notif.type === 'appointment' || notif.message.toLowerCase().includes('consulta') || notif.message.toLowerCase().includes('agendamento')) {
             onNavigate('agenda')
+        } else if (notif.type === 'evaluation' || notif.message.toLowerCase().includes('avaliação') || notif.message.toLowerCase().includes('evolução')) {
+            onNavigate('evolution')
+        } else if (notif.type === 'lab_exam' || notif.message.toLowerCase().includes('exame') || notif.message.toLowerCase().includes('laboratorial')) {
+            onNavigate('exams')
         }
 
         if (!notif.is_read) {

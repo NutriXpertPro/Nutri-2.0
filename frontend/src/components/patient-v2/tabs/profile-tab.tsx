@@ -1,12 +1,14 @@
 "use client"
 
-import { Ruler, Weight, Target, Edit2, ArrowLeft } from "lucide-react"
+import { Ruler, Weight, Target, Edit2, ArrowLeft, User, BadgeCheck, Phone, Mail } from "lucide-react"
 import { usePatient } from "@/contexts/patient-context"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 
 export function ProfileTab({ onBack }: { onBack?: () => void }) {
     const { patient } = usePatient()
+
+    const hasNutritionist = patient?.nutritionist_name
 
     return (
         <div className="space-y-6 pb-24">
@@ -26,6 +28,43 @@ export function ProfileTab({ onBack }: { onBack?: () => void }) {
                 <h2 className="text-2xl font-bold text-foreground">{patient?.name || "Paciente"}</h2>
                 <p className="text-muted-foreground">{patient?.email || "email@exemplo.com"}</p>
             </div>
+
+            {/* Nutritionist Info - Only show if exists */}
+            {hasNutritionist && (
+                <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-3xl p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl">
+                            <User className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-foreground">Seu Nutricionista</h3>
+                            <p className="text-xs text-muted-foreground">Profissional responsável</p>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="relative">
+                            <Avatar className="w-16 h-16 border-2 border-emerald-500/30">
+                                <AvatarImage src={patient?.nutritionist_avatar} />
+                                <AvatarFallback className="bg-emerald-500/20 text-emerald-400">
+                                    {patient?.nutritionist_name?.[0] || 'N'}
+                                </AvatarFallback>
+                            </Avatar>
+                            <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-emerald-500 bg-background rounded-full" />
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-foreground">{patient?.nutritionist_name}</h4>
+                            <p className="text-sm text-emerald-400">{patient?.nutritionist_title || 'Nutricionista'}</p>
+                        </div>
+                    </div>
+
+                    {patient?.nutritionist_gender && (
+                        <div className="text-xs text-muted-foreground mt-3 pt-3 border-t border-emerald-500/10">
+                            Gênero do profissional: <span className="text-foreground capitalize">{patient.nutritionist_gender === 'female' ? 'Feminino' : patient.nutritionist_gender === 'male' ? 'Masculino' : 'Outro'}</span>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4 px-1">

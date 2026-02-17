@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useEvolution } from "@/hooks/useEvolution"
+import { useEvolution, useMeasurements } from "@/hooks/useEvolution"
 import { useComparisonPhotos } from "@/hooks/useComparisonPhotos"
 import { evolutionAPI } from "@/services/api"
 
@@ -21,6 +21,16 @@ export function EvolutionTab() {
     const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false)
     const [isEvaluationDialogOpen, setIsEvaluationDialogOpen] = useState(false)
     const [adipometerProtocol, setAdipometerProtocol] = useState<'pollock3' | 'pollock7' | 'jackson' | 'guedes'>('pollock3')
+    const [evaluationData, setEvaluationData] = useState({
+        weight: '',
+        height: '',
+        waist: '',
+        arms: '',
+        legs: '',
+        glutes: '',
+        chest: '',
+    })
+    const [sendingEvaluation, setSendingEvaluation] = useState(false)
 
     // Photo Upload State
     const [photos, setPhotos] = useState<{ frente: File | null, lado: File | null, costas: File | null }>({
@@ -33,6 +43,7 @@ export function EvolutionTab() {
     const { data: fatData, loading: fatLoading } = useEvolution('fat')
     const { data: muscleData, loading: muscleLoading } = useEvolution('muscle')
     const { comparison, loading: comparisonLoading, refetch: refetchComparison } = useComparisonPhotos()
+    const { measurements, loading: measurementsLoading } = useMeasurements()
 
     const loading = weightLoading || fatLoading || muscleLoading || comparisonLoading
 
@@ -184,36 +195,69 @@ export function EvolutionTab() {
                     ))}
                 </div>
 
-                {/* Mock Visualization for Measures */}
+                {/* Body Measurements from API */}
                 <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-muted/30 rounded-2xl p-4 border border-border/5">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Inicial</p>
-                        <p className="text-xl font-bold text-foreground">
-                            {activeMeasure === 'waist' ? '72cm' :
-                                activeMeasure === 'arms' ? '30cm' :
-                                    activeMeasure === 'legs' ? '58cm' :
-                                        activeMeasure === 'glutes' ? '102cm' : '-'}
-                        </p>
-                    </div>
-                    <div className="bg-muted/30 rounded-2xl p-4 border border-border/5">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Atual</p>
-                        <p className="text-xl font-bold text-foreground">
-                            {activeMeasure === 'waist' ? '68cm' :
-                                activeMeasure === 'arms' ? '28cm' :
-                                    activeMeasure === 'legs' ? '54cm' :
-                                        activeMeasure === 'glutes' ? '98cm' : '-'}
-                        </p>
-                    </div>
-                    <div className="bg-muted/30 rounded-2xl p-4 border border-border/5">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Evolução</p>
-                        <div className="flex items-center text-emerald-500 font-bold text-lg">
-                            <ArrowDownRight className="w-4 h-4 mr-1" />
-                            {activeMeasure === 'waist' ? '-4cm' :
-                                activeMeasure === 'arms' ? '-2cm' :
-                                    activeMeasure === 'legs' ? '-4cm' :
-                                        activeMeasure === 'glutes' ? '-4cm' : '-'}
-                        </div>
-                    </div>
+                    {measurementsLoading ? (
+                        <>
+                            <div className="bg-muted/30 rounded-2xl p-4 border border-border/5">
+                                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Inicial</p>
+                                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                            </div>
+                            <div className="bg-muted/30 rounded-2xl p-4 border border-border/5">
+                                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Atual</p>
+                                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                            </div>
+                            <div className="bg-muted/30 rounded-2xl p-4 border border-border/5">
+                                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Evolução</p>
+                                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="bg-muted/30 rounded-2xl p-4 border border-border/5">
+                                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Inicial</p>
+                                <p className="text-xl font-bold text-foreground">
+                                    {measurements.find(m => 
+                                        (activeMeasure === 'waist' && m.bodyPart.toLowerCase().includes('cintura')) ||
+                                        (activeMeasure === 'arms' && m.bodyPart.toLowerCase().includes('braço')) ||
+                                        (activeMeasure === 'legs' && m.bodyPart.toLowerCase().includes('perna')) ||
+                                        (activeMeasure === 'glutes' && m.bodyPart.toLowerCase().includes('glúteo'))
+                                    )?.initial || '--'}cm
+                                </p>
+                            </div>
+                            <div className="bg-muted/30 rounded-2xl p-4 border border-border/5">
+                                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Atual</p>
+                                <p className="text-xl font-bold text-foreground">
+                                    {measurements.find(m => 
+                                        (activeMeasure === 'waist' && m.bodyPart.toLowerCase().includes('cintura')) ||
+                                        (activeMeasure === 'arms' && m.bodyPart.toLowerCase().includes('braço')) ||
+                                        (activeMeasure === 'legs' && m.bodyPart.toLowerCase().includes('perna')) ||
+                                        (activeMeasure === 'glutes' && m.bodyPart.toLowerCase().includes('glúteo'))
+                                    )?.current || '--'}cm
+                                </p>
+                            </div>
+                            <div className="bg-muted/30 rounded-2xl p-4 border border-border/5">
+                                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Evolução</p>
+                                {(() => {
+                                    const measure = measurements.find(m => 
+                                        (activeMeasure === 'waist' && m.bodyPart.toLowerCase().includes('cintura')) ||
+                                        (activeMeasure === 'arms' && m.bodyPart.toLowerCase().includes('braço')) ||
+                                        (activeMeasure === 'legs' && m.bodyPart.toLowerCase().includes('perna')) ||
+                                        (activeMeasure === 'glutes' && m.bodyPart.toLowerCase().includes('glúteo'))
+                                    )
+                                    if (!measure) return <span className="text-muted-foreground">--</span>
+                                    const diff = measure.initial - measure.current
+                                    const isPositive = diff > 0
+                                    return (
+                                        <div className={`flex items-center font-bold text-lg ${isPositive ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                                            {isPositive ? <ArrowDownRight className="w-4 h-4 mr-1" /> : <ArrowUpRight className="w-4 h-4 mr-1" />}
+                                            {Math.abs(diff).toFixed(1)}cm
+                                        </div>
+                                    )
+                                })()}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -438,27 +482,58 @@ export function EvolutionTab() {
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1">
                                     <Label className="text-xs">Peso (kg)</Label>
-                                    <Input type="number" step="0.1" placeholder="69.7" />
+                                    <Input 
+                                        type="number" 
+                                        step="0.1" 
+                                        placeholder="69.7" 
+                                        value={evaluationData.weight}
+                                        onChange={(e) => setEvaluationData({...evaluationData, weight: e.target.value})}
+                                    />
                                 </div>
                                 <div className="space-y-1">
                                     <Label className="text-xs">Altura (cm)</Label>
-                                    <Input type="number" placeholder="170" />
+                                    <Input 
+                                        type="number" 
+                                        placeholder="170" 
+                                        value={evaluationData.height}
+                                        onChange={(e) => setEvaluationData({...evaluationData, height: e.target.value})}
+                                    />
                                 </div>
                                 <div className="space-y-1">
                                     <Label className="text-xs">Cintura (cm)</Label>
-                                    <Input type="number" placeholder="68" />
+                                    <Input 
+                                        type="number" 
+                                        placeholder="68" 
+                                        value={evaluationData.waist}
+                                        onChange={(e) => setEvaluationData({...evaluationData, waist: e.target.value})}
+                                    />
                                 </div>
                                 <div className="space-y-1">
                                     <Label className="text-xs">Braços (cm)</Label>
-                                    <Input type="number" placeholder="28" />
+                                    <Input 
+                                        type="number" 
+                                        placeholder="28" 
+                                        value={evaluationData.arms}
+                                        onChange={(e) => setEvaluationData({...evaluationData, arms: e.target.value})}
+                                    />
                                 </div>
                                 <div className="space-y-1">
                                     <Label className="text-xs">Pernas (cm)</Label>
-                                    <Input type="number" placeholder="54" />
+                                    <Input 
+                                        type="number" 
+                                        placeholder="54" 
+                                        value={evaluationData.legs}
+                                        onChange={(e) => setEvaluationData({...evaluationData, legs: e.target.value})}
+                                    />
                                 </div>
                                 <div className="space-y-1">
                                     <Label className="text-xs">Glúteos (cm)</Label>
-                                    <Input type="number" placeholder="98" />
+                                    <Input 
+                                        type="number" 
+                                        placeholder="98" 
+                                        value={evaluationData.glutes}
+                                        onChange={(e) => setEvaluationData({...evaluationData, glutes: e.target.value})}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -604,32 +679,47 @@ export function EvolutionTab() {
                             Cancelar
                         </Button>
                         <Button onClick={async () => {
-                            // Gather physical data fields - in a real scenario we'd bind inputs to state
-                            // For this iteration, since there are many fields, I'll alert that we need state binding first
-                            // But per "do it" instruction, we should assume we can implement it or at least part of it.
-                            // I will implement a simplified version or assume inputs are bound to a state object we create.
+                            if (!evaluationData.weight || !evaluationData.height) {
+                                alert('Por favor, preencha o peso e altura.')
+                                return
+                            }
 
-
+                            setSendingEvaluation(true)
                             try {
-                                // For now, allow sending a mock object to verify connectivity if fields are empty
-                                // ideally we bind all inputs to `evaluationData` state
-
                                 const submissionData = {
-                                    weight: 70.0, // Replace with state
-                                    height: 175,
-                                    date: new Date().toISOString(),
-                                    // other fields...
+                                    weight: parseFloat(evaluationData.weight),
+                                    height: parseFloat(evaluationData.height),
+                                    date: new Date().toISOString().split('T')[0],
+                                    body_measurements: {
+                                        waist: evaluationData.waist ? parseFloat(evaluationData.waist) : null,
+                                        arms: evaluationData.arms ? parseFloat(evaluationData.arms) : null,
+                                        legs: evaluationData.legs ? parseFloat(evaluationData.legs) : null,
+                                        glutes: evaluationData.glutes ? parseFloat(evaluationData.glutes) : null,
+                                        chest: evaluationData.chest ? parseFloat(evaluationData.chest) : null,
+                                    },
+                                    method: adipometerProtocol,
                                 };
 
                                 await evolutionAPI.submitEvaluation(submissionData);
                                 alert('Avaliação enviada com sucesso! ✅');
                                 setIsEvaluationDialogOpen(false);
+                                setEvaluationData({
+                                    weight: '',
+                                    height: '',
+                                    waist: '',
+                                    arms: '',
+                                    legs: '',
+                                    glutes: '',
+                                    chest: '',
+                                });
                             } catch (error) {
                                 alert('Erro ao enviar avaliação. Tente novamente.');
+                            } finally {
+                                setSendingEvaluation(false);
                             }
-                        }}>
+                        }} disabled={sendingEvaluation}>
                             <Upload className="w-4 h-4 mr-2" />
-                            Enviar Avaliação
+                            {sendingEvaluation ? 'Enviando...' : 'Enviar Avaliação'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

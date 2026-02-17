@@ -1,6 +1,6 @@
 "use client"
 
-import { Search, Send, ArrowLeft, Mic, Phone, Video, MoreVertical, Paperclip, Camera, Loader2, AlertCircle, Smile, Image as ImageIcon, FileText, ClipboardList } from "lucide-react"
+import { Search, Send, ArrowLeft, Mic, Phone, Video, MoreVertical, Paperclip, Camera, Loader2, AlertCircle, Smile, Image as ImageIcon, FileText, ClipboardList, X } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -27,6 +27,10 @@ const isOnlyEmoji = (text: string) => {
 export function MessagesTab({ onBack }: { onBack?: () => void }) {
     const [mounted, setMounted] = useState(false)
     const [newMessage, setNewMessage] = useState("")
+    const [attachment, setAttachment] = useState<File | null>(null)
+    const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null)
+    const [sending, setSending] = useState(false)
+    const fileInputRef = useRef<HTMLInputElement>(null)
     const { user } = useAuth()
     const inputRef = useRef<HTMLInputElement>(null)
     
@@ -83,14 +87,65 @@ export function MessagesTab({ onBack }: { onBack?: () => void }) {
         fetchMessages(chatId)
     }
 
-    const handleSendMessage = async () => {
-        if (!newMessage.trim() || !selectedConversation) return
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            // Validate file
+            const maxSize = 10 * 1024 * 1024 // 10MB
+            if (file.size > maxSize) {
+                alert('O arquivo deve ter no máximo 10MB.')
+                return
+            }
+            setAttachment(file)
+            
+            // Create preview for images
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader()
+                reader.onload = () => {
+                    setAttachmentPreview(reader.result as string)
+                }
+                reader.readAsDataURL(file)
+            } else {
+                setAttachmentPreview(null)
+            }
+        }
+    }
 
+    const handleRemoveAttachment = () => {
+        setAttachment(null)
+        setAttachmentPreview(null)
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+        }
+    }
+
+    const handleSendMessage = async () => {
+        if ((!newMessage.trim() && !attachment) || !selectedConversation) return
+
+        setSending(true)
         try {
-            await sendMessage(selectedConversation, newMessage)
+            if (attachment) {
+                // Send message with attachment
+                const formData = new FormData()
+                formData.append('content', newMessage || (attachment.type.startsWith('image/') ? 'Enviou uma imagem' : 'Enviou um arquivo'))
+                formData.append('attachment', attachment)
+                
+                await fetch(`/api/v1/messages/messages/`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: formData
+                })
+            } else {
+                await sendMessage(selectedConversation, newMessage)
+            }
             setNewMessage("")
+            handleRemoveAttachment()
         } catch {
             // Error handling handled by hook or global toaster
+        } finally {
+            setSending(false)
         }
     }
 
@@ -362,7 +417,37 @@ export function MessagesTab({ onBack }: { onBack?: () => void }) {
 
                         {/* Chat Footer */}
                         <div className="p-2 bg-background flex items-end gap-2 pb-safe-bottom relative z-10 border-t border-border/5">
-                            <div className="flex-1 bg-card rounded-2xl flex items-center px-2 py-2 gap-2 border border-border/50 focus-within:border-primary/50 transition-colors shadow-sm relative">
+                            <div className="flex-1 bg-card rounded-2xl flex flex-col items-center px-2 py-2 gap-2 border border-border/50 focus-within:border-primary/50 transition-colors shadow-sm relative">
+                                {/* Attachment Preview */}
+                                {attachment && (
+                                    <div className="w-full relative">
+                                        {attachmentPreview ? (
+                                            <div className="relative">
+                                                <img 
+                                                    src={attachmentPreview} 
+                                                    alt="Preview" 
+                                                    className="max-h-24 rounded-lg object-contain"
+                                                />
+                                                <button
+                                                    onClick={handleRemoveAttachment}
+                                                    className="absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2 bg-muted p-2 rounded-lg">
+                                                <FileText className="w-5 h-5 text-blue-500" />
+                                                <span className="text-sm truncate flex-1">{attachment.name}</span>
+                                                <button onClick={handleRemoveAttachment}>
+                                                    <X className="w-4 h-4 text-muted-foreground" />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                
+                                <div className="flex items-center gap-2 w-full">
                                 
                                 <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
                                     <PopoverTrigger asChild>
@@ -397,11 +482,26 @@ export function MessagesTab({ onBack }: { onBack?: () => void }) {
                                     </PopoverTrigger>
                                     <PopoverContent className="w-48 p-2" align="end" side="top">
                                         <div className="grid gap-1">
-                                            <Button variant="ghost" className="justify-start gap-2 h-9" onClick={() => alert("Upload de imagem em breve!")}>
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={handleFileSelect}
+                                            />
+                                            <Button 
+                                                variant="ghost" 
+                                                className="justify-start gap-2 h-9" 
+                                                onClick={() => fileInputRef.current?.click()}
+                                            >
                                                 <ImageIcon className="w-4 h-4 text-purple-500" />
                                                 <span>Foto/Vídeo</span>
                                             </Button>
-                                            <Button variant="ghost" className="justify-start gap-2 h-9" onClick={() => alert("Upload de documento em breve!")}>
+                                            <Button 
+                                                variant="ghost" 
+                                                className="justify-start gap-2 h-9" 
+                                                onClick={() => fileInputRef.current?.click()}
+                                            >
                                                 <FileText className="w-4 h-4 text-blue-500" />
                                                 <span>Documento</span>
                                             </Button>
@@ -413,14 +513,16 @@ export function MessagesTab({ onBack }: { onBack?: () => void }) {
                                     </PopoverContent>
                                 </Popover>
 
-                                {!newMessage && <button className="text-muted-foreground hover:text-foreground"><Camera className="w-5 h-5" /></button>}
+                                {!newMessage && !attachment && <button className="text-muted-foreground hover:text-foreground"><Camera className="w-5 h-5" /></button>}
+                                </div>
                             </div>
 
                             <button
-                                onClick={newMessage ? handleSendMessage : () => alert("Segure para gravar áudio (Simulação)")}
-                                className="w-11 h-11 bg-primary rounded-full flex items-center justify-center text-primary-foreground shadow-lg hover:scale-105 transition-transform"
+                                onClick={newMessage || attachment ? handleSendMessage : () => alert("Segure para gravar áudio (Simulação)")}
+                                disabled={sending}
+                                className="w-11 h-11 bg-primary rounded-full flex items-center justify-center text-primary-foreground shadow-lg hover:scale-105 transition-transform disabled:opacity-50"
                             >
-                                {newMessage ? <Send className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                                {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : newMessage || attachment ? <Send className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                             </button>
                         </div>
 

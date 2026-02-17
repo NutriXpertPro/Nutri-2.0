@@ -57,7 +57,7 @@ export default function AuthPage() {
         setLoginIsLoading(true)
 
         try {
-            const response = await fetch(`${getBaseURL()}auth/token/`, {
+            const response = await fetch(`${getBaseURL()}auth/login/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -69,13 +69,16 @@ export default function AuthPage() {
             })
 
             if (!response.ok) {
-                throw new Error("Credenciais inválidas")
+                const errorData = await response.json().catch(() => ({}))
+                console.error('[Login] Error response:', errorData)
+                throw new Error(errorData.error || errorData.detail || "Credenciais inválidas")
             }
 
             const data = await response.json()
             login(data)
-        } catch (_err) {
-            setLoginError("Email ou senha incorretos. Tente novamente.")
+        } catch (_err: any) {
+            console.error('[Login] Exception:', _err)
+            setLoginError(_err.message || "Email ou senha incorretos. Tente novamente.")
             setLoginIsLoading(false)
         }
     }

@@ -3,11 +3,47 @@
 import { Clock, Check, MoreHorizontal, Utensils, Coffee, Apple, Moon, Loader2, AlertCircle, Trophy } from "lucide-react"
 import { motion } from "framer-motion"
 import { useMeals } from "@/hooks/useMeals"
+import { mealsAPI } from "@/services/api"
 import { Button } from "@/components/ui/button"
 import { SubstitutionDrawer } from "@/components/patient-v2/substitution-drawer"
+import { useState, useEffect } from "react"
+
+interface DietInfo {
+    name: string
+    target_calories: number
+    target_protein: number
+    target_carbs: number
+    target_fats: number
+    instructions: string
+}
 
 export function DietTab() {
     const { meals, loading, error, checkInMeal, checkInAll } = useMeals()
+    const [dietInfo, setDietInfo] = useState<DietInfo | null>(null)
+
+    useEffect(() => {
+        const fetchDietInfo = async () => {
+            try {
+                const response = await mealsAPI.getDiets()
+                if (response.data && response.data.length > 0) {
+                    const activeDiet = response.data.find((d: any) => d.is_active) || response.data[0]
+                    setDietInfo({
+                        name: activeDiet.name,
+                        target_calories: activeDiet.target_calories || 1800,
+                        target_protein: activeDiet.target_protein || 0,
+                        target_carbs: activeDiet.target_carbs || 0,
+                        target_fats: activeDiet.target_fats || 0,
+                        instructions: activeDiet.instructions || '',
+                    })
+                }
+            } catch (err) {
+                console.error('Erro ao buscar info da dieta:', err)
+            }
+        }
+        fetchDietInfo()
+    }, [])
+
+    const calories = dietInfo?.target_calories || 1800
 
     const handleCheckIn = async (mealId: number) => {
         try {
@@ -64,7 +100,7 @@ export function DietTab() {
                     </button>
                 </div>
                 <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full border border-primary/20">
-                    1.800 kcal
+                    {calories} kcal
                 </span>
             </div>
 

@@ -43,7 +43,14 @@ const AutomationSettings = () => {
         const response = await api.get('automation/templates/');
 
         if (isMounted) { // Verificar se o componente ainda está montado
-          setTemplates(response.data);
+          const data = response.data;
+          if (Array.isArray(data)) {
+            setTemplates(data);
+          } else if (data && Array.isArray(data.results)) {
+            setTemplates(data.results);
+          } else {
+            setTemplates([]);
+          }
         }
       } catch (_error) {
         if (isMounted) { // Verificar se o componente ainda está montado

@@ -26,15 +26,13 @@ from .serializers_patient_data import (
 )
 import unicodedata
 
+
 def normalize_text(text):
     if not text:
         return ""
-    text = (
-        unicodedata.normalize("NFKD", text)
-        .encode("ascii", "ignore")
-        .decode("utf8")
-    )
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("utf8")
     return text.lower().strip()
+
 
 def get_significant_words(text):
     words = normalize_text(text).split()
@@ -186,9 +184,15 @@ class PatientMealsViewSet(viewsets.ViewSet):
             # FALLBACK: Se não houver refeições para hoje, tentar dia 0 (padrão)
             # ou o primeiro dia disponível na dieta.
             if not meals.exists():
-                available_days = Meal.objects.filter(diet=active_diet).values_list('day_of_week', flat=True).distinct()
+                available_days = (
+                    Meal.objects.filter(diet=active_diet)
+                    .values_list("day_of_week", flat=True)
+                    .distinct()
+                )
                 if available_days.exists():
-                    fallback_day = 0 if 0 in available_days else sorted(list(available_days))[0]
+                    fallback_day = (
+                        0 if 0 in available_days else sorted(list(available_days))[0]
+                    )
                     meals = (
                         Meal.objects.filter(diet=active_diet, day_of_week=fallback_day)
                         .prefetch_related("items")
@@ -237,66 +241,70 @@ class PatientMealsViewSet(viewsets.ViewSet):
                     total_carbs += item_carbs
                     total_fats += item_fats
 
-
-
-                # === SUBSTITUTION LOGIC ===
+                    # === SUBSTITUTION LOGIC ===
                     # 1. Prioritize Strict/Manual Substitutions from the Diet Plan
                     # This ensures that what the nutritionist explicitly defined is what the patient sees.
-                    
+
                     sub_options = []
                     found_manual_sub = False
 
                     # Normalize current item name for matching
                     item_name_norm = normalize_text(item.food_name)
-                    
+
                     for sub_group in diet_subs:
                         original_name = sub_group.get("original", "")
                         original_norm = normalize_text(original_name)
-                        
+
                         # Check for exact match or robust containment (both ways)
                         # We also check if the item is part of the original name or vice-versa
                         # This handles cases like "Arroz Branco" matching "Arroz"
                         is_match = False
                         if original_norm and (
-                            original_norm == item_name_norm 
+                            original_norm == item_name_norm
                             or original_norm in item_name_norm
                             or item_name_norm in original_norm
                         ):
                             is_match = True
-                        
+
                         if is_match:
                             try:
                                 # Add manual options
                                 for opt in sub_group.get("options", []):
-                                    sub_options.append({
-                                        "name": opt.get("name", ""),
-                                        "quantity": float(opt.get("quantity", 0)),
-                                        "unit": opt.get("unit", item.unit),
-                                        "kcal": 0, # Frontend handles display or we could calc if DB link existed
-                                        "group": "Indicado pelo Nutri",
-                                        "source": "manual"
-                                    })
+                                    sub_options.append(
+                                        {
+                                            "name": opt.get("name", ""),
+                                            "quantity": float(opt.get("quantity", 0)),
+                                            "unit": opt.get("unit", item.unit),
+                                            "kcal": 0,  # Frontend handles display or we could calc if DB link existed
+                                            "group": "Indicado pelo Nutri",
+                                            "source": "manual",
+                                        }
+                                    )
                                 found_manual_sub = True
-                                print(f"DEBUG: MATCH MANUAL ENCONTRADO para {item.food_name} com regra {original_name}!")
+                                print(
+                                    f"DEBUG: MATCH MANUAL ENCONTRADO para {item.food_name} com regra {original_name}!"
+                                )
                             except Exception as sub_err:
-                                print(f"Erro ao processar substituição manual: {sub_err}")
-                    
+                                print(
+                                    f"Erro ao processar substituição manual: {sub_err}"
+                                )
+
                     # 2. Auto-Substitutions (Fallback)
                     # This searches for similar foods in the same nutritional group
                     if not found_manual_sub:
                         try:
                             from diets.nutritional_substitution import (
-                                sugerir_substitucoes, 
-                                identificar_grupo_nutricional, 
+                                sugerir_substitucoes,
+                                identificar_grupo_nutricional,
                                 NutricaoAlimento,
-                                alimento_taco_para_nutricao
+                                alimento_taco_para_nutricao,
                             )
                             from diets.models import AlimentoTACO
-                            
+
                             # Use logic centralizada e estrita
                             # 1. Identificar se vale a pena buscar (se for agua de coco, já volta vazio ou grupo de bloqueio)
                             group_name = identificar_grupo_nutricional(item.food_name)
-                            
+
                             # Se for grupo de bloqueio (agua_de_coco), nem busca candidatos
                             if group_name == "agua_de_coco":
                                 # Logica de bloqueio explícito
@@ -305,31 +313,58 @@ class PatientMealsViewSet(viewsets.ViewSet):
                                 # Create NutricaoAlimento for current item
                                 current_nutri = NutricaoAlimento(
                                     nome=item.food_name,
-                                    energia_kcal=item_calories * (100.0/float(item.quantity)) if float(item.quantity) > 0 else 0,
-                                    proteina_g=item_protein * (100.0/float(item.quantity)) if float(item.quantity) > 0 else 0,
-                                    lipidios_g=item_fats * (100.0/float(item.quantity)) if float(item.quantity) > 0 else 0,
-                                    carboidrato_g=item_carbs * (100.0/float(item.quantity)) if float(item.quantity) > 0 else 0,
-                                    fibra_g=float(item.fiber or 0) * (100.0/float(item.quantity)) if float(item.quantity) > 0 else 0
+                                    energia_kcal=item_calories
+                                    * (100.0 / float(item.quantity))
+                                    if float(item.quantity) > 0
+                                    else 0,
+                                    proteina_g=item_protein
+                                    * (100.0 / float(item.quantity))
+                                    if float(item.quantity) > 0
+                                    else 0,
+                                    lipidios_g=item_fats
+                                    * (100.0 / float(item.quantity))
+                                    if float(item.quantity) > 0
+                                    else 0,
+                                    carboidrato_g=item_carbs
+                                    * (100.0 / float(item.quantity))
+                                    if float(item.quantity) > 0
+                                    else 0,
+                                    fibra_g=float(item.fiber or 0)
+                                    * (100.0 / float(item.quantity))
+                                    if float(item.quantity) > 0
+                                    else 0,
                                 )
-                                
+
                                 # Fetch candidates (optimized slice)
-                                candidates_taco = [alimento_taco_para_nutricao(f) for f in AlimentoTACO.objects.all()[:1000]]
-                                
+                                candidates_taco = [
+                                    alimento_taco_para_nutricao(f)
+                                    for f in AlimentoTACO.objects.all()[:1000]
+                                ]
+
                                 # Call the STRICT engine
-                                suggestions = sugerir_substitucoes(current_nutri, candidates_taco, float(item.quantity), limite=5)
-                                
+                                suggestions = sugerir_substitucoes(
+                                    current_nutri,
+                                    candidates_taco,
+                                    float(item.quantity),
+                                    limite=5,
+                                )
+
                                 for res in suggestions:
-                                    sub_options.append({
-                                        "name": res.alimento_substituto,
-                                        "quantity": res.quantidade_substituto_g,
-                                        "unit": "g",
-                                        "kcal": res.calorias_substituto,
-                                        "group": res.grupo.replace("_", " ").title(),
-                                        "source": "auto"
-                                    })
+                                    sub_options.append(
+                                        {
+                                            "name": res.alimento_substituto,
+                                            "quantity": res.quantidade_substituto_g,
+                                            "unit": "g",
+                                            "kcal": res.calorias_substituto,
+                                            "group": res.grupo.replace(
+                                                "_", " "
+                                            ).title(),
+                                            "source": "auto",
+                                        }
+                                    )
                         except Exception as auto_err:
                             print(f"Erro no fallback de substituição: {auto_err}")
-                            
+
                     # ID e Fonte Técnica para Substituições Precisas
                     item_food_id = None
                     item_source = "TACO"
@@ -380,13 +415,16 @@ class PatientMealsViewSet(viewsets.ViewSet):
             )
         except Exception as e:
             import traceback
+
             error_details = traceback.format_exc()
             print(f"CRITICAL ERROR IN MEALS VIEW: {error_details}")
-            
+
             # Log to file for debugging
             try:
                 with open("debug_errors.log", "a") as f:
-                    f.write(f"\nCRITICAL ERROR in MEALS VIEW at {datetime.now()}:\n{error_details}\n")
+                    f.write(
+                        f"\nCRITICAL ERROR in MEALS VIEW at {datetime.now()}:\n{error_details}\n"
+                    )
             except:
                 pass
 
@@ -415,13 +453,13 @@ class PatientMealsViewSet(viewsets.ViewSet):
             try:
                 from notifications.models import Notification
                 from django.utils import timezone
-                
+
                 Notification.objects.create(
                     user=patient.nutritionist,
                     title="Novo Check-in de Refeição! 🥗",
                     message=f"Seu paciente {patient.user.name} registrou a refeição: {meal.name}.",
                     notification_type="meal_checkin",
-                    sent_at=timezone.now()
+                    sent_at=timezone.now(),
                 )
             except Exception as e:
                 print(f"Erro ao criar notificação de check-in: {e}")
@@ -963,7 +1001,197 @@ def patient_notes_view(request, patient_pk):
 
         serializer = ClinicalNoteSerializer(data=request.data)
         if serializer.is_valid():
-            # Associar a anotação ao paciente especificado
             serializer.save(patient=patient)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PatientDietsViewSet(viewsets.ViewSet):
+    """
+    ViewSet for patient to view all their diets (active and historical).
+    GET /api/v1/patients/me/diets/
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        """GET /api/v1/patients/me/diets/"""
+        from diets.models import Diet
+
+        try:
+            if request.user.user_type != "paciente":
+                return Response(
+                    {"error": "Acesso negado."}, status=status.HTTP_403_FORBIDDEN
+                )
+
+            patient = request.user.patient_profile
+
+            # Get all diets for this patient, ordered by creation date (newest first)
+            diets = Diet.objects.filter(patient=patient).order_by("-created_at")
+
+            result = []
+            for diet in diets:
+                # Get the first meal to calculate total calories if needed
+                first_meal = diet.meals.first()
+
+                result.append(
+                    {
+                        "id": diet.id,
+                        "name": diet.name,
+                        "goal": diet.get_goal_display() if diet.goal else None,
+                        "instructions": diet.instructions,
+                        "is_active": diet.is_active,
+                        "target_calories": diet.target_calories,
+                        "target_protein": diet.target_protein,
+                        "target_carbs": diet.target_carbs,
+                        "target_fats": diet.target_fats,
+                        "tmb": diet.tmb,
+                        "gcdt": diet.gcdt,
+                        "pdf_file": diet.pdf_file.url if diet.pdf_file else None,
+                        "created_at": diet.created_at.strftime("%d/%m/%Y")
+                        if diet.created_at
+                        else None,
+                        "start_date": diet.start_date.strftime("%d/%m/%Y")
+                        if diet.start_date
+                        else None,
+                        "end_date": diet.end_date.strftime("%d/%m/%Y")
+                        if diet.end_date
+                        else None,
+                    }
+                )
+
+            return Response(result)
+
+        except PatientProfile.DoesNotExist:
+            return Response(
+                {"error": "Perfil do paciente não encontrado"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class PatientEvaluationsViewSet(viewsets.ViewSet):
+    """
+    ViewSet for patient to view their physical evaluations.
+    GET /api/v1/patients/me/evaluations/
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        """GET /api/v1/patients/me/evaluations/"""
+        from evaluations.models import Evaluation, EvaluationPhoto
+
+        try:
+            if request.user.user_type != "paciente":
+                return Response(
+                    {"error": "Acesso negado."}, status=status.HTTP_403_FORBIDDEN
+                )
+
+            patient = request.user.patient_profile
+
+            # Get all evaluations for this patient
+            evaluations = Evaluation.objects.filter(patient=patient).order_by("-date")
+
+            result = []
+            for eval in evaluations:
+                # Get photos
+                photos = []
+                for photo in eval.photos.all():
+                    photos.append(
+                        {
+                            "id": photo.id,
+                            "label": photo.get_label_display(),
+                            "image_url": photo.image.url if photo.image else None,
+                        }
+                    )
+
+                result.append(
+                    {
+                        "id": eval.id,
+                        "date": eval.date.strftime("%d/%m/%Y") if eval.date else None,
+                        "method": eval.get_method_display() if eval.method else None,
+                        "height": eval.height,
+                        "weight": eval.weight,
+                        "body_fat": eval.body_fat,
+                        "muscle_mass": eval.muscle_mass,
+                        "bmi": eval.bmi,
+                        "body_measurements": eval.body_measurements,
+                        "notes": eval.notes,
+                        "photos": photos,
+                    }
+                )
+
+            return Response(result)
+
+        except PatientProfile.DoesNotExist:
+            return Response(
+                {"error": "Perfil do paciente não encontrado"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class PatientLabExamsViewSet(viewsets.ViewSet):
+    """
+    ViewSet for patient to view lab exams sent by nutritionist.
+    GET /api/v1/patients/me/lab_exams/
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        """GET /api/v1/patients/me/lab_exams/"""
+        from lab_exams.models import LabExam
+
+        try:
+            if request.user.user_type != "paciente":
+                return Response(
+                    {"error": "Acesso negado."}, status=status.HTTP_403_FORBIDDEN
+                )
+
+            patient = request.user.patient_profile
+
+            # Get lab exams for this patient
+            exams = LabExam.objects.filter(patient=patient).order_by("-created_at")
+
+            result = []
+            for exam in exams:
+                result.append(
+                    {
+                        "id": exam.id,
+                        "title": exam.title,
+                        "description": exam.description,
+                        "exam_type": exam.get_exam_type_display()
+                        if exam.exam_type
+                        else None,
+                        "status": exam.get_status_display() if exam.status else None,
+                        "result_data": exam.result_data,
+                        "notes": exam.notes,
+                        "nutritional_notes": exam.nutritional_notes,
+                        "created_at": exam.created_at.strftime("%d/%m/%Y")
+                        if exam.created_at
+                        else None,
+                        "appointment_date": exam.appointment_date.strftime("%d/%m/%Y")
+                        if exam.appointment_date
+                        else None,
+                    }
+                )
+
+            return Response(result)
+
+        except PatientProfile.DoesNotExist:
+            return Response(
+                {"error": "Perfil do paciente não encontrado"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

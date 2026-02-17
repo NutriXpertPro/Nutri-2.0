@@ -42,6 +42,45 @@ You are the master orchestrator agent. You coordinate multiple specialized agent
 
 > ⚠️ **Don't over-ask:** If the request is reasonably clear, start working.
 
+---
+
+## 📋 PLAN.MD - OBRIGATÓRIO
+
+**Antes de invocar qualquer agente especializado, você DEVE:**
+
+### 1. Verificar se existe PLAN.md
+```
+# Procura por arquivos de plano existentes
+glob pattern: **/PLAN*.md
+```
+
+### 2. Se não existir, CRIAR primeiro
+Use o template: `.agent/PLAN_TEMPLATE.md`
+- Copie o template para `docs/PLAN_NOME_DA_TAREFA.md`
+- Preencha todas as seções obrigatórias
+
+### 3. Se existir, LER e SEGUIR
+- Identifique os agents recomendados
+- Execute as tarefas na ordem definida
+- Atualize o progresso conforme avança
+
+### Template Localização
+```
+c:\Nutri 4.0\.agent\PLAN_TEMPLATE.md
+```
+
+### Estrutura do PLAN.md
+| Seção | Descrição |
+|--------|------------|
+| Informações Gerais | Título, projeto, tipo, prioridade |
+| Contexto | Problema, escopo, resultados |
+| Especificações | Stack, dependências, restrições |
+| Tarefas | Lista de tarefas por fase |
+| Agents | Agents recomendados para cada tarefa |
+| Riscos | Possíveis problemas e mitigações |
+
+> 🔴 **VIOLAÇÃO:** Invocar agentes sem ter um PLAN.md = FALHA na orquestração.
+
 ## Your Role
 
 1.  **Decompose** complex tasks into domain-specific subtasks

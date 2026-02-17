@@ -60,10 +60,33 @@ export function EcoHeader() {
         if (!name) return 'Novo Paciente'
         const parts = name.trim().split(/\s+/)
         if (parts.length <= 2) return name
-        const first = parts[0]
-        const last = parts[parts.length - 1]
-        const middles = parts.slice(1, -1).map(p => p[0].toUpperCase() + '.')
-        return `${first} ${middles.join(' ')} ${last}`
+        
+        const prepositions = ['de', 'da', 'do', 'des', 'das', 'dos']
+        
+        // Verificar se tem preposições no nome - se tiver, não abreviar
+        const hasPreposition = parts.some(p => prepositions.includes(p.toLowerCase()))
+        
+        // Se tem preposição, mostrar primeiro + último (ex: "Angela Ana")
+        if (hasPreposition) {
+            // Encontrar o último nome que não seja preposição
+            let lastNonPreposition = parts[parts.length - 1]
+            for (let i = parts.length - 1; i >= 0; i--) {
+                if (!prepositions.includes(parts[i].toLowerCase())) {
+                    lastNonPreposition = parts[i]
+                    break
+                }
+            }
+            return `${parts[0]} ${lastNonPreposition}`
+        }
+        
+        // Se não tem preposição e tem mais de 4 partes, abreviar
+        if (parts.length > 4) {
+            const middles = parts.slice(1, -1).map(p => p[0].toUpperCase() + '.')
+            return `${parts[0]} ${middles.join(' ')} ${parts[parts.length - 1]}`
+        }
+        
+        // Para 3-4 palavras sem preposições, mostrar completo
+        return name
     }
 
     // Patient Search State
@@ -340,7 +363,6 @@ export function EcoHeader() {
                         <div className="space-y-1">
                             <div className="flex items-center gap-3">
                                 <h1 className="text-3xl font-normal tracking-tight">{formatPatientName(patient?.name || '')}</h1>
-                                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Ativo</Badge>
                             </div>
                             <p className="text-muted-foreground flex items-center gap-2">
                                 <Target className="h-4 w-4 text-primary" />

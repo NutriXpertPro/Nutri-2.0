@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .serializers import (
     NutritionistRegistrationSerializer, 
@@ -50,12 +51,28 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
     """
     serializer_class = UserDetailSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_object(self):
         """
         The object to retrieve/update is the user making the request.
         """
         return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        """
+        Override update to pass request in context for file uploads.
+        This is needed to access request.FILES and request.data in the serializer.
+        """
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        
+        # Pass request in context so serializer can access request.FILES
+        serializer = self.get_serializer(instance, data=request.data, context={'request': request}, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
+        return Response(serializer.data)
 
 class ChangePasswordView(generics.GenericAPIView):
     """

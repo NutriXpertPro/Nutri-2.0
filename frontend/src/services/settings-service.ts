@@ -72,32 +72,50 @@ export const settingsService = {
     const formData = new FormData();
     let isFormData = false;
 
+    console.log('[SettingsService] updateProfileWithFiles:', {
+      hasProfilePicture: data.profile_picture !== undefined,
+      profilePictureType: data.profile_picture ? (data.profile_picture instanceof File ? 'File' : typeof data.profile_picture) : 'undefined',
+      profilePictureIsNull: data.profile_picture === null
+    });
+
+    // Apenas enviamos profile_picture se não for undefined
     if (data.profile_picture !== undefined) {
       isFormData = true;
       if (data.profile_picture === null) {
-        formData.append('profile_picture', '');
+        // Enviar string vazia sinaliza ao backend para remover a imagem
+        formData.append('profile_picture_file', '');
+        console.log('[SettingsService] Adicionado profile_picture_file vazio (remover)');
       } else if (data.profile_picture instanceof File) {
-        formData.append('profile_picture', data.profile_picture);
+        formData.append('profile_picture_file', data.profile_picture);
+        console.log('[SettingsService] Adicionado profile_picture_file File:', data.profile_picture.name);
       }
+    } else {
+      console.log('[SettingsService] profile_picture é undefined, não adicionando ao FormData');
     }
 
     if (isFormData) {
       if (data.name !== undefined) formData.append('name', data.name);
       if (data.professional_title !== undefined) formData.append('professional_title', data.professional_title === null ? '' : data.professional_title);
       if (data.gender !== undefined) formData.append('gender', data.gender === null ? '' : data.gender);
+
+      // DRF com MultiPartParser não aninha automaticamente settings.theme.
+      // Vamos enviar como strings no FormData.
       if (data.settings) {
-        formData.append('settings.theme', data.settings.theme || '');
-        formData.append('settings.language', data.settings.language || '');
-        formData.append('settings.notifications_email', String(data.settings.notifications_email));
-        formData.append('settings.notifications_push', String(data.settings.notifications_push));
+        if (data.settings.theme !== undefined) formData.append('settings.theme', data.settings.theme);
+        if (data.settings.language !== undefined) formData.append('settings.language', data.settings.language);
+        if (data.settings.notifications_email !== undefined) formData.append('settings.notifications_email', String(data.settings.notifications_email));
+        if (data.settings.notifications_push !== undefined) formData.append('settings.notifications_push', String(data.settings.notifications_push));
       }
 
+      console.log('[SettingsService] Enviando FormData para /users/me/');
       return api.patch('/users/me/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
     } else {
+      // Se não há arquivo, enviamos como JSON normal para manter o aninhamento do DRF
+      console.log('[SettingsService] Enviando JSON para /users/me/');
       return api.patch('/users/me/', data);
     }
   },
@@ -112,14 +130,22 @@ export const settingsService = {
       }
     });
 
-    // Adicionar arquivo de logo se existir
-    if (data.logo && typeof data.logo === 'object' && data.logo instanceof File) {
-      formData.append('logo', data.logo);
+    // Adicionar arquivo de logo se houver mudança
+    if (data.logo !== undefined) {
+      if (data.logo === null) {
+        formData.append('logo', '');
+      } else if (data.logo instanceof File) {
+        formData.append('logo', data.logo);
+      }
     }
 
-    // Adicionar arquivo de assinatura se existir
-    if (data.signature_image && typeof data.signature_image === 'object' && data.signature_image instanceof File) {
-      formData.append('signature_image', data.signature_image);
+    // Adicionar arquivo de assinatura se houver mudança
+    if (data.signature_image !== undefined) {
+      if (data.signature_image === null) {
+        formData.append('signature_image', '');
+      } else if (data.signature_image instanceof File) {
+        formData.append('signature_image', data.signature_image);
+      }
     }
 
     return api.patch('/branding/branding/me/', formData, {

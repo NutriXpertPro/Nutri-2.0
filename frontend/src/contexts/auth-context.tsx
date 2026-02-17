@@ -96,8 +96,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 
     const login = async (tokens: { access: string; refresh: string }, redirect = true) => {
-        Cookies.set("accessToken", tokens.access, { expires: 1, path: '/' }) // 1 day
-        Cookies.set("refreshToken", tokens.refresh, { expires: 7, path: '/' }) // 7 days
+        const isProduction = typeof window !== 'undefined' && window.location.protocol === 'https:'
+        
+        Cookies.set("accessToken", tokens.access, { 
+            expires: 1, 
+            path: '/',
+            sameSite: isProduction ? 'none' : 'lax',
+            secure: isProduction,
+        })
+        Cookies.set("refreshToken", tokens.refresh, { 
+            expires: 7, 
+            path: '/',
+            sameSite: isProduction ? 'none' : 'lax',
+            secure: isProduction,
+        })
 
         // Sync with localStorage for api.ts interceptor
         localStorage.setItem('access_token', tokens.access)

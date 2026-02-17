@@ -26,7 +26,7 @@ export default function PatientLoginPage() {
 
     try {
       // Fazer login do paciente
-      const response = await fetch(`${getBaseURL()}auth/token/`, {
+      const response = await fetch(`${getBaseURL()}auth/login/paciente/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +38,8 @@ export default function PatientLoginPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Credenciais inválidas');
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Credenciais inválidas');
       }
 
       const data = await response.json();
@@ -46,8 +47,8 @@ export default function PatientLoginPage() {
 
       // Redirecionar para o dashboard do paciente V2 (oficial)
       router.push('/patient-dashboard-v2');
-    } catch (_err) {
-      setError('Email ou senha incorretos. Tente novamente.');
+    } catch (err: any) {
+      setError(err.message || 'Email ou senha incorretos. Tente novamente.');
     } finally {
       setLoading(false);
     }

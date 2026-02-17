@@ -118,12 +118,16 @@ const patientService = {
     },
 
     update: async (id: number, data: any) => {
-        // Se houver arquivo, usar FormData
+        // Se houver arquivo ou for null (remover), usar FormData
         if (data.profile_picture instanceof File || data.profile_picture === null) {
             const formData = new FormData()
             Object.entries(data).forEach(([key, value]) => {
                 if (value !== undefined) {
-                    if (value === null) {
+                    if (key === 'profile_picture' && value instanceof File) {
+                        formData.append('profile_picture_file', value)
+                    } else if (key === 'profile_picture' && value === null) {
+                        formData.append('profile_picture_file', '')
+                    } else if (value === null) {
                         formData.append(key, '')
                     } else if (value instanceof File) {
                         formData.append(key, value)

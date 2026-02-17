@@ -55,12 +55,13 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     restart: always
+    ports:
+      - "3000:3000"
     environment:
       - NEXT_PUBLIC_API_BASE_URL=https://srv1354256.hstgr.cloud/api/v1
+      - NODE_ENV=production
     depends_on:
       - backend
-    volumes:
-      - frontend_build:/app/out
     networks:
       - app-network
 
@@ -75,7 +76,6 @@ services:
       - ./ssl_certs:/etc/ssl/certs:ro
       - static_data:/var/www/static
       - media_data:/var/www/media
-      - frontend_build:/var/www/html
     depends_on:
       - backend
       - frontend
@@ -87,7 +87,6 @@ volumes:
   redis_data:
   static_data:
   media_data:
-  frontend_build:
 
 
 networks:

@@ -5,8 +5,11 @@ import { Bell, User } from "lucide-react"
 import { AppearanceSettings } from "./AppearanceSettings"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useAuth } from "@/contexts/auth-context"
 
 export function PatientHeaderV2() {
+    const { user } = useAuth()
+
     return (
         <header className="fixed top-0 left-0 right-0 h-16 glass-header z-50 px-4 flex items-center justify-between">
             {/* Brand Logo & Name */}
@@ -21,8 +24,6 @@ export function PatientHeaderV2() {
 
             {/* Actions */}
             <div className="flex items-center gap-1">
-                {/* O usuário pediu os seletores apenas na tela de login, mas o prompt original 
-                também mencionou seletor de tema no header. Vou incluir de forma minimalista. */}
                 <AppearanceSettings />
 
                 <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full">
@@ -31,8 +32,10 @@ export function PatientHeaderV2() {
                 </Button>
 
                 <Avatar className="h-8 w-8 border border-border/50 ml-1">
-                    <AvatarImage src="" />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">AC</AvatarFallback>
+                    <AvatarImage src={user?.avatar || ""} />
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                        {user?.name?.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() || "U"}
+                    </AvatarFallback>
                 </Avatar>
             </div>
         </header>

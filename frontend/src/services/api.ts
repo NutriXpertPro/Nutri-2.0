@@ -4,17 +4,9 @@ export const getBaseURL = () => {
     // Check for environment variable first
     const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-    if (envUrl && !envUrl.includes('localhost')) {
+    if (envUrl) {
+        // Always use the configured URL, whether local or production
         return envUrl.endsWith('/') ? envUrl : `${envUrl}/`;
-    }
-
-    // Dynamic detection based on current hostname and protocol
-    if (typeof window !== 'undefined') {
-        const hostname = window.location.hostname;
-        const protocol = window.location.protocol; // 'http:' or 'https:'
-        
-        // If accessing via IP or domain, use same protocol and hostname for the API
-        return `${protocol}//${hostname}/api/v1/`;
     }
 
     // Fallback for local development
@@ -26,7 +18,7 @@ export const api: AxiosInstance = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 10000,
+    timeout: 30000,
     withCredentials: true,
 })
 
@@ -61,7 +53,7 @@ api.interceptors.response.use(
                     throw new Error('No refresh token')
                 }
 
-                const response = await axios.post(`${getBaseURL()}auth/token/refresh/`, {
+                const response = await axios.post(`${getBaseURL()}v1/auth/token/refresh/`, {
                     refresh: refreshToken,
                 })
 
@@ -104,13 +96,13 @@ api.interceptors.response.use(
 // --- Auth ---
 export const authAPI = {
     login: (email: string, password: string) =>
-        api.post('auth/login/', { email, password }),
+        api.post('v1/auth/token/', { email, password }),
 
     logout: () =>
-        api.post('auth/logout/'),
+        api.post('v1/auth/logout/'),
 
     refreshToken: (refresh: string) =>
-        api.post('auth/refresh/', { refresh }),
+        api.post('v1/auth/token/refresh/', { refresh }),
 }
 
 // --- Patient Profile ---
@@ -138,6 +130,9 @@ export const mealsAPI = {
 
     getMeals: (date?: string) =>
         api.get('patients/me/meals/', { params: { date } }),
+    
+    getDiets: () =>
+        api.get('patients/me/diets/'),
 
     checkInMeal: (mealId: number) =>
         api.post(`patients/me/meals/${mealId}/check_in/`),
@@ -169,6 +164,9 @@ export const evolutionAPI = {
 
     submitEvaluation: (data: any) =>
         api.post('patients/me/evaluations/', data),
+    
+    getEvaluations: () =>
+        api.get('patients/me/evaluations/'),
 }
 
 // --- Appointments ---
@@ -181,6 +179,15 @@ export const appointmentsAPI = {
 
     cancelAppointment: (appointmentId: number) =>
         api.delete(`patients/me/appointments/${appointmentId}/`),
+    
+    createAppointment: (data: {
+        date: string
+        time: string
+        appointment_type: string
+        notes?: string
+        status?: string
+    }) =>
+        api.post('patients/me/appointments/', data),
 }
 
 // --- Messages ---
@@ -214,6 +221,20 @@ export const settingsAPI = {
 
     getNotifications: () =>
         api.get('notifications/'),
+}
+
+// --- Exams ---
+export const examsAPI = {
+    getExams: () =>
+        api.get('patients/me/exams/'),
+    
+    getLabExams: () =>
+        api.get('patients/me/lab_exams/'),
+    
+    uploadExam: (formData: FormData) =>
+        api.post('patients/me/exams/', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        }),
 }
 
 export default api

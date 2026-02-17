@@ -475,7 +475,7 @@ export function Header({ className, sidebarCollapsed }: HeaderProps) {
                             <DropdownMenuContent align="end" className="w-56">
                                 <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => router.push("/profile")}>
+                                <DropdownMenuItem onClick={() => router.push("/settings")}>
                                     <User className="mr-2 h-4 w-4" />
                                     Perfil
                                 </DropdownMenuItem>

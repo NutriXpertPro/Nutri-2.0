@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { useAuth } from '@/contexts/auth-context';
 import {
   Select,
   SelectContent,
@@ -14,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { } from '@/components/ui/badge';
 import {
   Upload,
   Palette,
@@ -22,26 +22,19 @@ import {
   User,
   Phone,
   MapPin,
-  Mail,
   PenLine,
-  Settings,
   Save
 } from 'lucide-react';
-import { settingsService, CombinedSettings, BrandingSettings } from '@/services/settings-service';
+import { settingsService } from '@/services/settings-service';
 import { useToast } from '@/components/ui/use-toast';
-
-// Definir os tipos para reutilização
-const professionalTitleEnum = ["NUT", "DR", "DRA", "ESP", "MTR", "PHD"] as const;
-const genderEnum = ["M", "F", "O"] as const;
-const themeEnum = ["light", "dark", "system"] as const;
-const languageEnum = ["pt-BR", "en-US"] as const;
+import { useTheme } from 'next-themes';
 
 interface SettingsFormState {
   // Dados de perfil
   name: string;
   professional_title: string | null;
   gender: string | null;
-  profile_picture: File | null;
+  profile_picture: File | undefined | null;
   profile_picture_url: string | null;
   settings_theme: string;
   settings_language: string;
@@ -49,9 +42,9 @@ interface SettingsFormState {
   settings_notifications_push: boolean;
 
   // Dados de branding
-  logo: File | null;
+  logo: File | undefined | null;
   logo_url: string | null;
-  signature_image: File | null;
+  signature_image: File | undefined | null;
   signature_image_url: string | null;
   primary_color: string;
   secondary_color: string;
@@ -67,12 +60,14 @@ interface SettingsFormState {
 }
 
 const CombinedSettingsForm = () => {
+  const { refreshUser } = useAuth();
+  const { setTheme } = useTheme();
   const [settings, setSettings] = useState<SettingsFormState>({
     // Dados de perfil
     name: '',
     professional_title: null,
     gender: null,
-    profile_picture: null,
+    profile_picture: undefined,
     profile_picture_url: null,
     settings_theme: 'system',
     settings_language: 'pt-BR',
@@ -80,9 +75,9 @@ const CombinedSettingsForm = () => {
     settings_notifications_push: false,
 
     // Dados de branding
-    logo: null,
+    logo: undefined,
     logo_url: null,
-    signature_image: null,
+    signature_image: undefined,
     signature_image_url: null,
     primary_color: '#22c55e',
     secondary_color: '#059669',
@@ -107,30 +102,31 @@ const CombinedSettingsForm = () => {
 
   // Carregar configurações combinadas
   useEffect(() => {
-    let isMounted = true; // Flag para evitar atualizações em componentes desmontados
+    let isMounted = true;
 
     const fetchSettings = async () => {
       try {
         setLoading(true);
         const data = await settingsService.getCombinedSettings();
 
-        if (isMounted) { // Verificar se o componente ainda está montado
+        if (isMounted) {
+          const theme = data.profile.settings.theme || 'system';
           setSettings({
             // Dados de perfil
             name: data.profile.name || '',
             professional_title: data.profile.professional_title || null,
             gender: data.profile.gender || null,
-            profile_picture: null, // Não carregamos o arquivo, apenas a URL
+            profile_picture: undefined,
             profile_picture_url: data.profile.profile_picture || null,
-            settings_theme: data.profile.settings.theme || 'system',
+            settings_theme: theme,
             settings_language: data.profile.settings.language || 'pt-BR',
             settings_notifications_email: data.profile.settings.notifications_email,
             settings_notifications_push: data.profile.settings.notifications_push,
 
             // Dados de branding
-            logo: null, // Não carregamos o arquivo, apenas a URL
+            logo: undefined,
             logo_url: (data.branding.logo as string) || null,
-            signature_image: null, // Não carregamos o arquivo, apenas a URL
+            signature_image: undefined,
             signature_image_url: (data.branding.signature_image as string) || null,
             primary_color: data.branding.primary_color || '#22c55e',
             secondary_color: data.branding.secondary_color || '#059669',
@@ -144,10 +140,11 @@ const CombinedSettingsForm = () => {
             document_footer: data.branding.document_footer || '',
             is_active: data.branding.is_active
           });
+          // Sincronizar tema com next-themes
+          setTheme(theme);
         }
       } catch (_error) {
-        if (isMounted) { // Verificar se o componente ainda está montado
-
+        if (isMounted) {
           toast({
             title: 'Erro',
             description: 'Falha ao carregar as configurações',
@@ -155,7 +152,7 @@ const CombinedSettingsForm = () => {
           });
         }
       } finally {
-        if (isMounted) { // Verificar se o componente ainda está montado
+        if (isMounted) {
           setLoading(false);
         }
       }
@@ -163,11 +160,10 @@ const CombinedSettingsForm = () => {
 
     fetchSettings();
 
-    // Cleanup function para definir isMounted como false quando o componente for desmontado
     return () => {
       isMounted = false;
     };
-  }, []); // Remover toast das dependências para evitar reexecução desnecessária
+  }, []);
 
   // Manipular mudança de arquivo de foto de perfil
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -218,7 +214,13 @@ const CombinedSettingsForm = () => {
     try {
       setIsSaving(true);
 
-      // Preparar dados para atualização
+      // Debug: log do estado atual
+      console.log('[Settings] Antes do save:', {
+        profile_picture: settings.profile_picture,
+        profile_picture_url: settings.profile_picture_url,
+        hasFile: settings.profile_picture instanceof File
+      });
+
       const updateData = {
         profile: {
           name: settings.name,
@@ -249,14 +251,59 @@ const CombinedSettingsForm = () => {
         }
       };
 
-      await settingsService.updateCombinedSettings(updateData);
+      const updatedData = await settingsService.updateCombinedSettings(updateData);
+
+      console.log('[Settings] Retorno do update:', updatedData);
 
       toast({
         title: 'Sucesso!',
         description: 'Configurações atualizadas com sucesso.',
       });
-    } catch (error) {
 
+      // Recarregar configurações do servidor para obter URLs atualizadas das imagens
+      const data = await settingsService.getCombinedSettings();
+      const theme = data.profile.settings.theme || 'system';
+      
+      console.log('[Settings] Retorno do getCombinedSettings:', {
+        profile_picture: data.profile.profile_picture,
+        profile_picture_url: data.profile.profile_picture
+      });
+      
+      setSettings({
+        // Dados de perfil
+        name: data.profile.name || '',
+        professional_title: data.profile.professional_title || null,
+        gender: data.profile.gender || null,
+        profile_picture: undefined,
+        profile_picture_url: data.profile.profile_picture || null,
+        settings_theme: theme,
+        settings_language: data.profile.settings.language || 'pt-BR',
+        settings_notifications_email: data.profile.settings.notifications_email,
+        settings_notifications_push: data.profile.settings.notifications_push,
+
+        // Dados de branding
+        logo: undefined,
+        logo_url: (data.branding.logo as string) || null,
+        signature_image: undefined,
+        signature_image_url: (data.branding.signature_image as string) || null,
+        primary_color: data.branding.primary_color || '#22c55e',
+        secondary_color: data.branding.secondary_color || '#059669',
+        business_name: data.branding.business_name || '',
+        crn_number: data.branding.crn_number || '',
+        professional_license: data.branding.professional_license || '',
+        email_signature: data.branding.email_signature || '',
+        phone: data.branding.phone || '',
+        address: data.branding.address || '',
+        document_header: data.branding.document_header || '',
+        document_footer: data.branding.document_footer || '',
+        is_active: data.branding.is_active
+      });
+      // Aplicar tema ao next-themes após salvar
+      setTheme(theme);
+
+      await refreshUser();
+    } catch (error) {
+      console.error('[Settings] Erro ao salvar:', error);
       toast({
         title: 'Erro',
         description: 'Falha ao atualizar as configurações',
@@ -277,7 +324,6 @@ const CombinedSettingsForm = () => {
 
   return (
     <div className="space-y-6">
-      {/* Seção de Informações do Perfil */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -290,7 +336,6 @@ const CombinedSettingsForm = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Foto de Perfil */}
             <div>
               <Label htmlFor="profile-picture-upload">Foto de Perfil</Label>
               <div className="mt-2 flex items-center space-x-4">
@@ -321,7 +366,6 @@ const CombinedSettingsForm = () => {
                     <User className="h-8 w-8 text-muted-foreground" />
                   </div>
                 )}
-
                 <div>
                   <Input
                     id="profile-picture-upload"
@@ -346,7 +390,6 @@ const CombinedSettingsForm = () => {
               </div>
             </div>
 
-            {/* Nome e Título Profissional */}
             <div className="space-y-4">
               <div>
                 <Label htmlFor="name">Nome</Label>
@@ -358,7 +401,6 @@ const CombinedSettingsForm = () => {
                   className="mt-1"
                 />
               </div>
-
               <div>
                 <Label htmlFor="professional-title">Título Profissional</Label>
                 <Select
@@ -382,7 +424,6 @@ const CombinedSettingsForm = () => {
             </div>
           </div>
 
-          {/* Configurações de Preferências */}
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label htmlFor="theme">Tema da Interface</Label>
@@ -400,7 +441,6 @@ const CombinedSettingsForm = () => {
                 </SelectContent>
               </Select>
             </div>
-
             <div>
               <Label htmlFor="language">Idioma</Label>
               <Select
@@ -418,31 +458,21 @@ const CombinedSettingsForm = () => {
             </div>
           </div>
 
-          {/* Configurações de Notificações */}
           <div className="mt-6 space-y-4">
             <div className="flex items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <Label className="text-base">
-                  Notificações por Email
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Receba notificações importantes por email.
-                </p>
+                <Label className="text-base">Notificações por Email</Label>
+                <p className="text-sm text-muted-foreground">Receba notificações importantes por email.</p>
               </div>
               <Switch
                 checked={settings.settings_notifications_email}
                 onCheckedChange={(checked) => handleChange('settings_notifications_email', checked)}
               />
             </div>
-
             <div className="flex items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <Label className="text-base">
-                  Notificações Push
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Receba notificações instantâneas no seu navegador ou dispositivo.
-                </p>
+                <Label className="text-base">Notificações Push</Label>
+                <p className="text-sm text-muted-foreground">Receba notificações instantâneas no seu navegador ou dispositivo.</p>
               </div>
               <Switch
                 checked={settings.settings_notifications_push}
@@ -453,20 +483,16 @@ const CombinedSettingsForm = () => {
         </CardContent>
       </Card>
 
-      {/* Seção de Branding */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5 text-primary" />
             Configurações de Branding
           </CardTitle>
-          <CardDescription>
-            Personalize sua identidade visual na plataforma
-          </CardDescription>
+          <CardDescription>Personalize sua identidade visual na plataforma</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Coluna Esquerda - Identidade Visual */}
             <div className="space-y-6">
               <div>
                 <Label htmlFor="logo-upload">Logo do Consultório</Label>
@@ -498,7 +524,6 @@ const CombinedSettingsForm = () => {
                       <ImageIcon className="h-8 w-8 text-muted-foreground" />
                     </div>
                   )}
-
                   <div>
                     <Input
                       id="logo-upload"
@@ -516,19 +541,14 @@ const CombinedSettingsForm = () => {
                       <Upload className="h-4 w-4 mr-2" />
                       Selecionar Logo
                     </Button>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Formatos: JPG, PNG (máx. 5MB)
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">Formatos: JPG, PNG (máx. 5MB)</p>
                   </div>
                 </div>
               </div>
 
-              {/* Assinatura Digital */}
               <div>
                 <Label htmlFor="signature-upload">Assinatura Digital</Label>
-                <p className="text-xs text-muted-foreground mb-2">
-                  O fundo será removido automaticamente
-                </p>
+                <p className="text-xs text-muted-foreground mb-2">O fundo será removido automaticamente</p>
                 <div className="mt-2 flex items-center space-x-4">
                   {settings.signature_image_url ? (
                     <div className="relative">
@@ -560,7 +580,6 @@ const CombinedSettingsForm = () => {
                       <PenLine className="h-6 w-6 text-muted-foreground" />
                     </div>
                   )}
-
                   <div>
                     <Input
                       id="signature-upload"
@@ -578,9 +597,7 @@ const CombinedSettingsForm = () => {
                       <Upload className="h-4 w-4 mr-2" />
                       Selecionar Assinatura
                     </Button>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      PNG ou JPG • Fundo branco ou transparente
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">PNG ou JPG • Fundo branco ou transparente</p>
                   </div>
                 </div>
               </div>
@@ -603,7 +620,6 @@ const CombinedSettingsForm = () => {
                     />
                   </div>
                 </div>
-
                 <div>
                   <Label htmlFor="secondary-color">Cor Secundária</Label>
                   <div className="flex items-center space-x-2 mt-1">
@@ -624,7 +640,6 @@ const CombinedSettingsForm = () => {
               </div>
             </div>
 
-            {/* Coluna Direita - Informações de Contato */}
             <div className="space-y-6">
               <div className="space-y-4">
                 <div>
@@ -640,7 +655,6 @@ const CombinedSettingsForm = () => {
                     />
                   </div>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="crn-number">Número do CRN</Label>
@@ -652,7 +666,6 @@ const CombinedSettingsForm = () => {
                       className="mt-1"
                     />
                   </div>
-
                   <div>
                     <Label htmlFor="license">Licença Profissional</Label>
                     <Input
@@ -664,7 +677,6 @@ const CombinedSettingsForm = () => {
                     />
                   </div>
                 </div>
-
                 <div>
                   <Label htmlFor="phone">Telefone</Label>
                   <div className="relative mt-1">
@@ -678,7 +690,6 @@ const CombinedSettingsForm = () => {
                     />
                   </div>
                 </div>
-
                 <div>
                   <Label htmlFor="address">Endereço</Label>
                   <div className="relative mt-1">
@@ -696,7 +707,6 @@ const CombinedSettingsForm = () => {
             </div>
           </div>
 
-          {/* Seção de Assinatura e Documentos */}
           <div className="mt-6 space-y-6">
             <div>
               <Label htmlFor="email-signature">Assinatura de E-mail</Label>
@@ -709,7 +719,6 @@ const CombinedSettingsForm = () => {
                 className="mt-1"
               />
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="document-header">Cabeçalho de Documentos</Label>
@@ -722,7 +731,6 @@ const CombinedSettingsForm = () => {
                   className="mt-1"
                 />
               </div>
-
               <div>
                 <Label htmlFor="document-footer">Rodapé de Documentos</Label>
                 <Textarea
@@ -739,7 +747,6 @@ const CombinedSettingsForm = () => {
         </CardContent>
       </Card>
 
-      {/* Botão de salvamento */}
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={isSaving}>
           {isSaving ? (

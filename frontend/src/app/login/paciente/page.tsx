@@ -27,19 +27,30 @@ export default function PacienteLoginPage() {
         setError("")
 
         try {
-            const loginResponse = await api.post("auth/login/paciente/", {
-                email: email,
-                password: password,
+            const loginResponse = await fetch(`${getBaseURL()}auth/login/paciente/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                }),
             })
 
-            const data = loginResponse.data
+            if (!loginResponse.ok) {
+                const errorData = await loginResponse.json().catch(() => ({}))
+                throw new Error(errorData.error || errorData.detail || "Credenciais inválidas")
+            }
+
+            const data = await loginResponse.json()
             await login({
                 access: data.access,
                 refresh: data.refresh
             }, false)
             router.push("/patient-dashboard-v2")
         } catch (err: any) {
-            setError(err.response?.data?.detail || "Erro ao conectar com o servidor.")
+            setError(err.message || "Erro ao conectar com o servidor.")
             setIsLoading(false)
         }
     }
