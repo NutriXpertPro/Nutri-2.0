@@ -14,6 +14,9 @@ COPY . .
 # Build Next.js application in standalone mode
 RUN rm -rf .next out && npm run build
 
+# Copy static files for standalone mode
+RUN cp -r .next/static .next/standalone/.next/ && cp -r .next/static .next/standalone/
+
 # Expose port for Next.js server
 EXPOSE 3000
 
