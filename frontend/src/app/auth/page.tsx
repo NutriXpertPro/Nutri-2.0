@@ -53,11 +53,16 @@ export default function AuthPage() {
     // Handle login
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        e.stopPropagation()
         setLoginError("")
         setLoginIsLoading(true)
 
         try {
-            const response = await fetch(`${getBaseURL()}auth/login/`, {
+            console.log('[Login] Starting login process...')
+            const url = `${getBaseURL()}auth/login/`
+            console.log('[Login] URL:', url)
+            
+            const response = await fetch(url, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -69,6 +74,8 @@ export default function AuthPage() {
                 }),
             })
 
+            console.log('[Login] Response status:', response.status)
+
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}))
                 console.error('[Login] Error response:', errorData)
@@ -76,6 +83,7 @@ export default function AuthPage() {
             }
 
             const data = await response.json()
+            console.log('[Login] Success!')
             login(data)
         } catch (_err: any) {
             console.error('[Login] Exception:', _err)
