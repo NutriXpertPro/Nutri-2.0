@@ -17,5 +17,5 @@ RUN rm -rf .next out && npm run build
 # Expose port for Next.js server
 EXPOSE 3000
 
-# Start Next.js server
-CMD ["node", "server.js"]
+# Start Next.js server in standalone mode
+CMD ["node", ".next/standalone/server.js"]
