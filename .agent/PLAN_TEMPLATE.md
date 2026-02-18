@@ -7,6 +7,10 @@ skills: clean-code, parallel-agents, behavioral-modes, plan-writing, brainstormi
 
 # 📋 PLAN.md - Nutri 4.0
 
+> ⚠️ **REGRA DE OURO - IMPORTANTE:**  
+> **VOCÊ É TERMINANTEMENTE PROIBIDO DE FAZER QUALQUER ALTERAÇÃO, COMMIT OU DEPLOY SEM APROVAÇÃO EXPLÍCITA DO USUÁRIO.**  
+> Qualquer mudança deve ser primeiro mostada ao usuário para aprovação antes de implementar.
+
 > **Versão:** 3.0  
 > **Data:** {{DATA_ATUAL}}  
 > **Localização:** `docs/PLAN-{slug}.md`

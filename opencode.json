@@ -9,6 +9,7 @@
     }
   },
   "instructions": [
+    ".agent/rules/REGRAS_FUNDAMENTAIS.md",
     ".agent/ARCHITECTURE.md",
     ".agent/PLAN_TEMPLATE.md",
     ".agent/rules/GEMINI.md",
