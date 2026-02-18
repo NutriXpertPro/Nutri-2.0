@@ -59,6 +59,7 @@ export default function AuthPage() {
         try {
             const response = await fetch(`${getBaseURL()}auth/login/`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -98,6 +99,7 @@ export default function AuthPage() {
         try {
             const response = await fetch(`${getBaseURL()}auth/register/nutricionista/`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },

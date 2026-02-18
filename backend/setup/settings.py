@@ -127,14 +127,31 @@ CORS_ALLOWED_ORIGINS.extend(
 )
 CORS_ALLOWED_ORIGINS = list(set(CORS_ALLOWED_ORIGINS))
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CRITICAL: Cannot use ALLOW_ALL_ORIGINS with ALLOW_CREDENTIALS
+# Must specify exact origins when using credentials
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS + [
+
+# Explicitly allow production origins
+CORS_ALLOWED_ORIGINS.extend(
+    [
+        "https://srv1354256.hstgr.cloud",
+        "https://api.srv1354256.hstgr.cloud",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+)
+
+CSRF_TRUSTED_ORIGINS = [
     "https://srv1354256.hstgr.cloud",
     "https://api.srv1354256.hstgr.cloud",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+# Remove duplicates
+CORS_ALLOWED_ORIGINS = list(set(CORS_ALLOWED_ORIGINS))
+CSRF_TRUSTED_ORIGINS = list(set(CSRF_TRUSTED_ORIGINS))
 
 print(f"DEBUG: CORS_ALLOW_ALL_ORIGINS = {CORS_ALLOW_ALL_ORIGINS}")
 print(f"DEBUG: CORS_ALLOWED_ORIGINS = {CORS_ALLOWED_ORIGINS}")

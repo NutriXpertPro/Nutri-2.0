@@ -54,7 +54,8 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=https://srv1354256.hstgr.cloud/api/v1
+      # Using relative path - nginx handles proxy to backend
+      - NEXT_PUBLIC_API_BASE_URL=/api/v1
     depends_on:
       - backend
     volumes:

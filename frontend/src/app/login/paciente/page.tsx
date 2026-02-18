@@ -29,6 +29,7 @@ export default function PacienteLoginPage() {
         try {
             const loginResponse = await fetch(`${getBaseURL()}auth/login/paciente/`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
