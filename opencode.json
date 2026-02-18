@@ -10,6 +10,13 @@
   },
   "instructions": [
     ".agent/ARCHITECTURE.md",
-    ".agent/PLAN_TEMPLATE.md"
+    ".agent/PLAN_TEMPLATE.md",
+    ".agent/rules/GEMINI.md",
+    "docs/GOOGLE_OAUTH_SETUP.md",
+    "docs/api_specification.md",
+    "docs/recomendacoes_arquitetura_enterprise.md",
+    "docs/prd_product_requirements.md",
+    "docs/checklist.md",
+    "docs/status_atual.md"
   ]
 }
