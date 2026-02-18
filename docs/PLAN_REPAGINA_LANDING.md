@@ -6,184 +6,6 @@ Este documento apresenta o plano detalhado para repaginar a landing page do Nutr
 
 ---
 
-## 0. Identidade Visual - GUIA COMPLETO DE ESTILO
-
-### 0.1 Paleta de Cores
-
-| Cor | Hex | Uso |
-|-----|-----|-----|
-| **Primária (Emerald)** | `#10b981` | Logo, CTAs principais, highlights |
-| **Primária Escura** | `#059669` | Hover states, ênfase |
-| **Primária Clara** | `#34D399` | Borders, detalhes sutis |
-| **Fundo Principal** | `#020804` | Background geral (quase preto com tom verde) |
-| **Fundo Secundário** | `#050505` | Cards, seções alternativas |
-| **Fundo Terciário** | `#0A0A0A` | Elementos elevados |
-| **Texto Principal** | `#FFFFFF` | Títulos, texto em destaque |
-| **Texto Secundário** | `#A1A1AA` | Subtítulos, descrições |
-| **Texto Tertiary** | `#71717A` | Labels, hints |
-| **Accent Purple** | `#8B5CF6` | Gradientes, elementos decorativos |
-| **Accent Cyan** | `#06B6D4` | Elementos de destaque |
-| **Accent Amber** | `#F59E0B` | Warnings, badges |
-| **Erro** | `#EF4444` | Erros, alertas |
-| **Sucesso** | `#10B981` | Sucesso, checkmarks |
-
----
-
-### 0.2 Sistema de Gradientes
-
-| Nome | Composição | Uso |
-|------|------------|-----|
-| **Emerald Glow** | `linear-gradient(135deg, #10b981 0%, #059669 100%)` | Botões primários |
-| **Midnight Emerald** | `linear-gradient(180deg, #020804 0%, #050505 100%)` | Backgrounds |
-| **Purple Haze** | `linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)` | Elementos decorativos |
-| **Card Shine** | `linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)` | Hover em cards |
-| **Button Shine** | `linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%)` | Botões com brilho |
-
----
-
-### 0.3 Tipografia
-
-| Elemento | Fonte | Tamanho | Peso |
-|----------|-------|---------|------|
-| **H1 (Hero)** | Inter | 48-64px | 800 (ExtraBold) |
-| **H2 (Seções)** | Inter | 36-48px | 700 (Bold) |
-| **H3 (Títulos)** | Inter | 24-32px | 600 (SemiBold) |
-| **Body** | Inter | 16-18px | 400 (Regular) |
-| **Small** | Inter | 14px | 400 (Regular) |
-| **Caption** | Inter | 12px | 500 (Medium) |
-
----
-
-### 0.4 Efeitos Visuais
-
-| Efeito | Código | Uso |
-|--------|--------|-----|
-| **Glassmorphism** | `backdrop-blur-xl bg-white/5` | Header, modais |
-| **Card Glow** | `shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]` | Cards em destaque |
-| **Button Glow** | `shadow-[0_0_30px_-5px_rgba(16,185,129,0.5)]` | CTAs principais |
-| **Border Glow** | `border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]` | Hover em cards |
-| **Text Glow** | `drop-shadow-[0_0_25px_rgba(16,185,129,0.4)]` | Texto em destaque |
-| **Gradient Text** | `bg-clip-text text-transparent bg-gradient-to-r` | Títulos especiais |
-
----
-
-### 0.5 Formatos e Bordas
-
-| Elemento | Border Radius | Border |
-|----------|--------------|--------|
-| **Botões** | `rounded-full` (pill) | none ou border-white/10 |
-| **Cards** | `rounded-2xl` | border-white/10 |
-| **Inputs** | `rounded-xl` | border-white/20 |
-| **Imagens** | `rounded-2xl` | none |
-| **Badges** | `rounded-full` | none |
-
----
-
-### 0.6 Transições e Animações
-
-| Tipo | Duração | Easing | Uso |
-|------|---------|--------|-----|
-| **Fast** | 150ms | ease-out | Hover states |
-| **Normal** | 300ms | ease-in-out | Transições padrão |
-| **Slow** | 500ms | ease-in-out | Entrada de elementos |
-| **Stagger** | 100ms delay | ease-out | Listas animadas |
-
-**Animações recomendadas:**
-- `fade-in-up` - Elementos surgindo de baixo
-- `fade-in` - Elementos surgindo
-- `scale-in` - Elementos aumentando
-- `slide-in` - Elementos deslizando
-- `pulse-glow` - Brilho pulsante em CTAs
-
----
-
-### 0.7 Biblioteca UX/UI
-
-| Biblioteca | Versão | Uso |
-|------------|--------|-----|
-| **Framer Motion** | ^11.x | Animações complexas |
-| **Tailwind CSS** | ^3.x | Estilização |
-| **Lucide React** | ^0.x | Ícones |
-| **clsx / tailwind-merge** | latest | Condicional classes |
-
----
-
-### 0.8 Responsividade - BREAKPOINTS
-
-| Dispositivo | Largura | Layout |
-|-------------|---------|--------|
-| **Mobile Small** | 320-375px | 1 coluna, texto menor |
-| **Mobile** | 375-428px | 1 coluna |
-| **Mobile Large** | 428-768px | 1 coluna |
-| **Tablet** | 768-1024px | 2 colunas |
-| **Desktop** | 1024-1440px | 2-3 colunas |
-| **Desktop Large** | 1440px+ | Container 1280px max |
-
-**Regras Mobile-First:**
-1. Touch targets: mínimo 44x44px
-2. Espaçamento: 16px horizontal, 24px vertical
-3. Fontes: mínimo 16px para corpo (evita zoom)
-4. Botões: altura mínima 48px
-5. Ícones: 24px minimum
-6. Imagens: object-fit cover com aspect-ratio
-
----
-
-## 1. Estratégia de Preços
-
-### 1.1 Estrutura de Ofertas
-
-| Plano | Preço Original | Preço Promocional | Preço Final |
-|-------|----------------|-------------------|--------------|
-| **Trial** | - | 7 dias grátis | R$ 0 |
-| **Mensal** | R$ 89,90 | R$ 59,90 (3 meses) | R$ 69,90 (após 3 meses) |
-| **Anual** | R$ 1.078,80/ano | R$ 598,80/ano | **R$ 49,90/mês** |
-
-### 1.2 Estratégia de Conversão
-
-**Fase 1: Trial (Dias 1-7)**
-- Acesso COMPLETO a todas as funcionalidades
-- Banner sutil: "7 dias gratuitos"
-- Sem necessidade de cartão
-
-**Fase 2: Upgrade Sugerido (Dias 8-14)**
-- Modal de upgrade ao tentar acessar recurso
-- Texto: "Período de teste terminado"
-- Offer: "Primeiros 3 meses por R$ 59,90/mês"
-- Botão: "Continuar com Premium"
-
-**Fase 3: Conversão (Após 14 dias)**
-- Acesso limitado a funcionalidades básicas
-- Wall de conversão: "Atualize para continuar"
-- Preço normal: R$ 69,90/mês ou R$ 49,90/mês (anual)
-
-### 1.3 copy dos Preços
-
-**Plano Starter (Grátis)**
-- "Perfeito para conhecer a plataforma"
-- Anamnese completa
-- Até 10 pacientes
-- Presets básicos
-- Suporte por email
-
-**Plano Professional (R$ 59,90/mês)**
-- "Mais Popular - Ideal para crescer"
-- Pacientes ilimitados
-- Todos os presets
-- Xpert Messenger
-- Relatórios de evolução
-- Suporte prioritário
-- **Badge: "ESPECIAL 3 MESES"**
-
-**Plano Annual (R$ 49,90/mês)**
-- "Melhor custo-benefício"
-- Tudo do Professional
-- 2 meses gratuitos
-- Treinamento exclusivo
-- Badge: "ECONOMIZE 44%"
-
----
-
 ## 1. Análise Detalhada das Seções Atuais
 
 ### 1.1 Header (page.tsx:23-54)
@@ -297,33 +119,18 @@ Este documento apresenta o plano detalhado para repaginar a landing page do Nutr
 
 ### 1.7 PricingV3 (PricingV3.tsx)
 
-**Status:** Planes genéricos, PRECISA REDESENHAR COMPLETO
+**Status:** Planes genéricos, precisam de diferenciação
 
 **Problemas Identificados:**
 - Planos não têm diferenciação clara além de features
 - Falta badge de "Recomendado" mais impactante
 - Não há comparação detalhada
 - Falta garantia visual (selo de 7 dias)
-- NÃO TEM estratégia de trial e conversão
-
-**NOVA ESTRUTURA DE PREÇOS (IMPLEMENTAR):**
-
-| Plano | Preço | Destaque |
-|-------|-------|----------|
-| **Starter (Grátis)** | R$ 0 | "7 dias gratuitos para testar" |
-| **Professional** | R$ 59,90/mês (3 meses) → R$ 69,90 | Badge "ESPECIAL 3 MESES" |
-| **Annual** | R$ 49,90/mês | Badge "ECONOMIZE 44%" |
 
 **Melhorias Necessárias:**
-- Banner "7 dias grátis" bem visível
-- Cards com animação de destaque no Professional
-- Comparação visual lado a lado
-- Selo "GARANTIA DE 7 DIAS"
-- Contador de oferta (urgência)
-- CTA persuasivos:
-  - "Começar Trial Grátis"
-  - "Garantir Oferta Especial"
-  - "Economizar 44%"
+- Adicionar tooltip ou flip cards com detalhes
+- Criar comparação visual mais clara
+- Adicionar CTA mais persuasivos com urgência
 
 ---
 
@@ -530,93 +337,47 @@ Este documento apresenta o plano detalhado para repaginar a landing page do Nutr
 ## 2. Estratégia de Redesign por Seção
 
 ### 2.1 Header
-- **Efeito sticky** com blur mais intenso (`backdrop-blur-xl`)
-- **Animação da logo** no scroll (escala + glow verde esmeralda)
+- **Efeito sticky** com blur mais intenso
+- **Animação da logo** no scroll (escala + glow)
 - **Navegação com indicadores** de seção ativa
-- **Mobile:** Menu hamburger com drawer lateral
-- **Cores:** Background `#020804/80`, border `#white/5`
 
 ### 2.2 Hero Section
 - **Novo headline:** "A Plataforma que Transforma Nutricionistas em Referência de Mercado"
 - **Subtítulo focado em dor:** "Pare de perder horas com planilhas. Comece a atender mais pacientes com qualidade superior."
 - **Demonstração visual:** GIF/MP4 do sistema em ação (30 segundos)
 - **Barra de métricas flutuante:** "2.500+ Nutricionistas | 10M+ Refeições | 99% Satisfação"
-- **CTA duplo:** 
-  - Primário: "Experimente Grátis" (gradiente emerald)
-  - Secundário: "Ver Demo" (outline)
-- **Mobile:** Stack vertical, texto menor, demo em thumbnail clicável
+- **CTA duplo:** Primário (Experimente Grátis) + Secundário (Ver Demo)
 
 ### 2.3 Ecossistema (Recursos)
 - **11 cards** (um para cada feature)
-- **Efeito hover 3D** com rotação sutil (`group-hover:rotate-y-6`)
-- **Ícones maiores** com gradientes (emerald/purple/cyan)
+- **Efeito hover 3D** com rotação sutil
+- **Ícones maiores** com gradientes
 - **Badge de "Novo"** para recursos recentes
-- **Mobile:** Grid 1 coluna, cards com swipe horizontal
 
 ### 2.4 Produtividade
 - **Stats com fontes** (estudos, pesquisas)
 - **Workflow interativo** com step-by-step
 - **Comparação antes/depois**
-- **Mobile:** Stats em stack vertical, números grandes
 
 ### 2.5 Segurança & Performance
 - **Selos de certificação** visuais
 - **Grid de recursos de segurança**
-- **Badge LGPD Compliance** verde
-- **Certificações:** AES-256, Uptime 99.9%, ISO 27001
+- **Badge LGPD Compliance**
 
 ### 2.6 Depoimentos
 - **Carrossel com fotos** dos profissionais
 - **Seção de logos** de clínicas parceiras
 - **Vídeo-depoimentos** (embed ou thumbnail clicável)
-- **Mobile:** Carrossel touch, logos em scroll horizontal
 
 ### 2.7 Pricing
-- **Banner "7 dias grátis"** bem visível no topo
-- **Cards com animação** de destaque no Professional
-- **Comparação visual** lado a lado
-- **Selo "GARANTIA DE 7 DIAS"**
-- **Contador de oferta** (urgência)
-- **CTA persuasivos:**
-  - "Começar Trial Grátis"
-  - "Garantir Oferta Especial"
-  - "Economizar 44%"
-- **Cores por plano:**
-  - Grátis: `#71717A` (cinza)
-  - Professional: `#10b981` (emerald) - DESTAQUE
-  - Annual: `#8B5CF6` (purple)
-- **Mobile:** Cards em stack, preços bem visíveis
+- **Cards com animação** de destaque
+- **Comparação lado a lado**
+- **Seção FAQ** incorporada
 
 ### 2.8 Footer
-- **Expansão de links** (Blog, FAQ, Termos, Privacidade)
-- **Newsletter signup** com input + botão
+- **Expansão de links**
+- **Newsletter signup**
 - **Selos de segurança e pagamentos**
-- **Logo NutriXpertPro** com cores corretas
-- **Mobile:** Stack vertical, newsletter em 1 linha
-
-### 2.9 Responsividade Mobile (iPhone + Android)
-
-**Regras OBRIGATÓRIAS:**
-
-| Regra | Especificação |
-|-------|---------------|
-| **Touch targets** | Mínimo 44x44px |
-| **Botões** | Altura 48px minimum |
-| **Ícones** | 24px minimum |
-| **Spacing** | 16px horizontal, 24px vertical |
-| **Fontes** | Mínimo 16px (corpo) |
-| **Grid cards** | 1 coluna (mobile), 2 (tablet), 3 (desktop) |
-| **Imagens** | object-fit cover |
-| **Safe areas** | Respeitar notch iPhone |
-
-**Dispositivos de teste:**
-- iPhone SE / 13 Mini (375px)
-- iPhone 14/15 (390-393px)
-- iPhone 14/15 Pro Max (430px)
-- Samsung Galaxy S24 (360px)
-- Samsung Galaxy S24 Ultra (412px)
-- iPad Mini (768px)
-- iPad Pro (1024px)
 
 ---
 
@@ -718,82 +479,27 @@ Semana 3: Finalização
 
 ---
 
-## 6. Elementos Visuais de Alto Impacto - GUIA COMPLETO
+## 6. Elementos Visuais de Alto Impacto
 
-### 6.1 Cores (IDENTIDADE VISUAL)
+### Cores (Manter identidade)
+- **Primária:** #10b981 (Verde Esmeralda)
+- **Secundária:** #059669 (Emerald 600)
+- **Fundo:** #020804 (Quase preto com tom verde)
+- **Texto:** #FFFFFF e #A1A1AA
 
-| Elemento | Cor | Hex | Uso |
-|----------|-----|-----|-----|
-| **Logo** | Emerald | `#10b981` | Logo, CTAs, highlights |
-| **Primária Escura** | Emerald 600 | `#059669` | Hover states |
-| **Primária Clara** | Emerald 400 | `#34D399` | Borders, detalhes |
-| **Fundo Principal** | Quase Preto | `#020804` | Background geral |
-| **Fundo Secundário** | Preto Suave | `#050505` | Cards, seções |
-| **Fundo Terciário** | Preto Elevado | `#0A0A0A` | Elementos elevados |
-| **Texto Principal** | Branco | `#FFFFFF` | Títulos |
-| **Texto Secundário** | Cinza | `#A1A1AA` | Subtítulos |
-| **Texto Tertiary** | Cinza Escuro | `#71717A` | Labels |
-| **Accent Purple** | Violet | `#8B5CF6` | Elementos decorativos |
-| **Accent Cyan** | Cyan | `#06B6D4` | Destaques |
-| **Accent Amber** | Amber | `#F59E0B` | Warnings, badges |
+### Efeitos Recomendados
+- Glassmorphism no header (backdrop-blur-xl)
+- Gradientes suaves (emerald/purple/cyan)
+- Animações de entrada (fade-in-up)
+- Hover effects com scale e glow
+- Contadores animados para métricas
+- Parallax em background elements
 
-### 6.2 Gradientes
-
-| Nome | Composição | Uso |
-|------|------------|-----|
-| **Emerald Glow** | `linear-gradient(135deg, #10b981 0%, #059669 100%)` | Botões primários |
-| **Midnight Emerald** | `linear-gradient(180deg, #020804 0%, #050505 100%)` | Backgrounds |
-| **Purple Haze** | `linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)` | Decorativos |
-| **Card Shine** | `linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)` | Hover cards |
-| **Button Shine** | `linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%)` | Brilho CTAs |
-| **Text Gradient** | `bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500` | Títulos especiais |
-
-### 6.3 Efeitos Visuais
-
-| Efeito | Código Tailwind | Uso |
-|--------|-----------------|-----|
-| **Glassmorphism** | `backdrop-blur-xl bg-white/5 border border-white/10` | Header, modais |
-| **Card Glow** | `shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]` | Cards destaque |
-| **Button Glow** | `shadow-[0_0_30px_-5px_rgba(16,185,129,0.5)]` | CTAs principais |
-| **Border Glow** | `border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]` | Hover cards |
-| **Text Glow** | `drop-shadow-[0_0_25px_rgba(16,185,129,0.4)]` | Texto destaque |
-| **Gradient Text** | `bg-clip-text text-transparent` | Títulos gradient |
-| **Parallax BG** | Framer Motion | Backgrounds animados |
-
-### 6.4 Botões
-
-| Tipo | Estilo | Uso |
-|------|--------|-----|
-| **Primário** | `bg-emerald-500 hover:bg-emerald-600 text-white rounded-full h-12 px-8 shadow-glow` | CTAs principais |
-| **Secundário** | `border border-white/20 hover:border-emerald-500/50 text-white rounded-full h-12 px-8` | Ver Demo |
-| **Ghost** | `text-neutral-400 hover:text-white` | Links |
-| **Mobile** | `h-12 min-w-[120px]` | Touch friendly |
-
-### 6.5 Cards
-
-| Tipo | Estilo | Uso |
-|------|--------|-----|
-| **Feature Card** | `bg-[#0a0a0a] border border-white/10 rounded-2xl p-8 hover:border-emerald-500/30` | Ecossistema |
-| **Pricing Card** | `bg-gradient-to-b from-emerald-500/10 to-[#0a0a0a] border border-emerald-500/30 rounded-2xl` | Destaque |
-| **Testimonial** | `bg-white/[0.02] border border-white/5 rounded-2xl p-6` | Depoimentos |
-
-### 6.6 Animações
-
-| Animação | Biblioteca | Duração | Uso |
-|----------|------------|---------|-----|
-| **Fade In Up** | Framer Motion | 0.5s | Entrada de seções |
-| **Scale In** | Framer Motion | 0.3s | Elementos aparecem |
-| **Stagger** | Framer Motion | 0.1s delay | Listas |
-| **Hover Scale** | Tailwind | 0.2s | Botões, cards |
-| **Pulse Glow** | Framer Motion | 2s infinite | CTAs importantes |
-| **Count Up** | Framer Motion | 2s | Números animados |
-
-### 6.7 Ícones
-
-- **Biblioteca:** Lucide React
-- **Tamanho padrão:** 24px
-- **Tamanho mobile:** 24px minimum
-- **Cores:** Herdar do contexto ou usar emerald-400
+### Componentes-Chave
+- Botões com gradiente e glow effect
+- Cards com 3D tilt effect
+- Testimonials com carousel infinito
+- Pricing cards com badge flutuante
 
 ---
 

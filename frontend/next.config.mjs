@@ -10,9 +10,6 @@ const nextConfig = {
     },
     poweredByHeader: false,
     reactStrictMode: true,
-    outputFileTracingIncludes: {
-        '/api/*': ['./public/*'],
-    },
 };
 
 export default nextConfig;
