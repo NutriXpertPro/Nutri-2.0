@@ -1,10 +1,10 @@
 import React from "react";
-import HeroV3 from "@/components/landing-v3/HeroV3";
-import EcosystemV3 from "@/components/landing-v3/EcosystemV3";
+import HeroV4 from "@/components/landing-v4/HeroV4";
+import EcosystemV4 from "@/components/landing-v4/EcosystemV4";
 import ProductivityV3 from "@/components/landing-v3/ProductivityV3";
 import PerformanceV3 from "@/components/landing-v3/PerformanceV3";
 import TestimonialsV3 from "@/components/landing-v3/TestimonialsV3";
-import PricingV3 from "@/components/landing-v3/PricingV3";
+import PricingV4 from "@/components/landing-v4/PricingV4";
 import Logo from "@/components/landing-v3/Logo";
 import MobileMenuV3 from "@/components/landing-v3/MobileMenuV3";
 import Link from "next/link";
@@ -53,10 +53,10 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <HeroV3 />
+      <HeroV4 />
       
       <div id="ecosystem">
-        <EcosystemV3 />
+        <EcosystemV4 />
       </div>
 
       <div id="productivity">
@@ -72,7 +72,7 @@ export default function LandingPage() {
       </div>
 
       <div id="pricing">
-        <PricingV3 />
+        <PricingV4 />
       </div>
 
       <footer className="pt-24 pb-12 bg-black/50 border-t border-white/5">
