@@ -42,6 +42,13 @@ frontend/public/fallback-*.js
 frontend/public/sw.js
 frontend/public/workbox-*.js
 
+# SSH Keys - CRÍTICO, NUNCA COMMITAR
+.ssh/
+*.pem
+id_rsa*
+id_ed25519*
+*.key
+
 # IDEs
 
 .idea/

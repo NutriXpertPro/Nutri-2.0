@@ -1,0 +1,15 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "orquestrador",
+  "agent": {
+    "orquestrador": {
+      "description": "Coordenador multi-agent para tarefas complexas do Nutri 4.0",
+      "mode": "primary",
+      "model": "inherit"
+    }
+  },
+  "instructions": [
+    ".agent/ARCHITECTURE.md",
+    ".agent/PLAN_TEMPLATE.md"
+  ]
+}
