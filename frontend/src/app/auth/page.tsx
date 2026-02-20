@@ -85,9 +85,9 @@ export default function AuthPage() {
             const data = await response.json()
             console.log('[Login] Success!')
             login(data)
-        } catch (_err: any) {
+        } catch (_err: unknown) {
             console.error('[Login] Exception:', _err)
-            setLoginError(_err.message || "Email ou senha incorretos. Tente novamente.")
+            setLoginError((_err as Error)?.message || "Email ou senha incorretos. Tente novamente.")
             setLoginIsLoading(false)
         }
     }
@@ -138,8 +138,8 @@ export default function AuthPage() {
 
             // Success - redirect to login
             router.push("/auth?tab=login&registered=true")
-        } catch (err: any) {
-            setRegisterError(err.message || "Ocorreu um erro ao registrar.")
+        } catch (err: unknown) {
+            setRegisterError((err as Error)?.message || "Ocorreu um erro ao registrar.")
         } finally {
             setRegisterIsLoading(false)
         }
