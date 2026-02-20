@@ -43,7 +43,7 @@ function AnamnesisAnswerContent() {
         mutationFn: (data: StandardAnamnesisData) => {
             if (!patientId) throw new Error("Patient ID missing")
             // Converter StandardAnamnesisData para AnamnesisFormData para compatibilidade
-            const formData: any = { ...data }
+            const formData: StandardAnamnesisData = { ...data }
             if (formData.patient === undefined) {
                 formData.patient = patientId
             }

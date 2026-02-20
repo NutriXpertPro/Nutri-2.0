@@ -1,2 +1,20 @@
+# Ignorar scripts utilitários e assets
 frontend/generate_wav.js
 frontend/check_audio.js
+frontend/public/service-worker.js
+frontend/public/*.js
+frontend/*.js
+frontend/scripts/*.js
+frontend/utils/*.js
+
+# Ignorar qualquer JS fora de src/app e src/components
+frontend/src/**/*.test.tsx
+frontend/src/**/*.spec.tsx
+frontend/src/**/types/*.ts
+frontend/src/**/mocks/*.ts
+
+# Pastas inteiras de terceiros ou não React
+frontend/node_modules/**
+frontend/dist/**
+frontend/out/**
+frontend/.next/**

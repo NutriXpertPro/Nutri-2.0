@@ -10,8 +10,7 @@ export default function TestLoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulação de login
-    console.log('Login attempt:', { email, password });
+    // Simulação de login — console removido para ESLint
     router.push('/patient/dashboard');
   };
 
