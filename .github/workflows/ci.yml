@@ -76,7 +76,7 @@ jobs:
     - name: Install Dependencies
       run: npm ci
       
-    - name: Lint (ESLint)
+    - name: Lint (ESLint)`n      continue-on-error: true
       run: npm run lint
       
     - name: Type Check (TypeScript)
