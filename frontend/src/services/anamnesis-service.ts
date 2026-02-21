@@ -12,8 +12,8 @@ export type { AnamnesisTemplate, Question, StandardAnamnesisData } from "@/types
 export const anamnesisService = {
     // Templates
     listTemplates: async () => {
-        const { data } = await api.get<AnamnesisTemplate[]>("/anamnesis/templates/")
-        return data
+        const { data } = await api.get<{ results: AnamnesisTemplate[] }>("/anamnesis/templates/")
+        return data.results || []
     },
     createTemplate: async (template: Omit<AnamnesisTemplate, "id" | "created_at" | "is_active">) => {
         const { data } = await api.post<AnamnesisTemplate>("/anamnesis/templates/", template)
