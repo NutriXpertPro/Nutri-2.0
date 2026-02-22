@@ -860,15 +860,17 @@ function ProfessionalBrand() {
             transition: "all 0.5s ease"
           }}>
             <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 24 }}>
-              {/* FOTO DA NUTRICIONISTA LOIRA DE JALECO - DIV COM BACKGROUND PARA GARANTIR CARREGAMENTO */}
-              <div style={{
-                width: 64, height: 64, borderRadius: "50%",
-                backgroundImage: "url('https://images.unsplash.com/photo-1559839734-2b71f1e59816?w=400&auto=format&fit=crop&q=80')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                border: `2px solid ${C.teal}`,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
-              }} />
+              <img 
+                src="https://images.unsplash.com/photo-1559839734-2b71f1e59816?w=200&h=200&fit=crop&crop=face"
+                alt="Dra. Ana Beatriz Silva"
+                style={{
+                  width: 64, height: 64, borderRadius: "50%",
+                  objectFit: "cover",
+                  border: `3px solid ${C.teal}`,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  flexShrink: 0
+                }}
+              />
               <div>
                 <div style={{ color: isDarkMode ? "white" : C.text, fontWeight: 800, fontSize: "15px" }}>Dra. Ana Beatriz Silva</div>
                 <div style={{ color: C.teal, fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>Nutricionista Esportiva Elite</div>
@@ -1464,15 +1466,21 @@ function ClinicalEvolution() {
           ))}
         </div>
 
-        {/* ── BOTTOM METRICS ── */}
+        {/* BOTTOM METRICS - RESPONSIVO MOBILE */}
         <div style={{
-          display: "flex", justifyContent: "center", gap: 48, marginTop: 64,
-          paddingTop: 40, borderTop: "1px solid rgba(255,255,255,0.07)",
+          display: "grid", 
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: 24,
+          marginTop: 64,
+          paddingTop: 40, 
+          borderTop: "1px solid rgba(255,255,255,0.07)",
+          maxWidth: "100%",
+          padding: "40px 16px 0"
         }}>
           {[["2.500+", "Nutricionistas Ativos"], ["10M+", "Refeições Calculadas"], ["99%", "Precisão Nutricional"], ["<1s", "Tempo de Resposta"]].map(([v, l]) => (
             <div key={l as string} style={{ textAlign: "center" }}>
-              <div className="serif-italic" style={{ fontSize: 36, color: C.lime, lineHeight: 1, fontWeight: 600 }}>{v}</div>
-              <div style={{ fontFamily: "'Outfit',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.38)", marginTop: 5, textTransform: "uppercase", letterSpacing: "0.07em" }}>{l}</div>
+              <div className="serif-italic" style={{ fontSize: "clamp(24px, 5vw, 36px)", color: C.lime, lineHeight: 1, fontWeight: 600 }}>{v}</div>
+              <div style={{ fontFamily: "'Outfit',sans-serif", fontSize: "clamp(9px, 2vw, 11px)", color: "rgba(255,255,255,0.38)", marginTop: 5, textTransform: "uppercase", letterSpacing: "0.05em" }}>{l}</div>
             </div>
           ))}
         </div>
