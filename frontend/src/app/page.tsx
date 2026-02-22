@@ -861,7 +861,7 @@ function ProfessionalBrand() {
           }}>
             <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 24 }}>
               <img 
-                src="https://images.unsplash.com/photo-1559839734-2b71f1e59816?w=200&h=200&fit=crop&crop=face"
+                src="/imagem/nutricionista.jpg"
                 alt="Dra. Ana Beatriz Silva"
                 style={{
                   width: 64, height: 64, borderRadius: "50%",
