@@ -116,7 +116,7 @@ function Navbar() {
       transition: "all 0.3s ease"
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <Image src="/imagem/logo_final.svg" alt="Logo" width={175} height={50} style={{ height: "50px", width: "auto" }} className="mobile-logo" priority />
+        <img src="/imagem/logo_final.svg" alt="Logo" style={{ height: "50px", width: "auto" }} className="mobile-logo" />
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           <span style={{ fontWeight: 800, fontSize: "clamp(16px, 4vw, 20px)", color: C.text, letterSpacing: "-0.02em", lineHeight: 1 }} className="mobile-name">
             Nutri <span style={{ color: C.teal }}>Xpert</span> Pro
@@ -784,29 +784,21 @@ function Pricing() {
                 </ul>
               </div>
 
-              <Link 
-                href="/register" 
-                passHref 
-                legacyBehavior
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => window.location.href = '/register'}
+                style={{
+                  width: "100%", padding: "18px", borderRadius: "16px",
+                  border: i === 0 ? `2px solid ${C.teal}30` : "none",
+                  background: p.highlight ? C.teal : (i === 0 ? "#f8fafc" : C.teal),
+                  color: p.highlight ? "white" : (i === 0 ? C.teal : "white"),
+                  fontWeight: 800, cursor: "pointer", fontSize: "16px",
+                  boxShadow: (p.highlight || i !== 0) ? "0 10px 20px -5px rgba(13,148,136,0.3)" : "none",
+                  transition: "background 0.3s"
+                }}
               >
-                <motion.a
-                  whileTap={{ scale: 0.96 }}
-                  style={{
-                    width: "100%", padding: "18px", borderRadius: "16px",
-                    border: i === 0 ? `2px solid ${C.teal}30` : "none",
-                    background: p.highlight ? C.teal : (i === 0 ? "#f8fafc" : C.teal),
-                    color: p.highlight ? "white" : (i === 0 ? C.teal : "white"),
-                    fontWeight: 800, cursor: "pointer", fontSize: "16px",
-                    boxShadow: (p.highlight || i !== 0) ? "0 10px 20px -5px rgba(13,148,136,0.3)" : "none",
-                    transition: "background 0.3s",
-                    display: "block",
-                    textAlign: "center",
-                    textDecoration: "none"
-                  }}
-                >
-                  {p.buttonText}
-                </motion.a>
-              </Link>
+                {p.buttonText}
+              </motion.button>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -818,7 +810,7 @@ function Pricing() {
 function Footer() {
   return (
     <footer style={{ padding: "60px 6%", textAlign: "center", borderTop: "1px solid #eee" }}>
-      <Image src="/imagem/logo_final.svg" alt="Logo" width={140} height={40} style={{ marginBottom: "24px", height: "40px", width: "auto" }} />
+      <img src="/imagem/logo_final.svg" alt="Logo" style={{ height: "40px", width: "auto", marginBottom: "24px" }} />
       <p style={{ color: "#64748b", fontSize: "14px" }}>© 2026 Nutri Xpert Pro. Todos os direitos reservados.</p>
     </footer>
   );
