@@ -124,10 +124,13 @@ function Navbar() {
         </div>
       </div>
 
-      <div className="hide-mobile" style={{ display: "flex", gap: 32 }}>
-        {["Recursos", "Protocolo", "Preços", "Depoimentos"].map(l => (
-          <a key={l} href={`#${l.toLowerCase()}`} style={{ textDecoration: "none", color: C.text, fontSize: "14px", fontWeight: 600 }}>{l}</a>
-        ))}
+      <div className="hide-mobile" style={{ display: "flex", gap: 24 }}>
+        <a href="#protocolo" style={{ textDecoration: "none", color: C.text, fontSize: "14px", fontWeight: 600 }}>Protocolo</a>
+        <a href="#recursos" style={{ textDecoration: "none", color: C.text, fontSize: "14px", fontWeight: 600 }}>Recursos</a>
+        <a href="#marca" style={{ textDecoration: "none", color: C.text, fontSize: "14px", fontWeight: 600 }}>Sua Marca</a>
+        <a href="#resultados" style={{ textDecoration: "none", color: C.text, fontSize: "14px", fontWeight: 600 }}>Resultados</a>
+        <a href="#depoimentos" style={{ textDecoration: "none", color: C.text, fontSize: "14px", fontWeight: 600 }}>Depoimentos</a>
+        <a href="#preços" style={{ textDecoration: "none", color: C.text, fontSize: "14px", fontWeight: 600 }}>Preços</a>
       </div>
 
       <div style={{ display: "flex", gap: 12 }}>
@@ -146,6 +149,14 @@ function Navbar() {
 // ─── HERO (Ajustes de Texto e Foto de Nutricionista de Elite Real) ───────────
 function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 991);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -218,11 +229,11 @@ function Hero() {
         background: "#f8fafc", borderRadius: "30px 0 0 30px", overflow: "hidden",
         display: "flex"
       }}>
-        {/* VIDEO DE ALTA CONVERSAO - AUTOPLAY FUNCIONA COM MUTED EM MOBILE */}
+        {/* VIDEO - MUTED APENAS EM MOBILE PARA PERMITIR AUTOPLAY */}
         <video
           ref={videoRef}
           autoPlay
-          muted
+          muted={isMobile}
           loop
           playsInline
           style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
@@ -248,7 +259,7 @@ function EliteSpecs() {
   ];
 
   return (
-    <div style={{ background: C.dark, padding: "30px 6%", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 30 }}>
+    <section id="protocolo" style={{ background: C.dark, padding: "30px 6%", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 30 }}>
       {specs.map(s => (
         <div key={s.label} style={{ flex: "1 1 45%", minWidth: "120px", textAlign: "center" }}>
           <div style={{ fontSize: "24px", marginBottom: "8px" }}>{s.icon}</div>
@@ -268,7 +279,7 @@ function EliteSpecs() {
           Acesse o banco de dados mais completo do mercado. <span style={{ color: C.teal, fontWeight: 700 }}>Presets infinitos</span>, automação de lembretes (24h e Follow-up) e o <strong>Xpert Messenger</strong> para total privacidade do seu número.
         </p>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -567,7 +578,7 @@ function Features() {
 function Stats() {
   const stats = [{ val: "80%", label: "Economia de Tempo" }, { val: "3×", label: "Criação Rápida" }, { val: "99%", label: "Precisão" }, { val: "+60%", label: "Produtividade" }];
   return (
-    <section style={{ background: "#0f172a", padding: "80px 6%" }}>
+    <section id="resultados" style={{ background: "#0f172a", padding: "80px 6%" }}>
       <div className="mobile-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32, maxWidth: 1200, margin: "0 auto" }}>
         {stats.map((s, i) => (
           <div key={i} style={{ textAlign: "center" }}>
@@ -582,15 +593,15 @@ function Stats() {
 
 function Testimonials() {
   const reviews = [
-    { name: "Dra. Mariana Silva", role: "Nutricionista Esportiva", text: "O NutriXpert mudou minha rotina. Resolvo tudo em 20 minutos com precisão absurda.", img: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&h=400&fit=crop" },
-    { name: "Dr. Roberto Costa", role: "Nutrição Clínica", text: "A integração TACO/TBCA e o cálculo automático fizeram meus pacientes aderirem 40% mais.", img: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop" },
-    { name: "Dra. Camila Fernandes", role: "Especialista em Emagrecimento", text: "O design dos PDFs é impecável. A percepção de valor do meu trabalho subiu 300%.", img: "https://images.unsplash.com/photo-1559839734-2b71f1e59816?w=400&h=400&fit=crop" },
-    { name: "Dra. Beatriz Nunes", role: "Nutrição Funcional", text: "O Xpert Messenger me devolveu a paz. Privacidade total e organização impecável do consultório.", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop" },
-    { name: "Dr. Henrique Souza", role: "Alta Performance", text: "Presets infinitos são um divisor de águas. Prescrevo dietas complexas em segundos agora.", img: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop" },
-    { name: "Dra. Letícia Oliveira", role: "Materno-Infantil", text: "O App do paciente é lindo e as fotos de evolução encantam os pais. Retenção total.", img: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop" },
-    { name: "Dr. Gustavo Meira", role: "Nutrologia Esportiva", text: "A análise de exames e dobras no mesmo lugar facilita o raciocínio clínico de elite.", img: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=400&h=400&fit=crop" },
-    { name: "Dra. Juliana Paes", role: "Nutrição Estética", text: "Minha autoridade subiu de nível. O sistema transmite o profissionalismo que eu sempre quis.", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop" },
-    { name: "Dr. Felipe Alencar", role: "Nutrição Comportamental", text: "Lembretes automáticos e follow-up garantem que nenhum paciente se sinta esquecido.", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop" }
+    { name: "Dra. Mariana Silva", role: "Nutricionista Esportiva", text: "O NutriXpert mudou minha rotina. Resolvo tudo em 20 minutos com precisão absurda.", img: "/imagem/nutri_mariana.jpg" },
+    { name: "Dr. Roberto Costa", role: "Nutrição Clínica", text: "A integração TACO/TBCA e o cálculo automático fizeram meus pacientes aderirem 40% mais.", img: "/imagem/nutri_roberto.jpg" },
+    { name: "Dra. Camila Fernandes", role: "Especialista em Emagrecimento", text: "O design dos PDFs é impecável. A percepção de valor do meu trabalho subiu 300%.", img: "/imagem/nutri_camila.jpg" },
+    { name: "Dra. Beatriz Nunes", role: "Nutrição Funcional", text: "O Xpert Messenger me devolveu a paz. Privacidade total e organização impecável do consultório.", img: "/imagem/nutri_beatriz.jpg" },
+    { name: "Dr. Henrique Souza", role: "Alta Performance", text: "Presets infinitos são um divisor de águas. Prescrevo dietas complexas em segundos agora.", img: "/imagem/nutri_henrique.jpg" },
+    { name: "Dra. Letícia Oliveira", role: "Materno-Infantil", text: "O App do paciente é lindo e as fotos de evolução encantam os pais. Retenção total.", img: "/imagem/nutri_leticia.jpg" },
+    { name: "Dr. Gustavo Meira", role: "Nutrologia Esportiva", text: "A análise de exames e dobras no mesmo lugar facilita o raciocínio clínico de elite.", img: "/imagem/nutri_gustavo.jpg" },
+    { name: "Dra. Juliana Paes", role: "Nutrição Estética", text: "Minha autoridade subiu de nível. O sistema transmite o profissionalismo que eu sempre quis.", img: "/imagem/nutri_juliana.jpg" },
+    { name: "Dr. Felipe Alencar", role: "Nutrição Comportamental", text: "Lembretes automáticos e follow-up garantem que nenhum paciente se sinta esquecido.", img: "/imagem/nutri_felipe.jpg" }
   ];
   return (
     <section id="depoimentos" style={{ padding: "120px 6%", background: C.white }}>
@@ -672,7 +683,7 @@ function Pricing() {
         { title: "Estabilidade Total", desc: "Consultório backup 100% blindado e online." }
       ],
       highlight: true,
-      buttonText: "Assinar o Anual VIP"
+      buttonText: "Assinar o Anual PRO"
     }
   ];
 
@@ -773,20 +784,29 @@ function Pricing() {
                 </ul>
               </div>
 
-              <motion.button
-                whileTap={{ scale: 0.96 }}
-                style={{
-                  width: "100%", padding: "18px", borderRadius: "16px",
-                  border: i === 0 ? `2px solid ${C.teal}30` : "none",
-                  background: p.highlight ? C.teal : (i === 0 ? "#f8fafc" : C.teal),
-                  color: p.highlight ? "white" : (i === 0 ? C.teal : "white"),
-                  fontWeight: 800, cursor: "pointer", fontSize: "16px",
-                  boxShadow: (p.highlight || i !== 0) ? "0 10px 20px -5px rgba(13,148,136,0.3)" : "none",
-                  transition: "background 0.3s"
-                }}
+              <Link 
+                href="/register" 
+                passHref 
+                legacyBehavior
               >
-                {p.buttonText}
-              </motion.button>
+                <motion.a
+                  whileTap={{ scale: 0.96 }}
+                  style={{
+                    width: "100%", padding: "18px", borderRadius: "16px",
+                    border: i === 0 ? `2px solid ${C.teal}30` : "none",
+                    background: p.highlight ? C.teal : (i === 0 ? "#f8fafc" : C.teal),
+                    color: p.highlight ? "white" : (i === 0 ? C.teal : "white"),
+                    fontWeight: 800, cursor: "pointer", fontSize: "16px",
+                    boxShadow: (p.highlight || i !== 0) ? "0 10px 20px -5px rgba(13,148,136,0.3)" : "none",
+                    transition: "background 0.3s",
+                    display: "block",
+                    textAlign: "center",
+                    textDecoration: "none"
+                  }}
+                >
+                  {p.buttonText}
+                </motion.a>
+              </Link>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -798,7 +818,7 @@ function Pricing() {
 function Footer() {
   return (
     <footer style={{ padding: "60px 6%", textAlign: "center", borderTop: "1px solid #eee" }}>
-      <Image src="/imagem/logo_final.svg" alt="Logo" width={140} height={40} style={{ marginBottom: "24px" }} />
+      <Image src="/imagem/logo_final.svg" alt="Logo" width={140} height={40} style={{ marginBottom: "24px", height: "40px", width: "auto" }} />
       <p style={{ color: "#64748b", fontSize: "14px" }}>© 2026 Nutri Xpert Pro. Todos os direitos reservados.</p>
     </footer>
   );
@@ -808,7 +828,7 @@ function ProfessionalBrand() {
   const [isDarkMode, setIsDarkMode] = useState(true);
 
   return (
-    <section style={{ padding: "120px 6%", background: C.white }}>
+    <section id="marca" style={{ padding: "120px 6%", background: C.white }}>
       <div className="responsive-grid" style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 64, maxWidth: 1200, margin: "0 auto", alignItems: "center" }}>
         <div>
           <span className="tag" style={{ background: `${C.teal}10`, color: C.teal, marginBottom: "20px" }}>Identidade Profissional</span>
