@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { MousePointer2, CheckCircle2, LineChart, Activity, Sparkles, Smartphone } from "lucide-react";
+import { MousePointer2, CheckCircle2, LineChart, Activity, Sparkles, Smartphone, Volume2, VolumeX } from "lucide-react";
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const C = {
@@ -150,6 +150,14 @@ function Navbar() {
 function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 991);
@@ -233,12 +241,41 @@ function Hero() {
         <video
           ref={videoRef}
           autoPlay
-          muted={isMobile}
+          muted={isMobile || isMuted}
           loop
           playsInline
           style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
           src="/imagem/hero-video.mp4"
         />
+
+        {/* BOTAO DE SOM - APARECE APENAS EM MOBILE */}
+        {isMobile && (
+          <button
+            onClick={toggleMute}
+            style={{
+              position: "absolute",
+              bottom: 20,
+              right: 20,
+              width: 50,
+              height: 50,
+              borderRadius: "50%",
+              background: "rgba(0, 0, 0, 0.6)",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10,
+              transition: "all 0.3s ease"
+            }}
+          >
+            {isMuted ? (
+              <VolumeX style={{ width: 24, height: 24, color: "white" }} />
+            ) : (
+              <Volume2 style={{ width: 24, height: 24, color: "white" }} />
+            )}
+          </button>
+        )}
 
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
