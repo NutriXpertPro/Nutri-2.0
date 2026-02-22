@@ -12,6 +12,8 @@ RUN npm install --ignore-scripts
 COPY . .
 
 # Build Next.js application in standalone mode
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 RUN rm -rf .next out && npm run build
 
 # Copy static files for standalone mode

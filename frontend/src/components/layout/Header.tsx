@@ -73,11 +73,11 @@ export function Header({ className, sidebarCollapsed }: HeaderProps) {
                 hover: "hover:bg-zinc-500/10"
             },
             teal: {
-                icon: "text-teal-500",
-                bg: "bg-teal-500/10",
-                text: "text-teal-700 dark:text-teal-300",
-                dot: "bg-teal-500",
-                hover: "hover:bg-teal-500/10"
+                icon: "text-[#0D9488]",
+                bg: "bg-[#0D9488]/10",
+                text: "text-[#0D9488] dark:text-[#0D9488]",
+                dot: "bg-[#0D9488]",
+                hover: "hover:bg-[#0D9488]/10"
             },
             blue: {
                 icon: "text-blue-500",
@@ -317,7 +317,7 @@ export function Header({ className, sidebarCollapsed }: HeaderProps) {
                                 <div className="grid grid-cols-1 gap-1 pt-1">
                                     {([
                                         { id: "monochrome", label: "Studio Minimal", color: "bg-zinc-500", desc: "Foco total no conteúdo" },
-                                        { id: "teal", label: "Oceanic Zen", color: "bg-teal-400", desc: "Calma e equilíbrio" },
+                                        { id: "teal", label: "Oceanic Zen", color: "bg-[#0D9488]", desc: "Calma e equilíbrio" },
                                         { id: "blue", label: "Executive Blue", color: "bg-blue-400", desc: "Confiança e autoridade" },
                                         { id: "violet", label: "Royal Focus", color: "bg-violet-400", desc: "Criatividade e prestígio" },
                                         { id: "pink", label: "Vital Energy", color: "bg-pink-400", desc: "Vigor e proximidade" },

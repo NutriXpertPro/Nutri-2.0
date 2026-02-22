@@ -104,11 +104,20 @@ export function DietMealCard({
     const handleReplaceFood = (oldFoodId: number, newFood: Food) => {
         const updatedFoods: WorkspaceMealFood[] = meal.foods.map(f => {
             if (f.id === oldFoodId) {
+                // 🔒 Correção: preservar qty ou calcular com base na unidade caseira
+                let newQty: number;
+                if (typeof f.qty === 'number') {
+                    newQty = f.qty;
+                } else if (newFood.peso_unidade_caseira_g) {
+                    newQty = (newFood.peso_unidade_caseira_g / 100) * 100; // escala para 100g padrão
+                } else {
+                    newQty = 1; // fallback seguro: 1 unidade
+                }
                 return {
                     ...f,
                     id: Date.now(),
                     name: newFood.nome,
-                    qty: '' as const, // Use constant to match 'number | ""'
+                    qty: newQty, // ✅ número garantido
                     ptn: newFood.proteina_g,
                     cho: newFood.carboidrato_g,
                     fat: newFood.lipidios_g,
@@ -119,8 +128,8 @@ export function DietMealCard({
                     originalId: newFood.id,
                     source: newFood.source,
                     prep: '',
-                    measure: 'g', // Default to grams for new food
-                    unit: 'g',
+                    measure: newFood.unidade_caseira ?? 'g', // ✅ respeita unidade original
+                    unit: newFood.unidade_caseira ?? 'g',   // ✅
                     preferred: false
                 }
             }

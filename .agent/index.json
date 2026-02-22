@@ -1,0 +1,936 @@
+{
+  "agents": [
+    {
+      "name": "analista-anamneses",
+      "description": "Especialista em análise de anamneses e objetivos dos pacientes para o sistema Nutri 4.0. Use para analisar, interpretar e extrair informações relevantes das anamneses completas. Ativa em anamnese, objetivos, análise de dados, interpretação.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\analista-anamneses.md"
+    },
+    {
+      "name": "analista-dados-nutricionais",
+      "description": "Especialista em análise de dados nutricionais e bases de dados (TACO/TBCA/USDA/IBGE) para o sistema Nutri 4.0. Use para validar dados nutricionais, analisar bases de alimentos e garantir qualidade dos dados. Ativa em dados nutricionais, TACO, TBCA, USDA, IBGE, validação.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "database-design",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\analista-dados-nutricionais.md"
+    },
+    {
+      "name": "arqueologo-codigo",
+      "description": "Especialista em código legado, refatoração e compreensão de sistemas não documentados. Use para ler código bagunçado, engenharia reversa e planejamento de modernização. Ativa em legado, refatorar, código espaguete, analisar repositório, explicar base de código.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "refactoring-patterns",
+        "code-review-checklist"
+      ],
+      "file": ".agent\\agents\\arqueologo-codigo.md"
+    },
+    {
+      "name": "arquiteto-backend",
+      "description": "Arquiteto backend especializado em sistemas Django/Python para o Nutri 4.0. Use para desenvolvimento de APIs, lógica de servidor, integração de banco de dados e segurança. Ativa em backend, servidor, api, endpoint, banco de dados, autenticação.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "api-patterns",
+        "database-design",
+        "django-best-practices",
+        "lint-and-validate",
+        "powershell-windows",
+        "bash-linux",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\arquiteto-backend.md"
+    },
+    {
+      "name": "arquiteto-banco-dados",
+      "description": "Arquiteto de banco de dados especializado em design de esquemas, otimização de consultas, migrações e bancos de dados modernos para o Nutri 4.0. Use para operações de banco de dados, mudanças de esquema, indexação e modelagem de dados. Ativa em banco de dados, sql, esquema, migração, consulta, mysql, índice, tabela.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "database-design",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\arquiteto-banco-dados.md"
+    },
+    {
+      "name": "assistente-atendimento",
+      "description": "Especialista em suporte e atendimento ao paciente para o sistema Nutri 4.0. Use para gerenciar dúvidas, suporte e interações com pacientes. Ativa em atendimento, suporte, dúvidas, interação com paciente.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\assistente-atendimento.md"
+    },
+    {
+      "name": "security-auditor",
+      "description": "Elite cybersecurity expert. Think like an attacker, defend like an expert. OWASP 2025, supply chain security, zero trust architecture. Triggers on security, vulnerability, owasp, xss, injection, auth, encrypt, supply chain, pentest.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "vulnerability-scanner",
+        "red-team-tactics",
+        "api-patterns"
+      ],
+      "file": ".agent\\agents\\auditor-seguranca.md"
+    },
+    {
+      "name": "calculador-macros",
+      "description": "Especialista em cálculo de macros nutricionais, TMB, GCDT e objetivos para o sistema Nutri 4.0. Use para calcular valores nutricionais, taxas metabólicas e distribuição de macros. Ativa em TMB, GCDT, macros, cálculo nutricional.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\calculador-macros.md"
+    },
+    {
+      "name": "conversor-medidas",
+      "description": "Especialista em conversão de medidas caseiras para gramas e vice-versa para o sistema Nutri 4.0. Use para gerenciar conversões baseadas nas tabelas IBGE de medidas caseiras. Ativa em medidas caseiras, conversão, IBGE, medidas.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\conversor-medidas.md"
+    },
+    {
+      "name": "coordenador-consultas",
+      "description": "Especialista em coordenação de consultas e integração com Google Calendar para o sistema Nutri 4.0. Use para gerenciar agendamentos, integrações com calendários e sincronização de consultas. Ativa em consultas, agendamento, Google Calendar, sincronização.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\coordenador-consultas.md"
+    },
+    {
+      "name": "criador-alimentos-personalizados",
+      "description": "Especialista em criação de alimentos personalizados para o sistema Nutri 4.0. Use para gerenciar alimentos criados pelos nutricionistas com valores nutricionais personalizados. Ativa em alimentos personalizados, valores nutricionais, criação de alimentos.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\criador-alimentos-personalizados.md"
+    },
+    {
+      "name": "depurador",
+      "description": "Especialista em depuração sistemática, análise de causa raiz e investigação de falhas. Use para bugs complexos, problemas em produção, problemas de performance e análise de erros. Ativa em bug, erro, falha, não funcionando, quebrado, investigar, corrigir.",
+      "tools": [],
+      "skills": [
+        "clean-code",
+        "systematic-debugging"
+      ],
+      "file": ".agent\\agents\\depurador.md"
+    },
+    {
+      "name": "engenheiro-devops",
+      "description": "Especialista em implantação, gerenciamento de servidores, CI/CD e operações de produção. CRÍTICO - Use para implantação, acesso a servidor, rollback e mudanças em produção. Operações de ALTO RISCO. Ativa em deploy, produção, servidor, pm2, ssh, release, rollback, ci/cd.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "deployment-procedures",
+        "server-management",
+        "powershell-windows",
+        "bash-linux"
+      ],
+      "file": ".agent\\agents\\engenheiro-deplay.md"
+    },
+    {
+      "name": "qa-automation-engineer",
+      "description": "Specialist in test automation infrastructure and E2E testing. Focuses on Playwright, Cypress, CI pipelines, and breaking the system. Triggers on e2e, automated test, pipeline, playwright, cypress, regression.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "webapp-testing",
+        "testing-patterns",
+        "clean-code",
+        "lint-and-validate"
+      ],
+      "file": ".agent\\agents\\engenheiro-qa-automacao.md"
+    },
+    {
+      "name": "test-engineer",
+      "description": "Expert in testing, TDD, and test automation. Use for writing tests, improving coverage, debugging test failures. Triggers on test, spec, coverage, jest, pytest, playwright, e2e, unit test.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "testing-patterns",
+        "tdd-workflow",
+        "webapp-testing",
+        "code-review-checklist",
+        "lint-and-validate"
+      ],
+      "file": ".agent\\agents\\engenheiro-testes.md"
+    },
+    {
+      "name": "escritor-documentacao",
+      "description": "Especialista em documentação técnica. Use APENAS quando o usuário explicitamente solicitar documentação (README, docs de API, changelog). NÃO invoque automaticamente durante desenvolvimento normal.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "documentation-templates"
+      ],
+      "file": ".agent\\agents\\escritor-documentacao.md"
+    },
+    {
+      "name": "especialista-autenticacao",
+      "description": "Especialista em sistemas de autenticação e autorização para o sistema Nutri 4.0. Use para configurar, gerenciar e otimizar sistemas de login, JWT, OAuth e controle de acesso. Ativa em autenticação, autorização, JWT, OAuth, controle de acesso, segurança.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\especialista-autenticacao.md"
+    },
+    {
+      "name": "especialista-avaliacoes",
+      "description": "Especialista em avaliações físicas e fotos de progresso para o sistema Nutri 4.0. Use para gerenciar avaliações antropométricas, fotos comparativas e métricas de progresso. Ativa em avaliações, antropometria, fotos, progresso.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\especialista-avaliacoes.md"
+    },
+    {
+      "name": "frontend-specialist",
+      "description": "Senior Frontend Architect who builds maintainable React/Next.js systems with performance-first mindset. Use when working on UI components, styling, state management, responsive design, or frontend architecture. Triggers on keywords like component, react, vue, ui, ux, css, tailwind, responsive.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "react-patterns",
+        "nextjs-best-practices",
+        "tailwind-patterns",
+        "frontend-design",
+        "lint-and-validate"
+      ],
+      "file": ".agent\\agents\\especialista-frontend.md"
+    },
+    {
+      "name": "especialista-seo",
+      "description": "Especialista em SEO e GEO (Generative Engine Optimization). Lida com auditorias de SEO, Core Web Vitals, otimização E-E-A-T, visibilidade em busca por IA. Use para melhorias de SEO, otimização de conteúdo ou estratégias de citação por IA.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "seo-fundamentals",
+        "geo-fundamentals"
+      ],
+      "file": ".agent\\agents\\especialista-seo.md"
+    },
+    {
+      "name": "especialista-substituicoes",
+      "description": "Especialista em regras de substituição de alimentos e similaridade nutricional para o sistema Nutri 4.0. Use para gerenciar substituições inteligentes, equivalência nutricional e regras de substituição. Ativa em substituições, equivalência nutricional, regras de substituição.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\especialista-substituicoes.md"
+    },
+    {
+      "name": "explorer-agent",
+      "description": "Advanced codebase discovery, deep architectural analysis, and proactive research agent. The eyes and ears of the framework. Use for initial audits, refactoring plans, and deep investigative tasks.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "ViewCodeItem",
+        "FindByName"
+      ],
+      "skills": [
+        "clean-code",
+        "architecture",
+        "plan-writing",
+        "brainstorming",
+        "systematic-debugging"
+      ],
+      "file": ".agent\\agents\\explorador-codigo.md"
+    },
+    {
+      "name": "gerador-relatorios",
+      "description": "Especialista em geração de relatórios nutricionais e acompanhamento para o sistema Nutri 4.0. Use para criar, formatar e gerenciar relatórios de evolução, adesão e resultados dos pacientes. Ativa em relatórios, evolução, adesão, resultados, acompanhamento.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\gerador-relatorios.md"
+    },
+    {
+      "name": "gerenciador-medidas-ibge",
+      "description": "Especialista em gerenciamento de medidas caseiras IBGE e conversões para o sistema Nutri 4.0. Use para gerenciar dados de medidas caseiras, pesos médios e conversões baseadas na pesquisa POF. Ativa em medidas IBGE, conversões, medidas caseiras, POF.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\gerenciador-medidas-ibge.md"
+    },
+    {
+      "name": "gerenciador-perfis-usuarios",
+      "description": "Especialista em gerenciamento de perfis de usuários e configurações para o sistema Nutri 4.0. Use para gerenciar perfis, configurações, permissões e preferências de usuários. Ativa em perfis de usuários, configurações, permissões, preferências.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\gerenciador-perfis-usuarios.md"
+    },
+    {
+      "name": "gerente-integracoes",
+      "description": "Especialista em gerenciamento de integrações externas para o sistema Nutri 4.0. Use para configurar, gerenciar e monitorar integrações com serviços externos como Google Calendar. Ativa em integrações, Google Calendar, APIs externas, conectividade.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\gerente-integracoes.md"
+    },
+    {
+      "name": "gerente-pacientes",
+      "description": "Especialista em gestão de pacientes e anamneses para o sistema Nutri 4.0. Use para gerenciar perfis de pacientes, anamneses completas, objetivos e dados clínicos. Ativa em pacientes, anamnese, perfil, dados clínicos, objetivos.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\gerente-pacientes.md"
+    },
+    {
+      "name": "gerente-presets-refeicoes",
+      "description": "Especialista em gerenciamento de presets de refeições e modelos de refeições para o sistema Nutri 4.0. Use para criar, gerenciar e otimizar presets de refeições personalizados. Ativa em presets, refeições, modelos de refeições, templates.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\gerente-presets-refeicoes.md"
+    },
+    {
+      "name": "product-manager",
+      "description": "Expert in product requirements, user stories, and acceptance criteria. Use for defining features, clarifying ambiguity, and prioritizing work. Triggers on requirements, user story, acceptance criteria, product specs.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash"
+      ],
+      "skills": [
+        "plan-writing",
+        "brainstorming",
+        "clean-code"
+      ],
+      "file": ".agent\\agents\\gerente-produto.md"
+    },
+    {
+      "name": "guardiao-isolamento-dados",
+      "description": "Especialista em isolamento e segurança de dados entre nutricionistas para o sistema Nutri 4.0. Use para garantir que dados de pacientes e funcionalidades fiquem restritos ao nutricionista responsável. Ativa em segurança, isolamento de dados, privacidade, multitenancy.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\guardiao-isolamento-dados.md"
+    },
+    {
+      "name": "orchestrator",
+      "description": "Multi-agent coordination and task orchestration. Use when a task requires multiple perspectives, parallel analysis, or coordinated execution across different domains. Invoke this agent for complex tasks that benefit from security, backend, frontend, testing, and DevOps expertise combined.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Write",
+        "Edit",
+        "Agent"
+      ],
+      "skills": [
+        "clean-code",
+        "parallel-agents",
+        "behavioral-modes",
+        "plan-writing",
+        "brainstorming",
+        "architecture",
+        "lint-and-validate",
+        "powershell-windows",
+        "bash-linux"
+      ],
+      "file": ".agent\\agents\\orquestrador.md"
+    },
+    {
+      "name": "performance-optimizer",
+      "description": "Expert in performance optimization, profiling, Core Web Vitals, and bundle optimization. Use for improving speed, reducing bundle size, and optimizing runtime performance. Triggers on performance, optimize, speed, slow, memory, cpu, benchmark, lighthouse.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "performance-profiling"
+      ],
+      "file": ".agent\\agents\\otimizador-performance.md"
+    },
+    {
+      "name": "otimizador-substituicoes",
+      "description": "Especialista em otimização de regras de substituição de alimentos e similaridade nutricional para o sistema Nutri 4.0. Use para otimizar, melhorar e gerenciar regras de substituição. Ativa em otimização de substituições, similaridade nutricional, regras de substituição.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\otimizador-substituicoes.md"
+    },
+    {
+      "name": "planejador-dietas",
+      "description": "Especialista em planejamento de dietas e cálculos nutricionais para o sistema Nutri 4.0. Use para criar dietas personalizadas, calcular macros, TMB/GCDT e gerenciar regras de substituição de alimentos. Ativa em dieta, macros, nutricional, TMB, GCDT, substituição.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\planejador-dietas.md"
+    },
+    {
+      "name": "project-planner",
+      "description": "Smart project planning agent. Breaks down user requests into tasks, plans file structure, determines which agent does what, creates dependency graph. Use when starting new projects or planning major features.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash"
+      ],
+      "skills": [
+        "clean-code",
+        "app-builder",
+        "plan-writing",
+        "brainstorming"
+      ],
+      "file": ".agent\\agents\\planejador-projetos.md"
+    },
+    {
+      "name": "rastreador-progresso",
+      "description": "Especialista em acompanhamento e rastreamento de progresso dos pacientes para o sistema Nutri 4.0. Use para monitorar evolução, adesão e resultados dos pacientes. Ativa em progresso, evolução, adesão, resultados.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\rastreador-progresso.md"
+    },
+    {
+      "name": "validador-dados-nutricionais",
+      "description": "Especialista em validação de dados nutricionais e qualidade de bases de dados (TACO/TBCA/USDA/IBGE) para o sistema Nutri 4.0. Use para validar, verificar e garantir qualidade dos dados nutricionais. Ativa em validação, qualidade de dados, TACO, TBCA, USDA, IBGE.",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "skills": [
+        "clean-code",
+        "python-patterns",
+        "django-best-practices",
+        "nutri40-practices"
+      ],
+      "file": ".agent\\agents\\validador-dados-nutricionais.md"
+    }
+  ],
+  "skills": {
+    "api-patterns": {
+      "path": ".agent\\skills\\api-patterns",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "API design principles and decision-making. REST vs GraphQL vs tRPC selection, response formats, versioning, pagination."
+    },
+    "app-builder": {
+      "path": ".agent\\skills\\app-builder",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Main application building orchestrator. Creates full-stack applications from natural language requests. Determines project type, selects tech stack, coordinates agents."
+    },
+    "architecture": {
+      "path": ".agent\\skills\\architecture",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Architectural decision-making framework. Requirements analysis, trade-off evaluation, ADR documentation. Use when making architecture decisions or analyzing system design."
+    },
+    "bash-linux": {
+      "path": ".agent\\skills\\bash-linux",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Bash/Linux terminal patterns. Critical commands, piping, error handling, scripting. Use when working on macOS or Linux systems."
+    },
+    "behavioral-modes": {
+      "path": ".agent\\skills\\behavioral-modes",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "AI operational modes (brainstorm, implement, debug, review, teach, ship, orchestrate). Use to adapt behavior based on task type."
+    },
+    "brainstorming": {
+      "path": ".agent\\skills\\brainstorming",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Socratic questioning protocol + user communication. MANDATORY for complex requests, new features, or unclear requirements. Includes progress reporting and error handling."
+    },
+    "clean-code": {
+      "path": ".agent\\skills\\clean-code",
+      "version": "2.0",
+      "priority": "CRITICAL",
+      "description": "Pragmatic coding standards - concise, direct, no over-engineering, no unnecessary comments"
+    },
+    "code-review-checklist": {
+      "path": ".agent\\skills\\code-review-checklist",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Code review guidelines covering code quality, security, and best practices."
+    },
+    "database-design": {
+      "path": ".agent\\skills\\database-design",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Database design principles and decision-making. Schema design, indexing strategy, ORM selection, serverless databases."
+    },
+    "deployment-procedures": {
+      "path": ".agent\\skills\\deployment-procedures",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Production deployment principles and decision-making. Safe deployment workflows, rollback strategies, and verification. Teaches thinking, not scripts."
+    },
+    "documentation-templates": {
+      "path": ".agent\\skills\\documentation-templates",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Documentation templates and structure guidelines. README, API docs, code comments, and AI-friendly documentation."
+    },
+    "frontend-design": {
+      "path": ".agent\\skills\\frontend-design",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Design thinking and decision-making for web UI. Use when designing components, layouts, color schemes, typography, or creating aesthetic interfaces. Teaches principles, not fixed values."
+    },
+    "game-development": {
+      "path": ".agent\\skills\\game-development",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Game development orchestrator. Routes to platform-specific skills based on project needs."
+    },
+    "geo-fundamentals": {
+      "path": ".agent\\skills\\geo-fundamentals",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Generative Engine Optimization for AI search engines (ChatGPT, Claude, Perplexity)."
+    },
+    "i18n-localization": {
+      "path": ".agent\\skills\\i18n-localization",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Internationalization and localization patterns. Detecting hardcoded strings, managing translations, locale files, RTL support."
+    },
+    "intelligent-routing": {
+      "path": ".agent\\skills\\intelligent-routing",
+      "version": "1.0.0",
+      "priority": "NORMAL",
+      "description": "Automatic agent selection and intelligent task routing. Analyzes user requests and automatically selects the best specialist agent(s) without requiring explicit user mentions."
+    },
+    "lint-and-validate": {
+      "path": ".agent\\skills\\lint-and-validate",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Automatic quality control, linting, and static analysis procedures. Use after every code modification to ensure syntax correctness and project standards. Triggers onKeywords: lint, format, check, validate, types, static analysis."
+    },
+    "mcp-builder": {
+      "path": ".agent\\skills\\mcp-builder",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "MCP (Model Context Protocol) server building principles. Tool design, resource patterns, best practices."
+    },
+    "mobile-design": {
+      "path": ".agent\\skills\\mobile-design",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Mobile-first design thinking and decision-making for iOS and Android apps. Touch interaction, performance patterns, platform conventions. Teaches principles, not fixed values. Use when building React Native, Flutter, or native mobile apps."
+    },
+    "nextjs-best-practices": {
+      "path": ".agent\\skills\\nextjs-best-practices",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Next.js App Router principles. Server Components, data fetching, routing patterns."
+    },
+    "nodejs-best-practices": {
+      "path": ".agent\\skills\\nodejs-best-practices",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Node.js development principles and decision-making. Framework selection, async patterns, security, and architecture. Teaches thinking, not copying."
+    },
+    "parallel-agents": {
+      "path": ".agent\\skills\\parallel-agents",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Multi-agent orchestration patterns. Use when multiple independent tasks can run with different domain expertise or when comprehensive analysis requires multiple perspectives."
+    },
+    "performance-profiling": {
+      "path": ".agent\\skills\\performance-profiling",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Performance profiling principles. Measurement, analysis, and optimization techniques."
+    },
+    "plan-writing": {
+      "path": ".agent\\skills\\plan-writing",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Structured task planning with clear breakdowns, dependencies, and verification criteria. Use when implementing features, refactoring, or any multi-step work."
+    },
+    "powershell-windows": {
+      "path": ".agent\\skills\\powershell-windows",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "PowerShell Windows patterns. Critical pitfalls, operator syntax, error handling."
+    },
+    "python-patterns": {
+      "path": ".agent\\skills\\python-patterns",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Python development principles and decision-making. Framework selection, async patterns, type hints, project structure. Teaches thinking, not copying."
+    },
+    "react-patterns": {
+      "path": ".agent\\skills\\react-patterns",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Modern React patterns and principles. Hooks, composition, performance, TypeScript best practices."
+    },
+    "red-team-tactics": {
+      "path": ".agent\\skills\\red-team-tactics",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Red team tactics principles based on MITRE ATT&CK. Attack phases, detection evasion, reporting."
+    },
+    "seo-fundamentals": {
+      "path": ".agent\\skills\\seo-fundamentals",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "SEO fundamentals, E-E-A-T, Core Web Vitals, and Google algorithm principles."
+    },
+    "server-management": {
+      "path": ".agent\\skills\\server-management",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Server management principles and decision-making. Process management, monitoring strategy, and scaling decisions. Teaches thinking, not commands."
+    },
+    "systematic-debugging": {
+      "path": ".agent\\skills\\systematic-debugging",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "4-phase systematic debugging methodology with root cause analysis and evidence-based verification. Use when debugging complex issues."
+    },
+    "tailwind-patterns": {
+      "path": ".agent\\skills\\tailwind-patterns",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Tailwind CSS v4 principles. CSS-first configuration, container queries, modern patterns, design token architecture."
+    },
+    "tdd-workflow": {
+      "path": ".agent\\skills\\tdd-workflow",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Test-Driven Development workflow principles. RED-GREEN-REFACTOR cycle."
+    },
+    "testing-patterns": {
+      "path": ".agent\\skills\\testing-patterns",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Testing patterns and principles. Unit, integration, mocking strategies."
+    },
+    "vulnerability-scanner": {
+      "path": ".agent\\skills\\vulnerability-scanner",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Advanced vulnerability analysis principles. OWASP 2025, Supply Chain Security, attack surface mapping, risk prioritization."
+    },
+    "webapp-testing": {
+      "path": ".agent\\skills\\webapp-testing",
+      "version": "1.0",
+      "priority": "NORMAL",
+      "description": "Web application testing principles. E2E, Playwright, deep audit strategies."
+    }
+  },
+  "workflows": [
+    "brainstorm",
+    "create",
+    "debug",
+    "deploy",
+    "enhance",
+    "orchestrate",
+    "plan",
+    "preview",
+    "status",
+    "test",
+    "ui-ux-pro-max"
+  ],
+  "generated_at": "2026-02-18T12:47:03.420Z",
+  "version": "2.0"
+}

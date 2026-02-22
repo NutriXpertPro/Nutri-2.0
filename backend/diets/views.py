@@ -323,8 +323,14 @@ class FoodSearchViewSet(viewsets.ViewSet):
 
         # --- FILTROS DE CATEGORIA ROBUSTOS ---
         # Grupos que identificam suplementos de forma clara
-        SUPPLEMENT_KEYWORDS = ["SUPLEMENTO", "WHEY", "CREATINA", "WHEY PROTEIN", "FINS ESPECIAIS"]
-        
+        SUPPLEMENT_KEYWORDS = [
+            "SUPLEMENTO",
+            "WHEY",
+            "CREATINA",
+            "WHEY PROTEIN",
+            "FINS ESPECIAIS",
+        ]
+
         def filter_category(queryset, field_name, mode):
             """
             Aplica filtros de inclusão ou exclusão de suplementos.
@@ -333,7 +339,7 @@ class FoodSearchViewSet(viewsets.ViewSet):
             q_filter = Q()
             for kw in SUPPLEMENT_KEYWORDS:
                 q_filter |= Q(**{f"{field_name}__icontains": kw})
-            
+
             if mode == "SUPLEMENTOS":
                 return queryset.filter(q_filter)
             elif mode == "NOT_SUPPLEMENTS":
@@ -345,10 +351,19 @@ class FoodSearchViewSet(viewsets.ViewSet):
         # Determinar permissões de busca baseadas na fonte
         is_all = source_param in ["", "ALL", "SUPLEMENTOS"]
         search_custom = is_all or source_param in ["SUA TABELA", "CUSTOM"]
-        search_official = is_all or source_param in ["ALIMENTOS", "TACO", "TBCA", "USDA"]
-        
+        search_official = is_all or source_param in [
+            "ALIMENTOS",
+            "TACO",
+            "TBCA",
+            "USDA",
+        ]
+
         # Modo de operação: Aba de Suplementos ou Aba de Alimentos
-        op_mode = "SUPLEMENTOS" if (grupo_param == "SUPLEMENTOS" or source_param == "SUPLEMENTOS") else "NOT_SUPPLEMENTS"
+        op_mode = (
+            "SUPLEMENTOS"
+            if (grupo_param == "SUPLEMENTOS" or source_param == "SUPLEMENTOS")
+            else "NOT_SUPPLEMENTS"
+        )
 
         # 1. CustomFood (Sua Tabela / Meus Suplementos)
         if search_custom:
@@ -356,20 +371,28 @@ class FoodSearchViewSet(viewsets.ViewSet):
             if only_mine:
                 custom_qs = custom_qs.filter(nutritionist=request.user)
             else:
-                custom_qs = custom_qs.filter(Q(nutritionist=request.user) | Q(nutritionist__isnull=True))
+                custom_qs = custom_qs.filter(
+                    Q(nutritionist=request.user) | Q(nutritionist__isnull=True)
+                )
 
             # Aplicar filtro de categoria (Suplementos vs Alimentos)
             custom_qs = filter_category(custom_qs, "grupo", op_mode)
 
             # Filtros adicionais de subgrupo (ex: Frutas, Carnes)
-            if grupo_param and grupo_param not in ["SUPLEMENTOS", "NOT_SUPPLEMENTS", "TODOS"]:
+            if grupo_param and grupo_param not in [
+                "SUPLEMENTOS",
+                "NOT_SUPPLEMENTS",
+                "TODOS",
+            ]:
                 custom_qs = custom_qs.filter(grupo__icontains=grupo_param)
 
             if search_query:
                 custom_qs = apply_search_filter(custom_qs, search_query, field="nome")
 
             for item in custom_qs[:200]:
-                results.append(self._map_custom_to_unified(item, "Sua Tabela", user_fav_keys))
+                results.append(
+                    self._map_custom_to_unified(item, "Sua Tabela", user_fav_keys)
+                )
 
         # 2. Modelos Oficiais (TACO, TBCA, USDA)
         if search_official:
@@ -381,31 +404,45 @@ class FoodSearchViewSet(viewsets.ViewSet):
             if taco_active:
                 qs = AlimentoTACO.objects.all()
                 qs = filter_category(qs, "grupo", op_mode)
-                if grupo_param and grupo_param not in ["SUPLEMENTOS", "NOT_SUPPLEMENTS", "TODOS"]:
+                if grupo_param and grupo_param not in [
+                    "SUPLEMENTOS",
+                    "NOT_SUPPLEMENTS",
+                    "TODOS",
+                ]:
                     qs = qs.filter(grupo__icontains=grupo_param)
-                
+
                 qs = apply_search_filter(qs, search_query)
                 for item in qs[:150]:
-                    results.append(self._map_model_to_unified(item, "TACO", user_fav_keys))
+                    results.append(
+                        self._map_model_to_unified(item, "TACO", user_fav_keys)
+                    )
 
             if tbca_active:
                 qs = AlimentoTBCA.objects.all()
                 qs = filter_category(qs, "grupo", op_mode)
-                if grupo_param and grupo_param not in ["SUPLEMENTOS", "NOT_SUPPLEMENTS", "TODOS"]:
+                if grupo_param and grupo_param not in [
+                    "SUPLEMENTOS",
+                    "NOT_SUPPLEMENTS",
+                    "TODOS",
+                ]:
                     qs = qs.filter(grupo__icontains=grupo_param)
-                
+
                 qs = apply_search_filter(qs, search_query)
                 for item in qs[:150]:
-                    results.append(self._map_model_to_unified(item, "TBCA", user_fav_keys))
+                    results.append(
+                        self._map_model_to_unified(item, "TBCA", user_fav_keys)
+                    )
 
             if usda_active:
                 qs = AlimentoUSDA.objects.all()
                 # USDA usa 'categoria' em vez de 'grupo'
                 qs = filter_category(qs, "categoria", op_mode)
-                
+
                 qs = apply_search_filter(qs, search_query)
                 for item in qs[:100]:
-                    results.append(self._map_model_to_unified(item, "USDA", user_fav_keys))
+                    results.append(
+                        self._map_model_to_unified(item, "USDA", user_fav_keys)
+                    )
 
         # Scoring e Ordenação
         if search_query:
@@ -446,22 +483,24 @@ class FoodSearchViewSet(viewsets.ViewSet):
         # Buscar dados do alimento para obter o nome original
         food_data = _get_food_data(food_source, food_id)
         if not food_data:
-            return Response({"error": "Alimento não encontrado"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Alimento não encontrado"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         food_name = food_data.get("nome", "Alimento")
-        
+
         # Parâmetros de contexto (opcionais no GET)
         qty = safe_float(request.query_params.get("quantity", 100))
         diet = request.query_params.get("diet_type", "normocalorica")
-        
+
         results, group, code = calculate_suggestion_service(
             food_id=food_id,
             food_name=food_name,
             food_source=food_source,
             original_quantity=qty,
-            diet_type=diet
+            diet_type=diet,
         )
-        
+
         if code != 200:
             return Response({"error": group}, status=code)
 
@@ -469,38 +508,42 @@ class FoodSearchViewSet(viewsets.ViewSet):
         formatted_results = []
         for res in results:
             fptr = res["food"]
-            formatted_results.append({
-                "substitute_food_id": str(fptr.get("id", "")),
-                "substitute_food_name": fptr.get("nome", ""),
-                "substitute_source": fptr.get("source", "AUTO"),
-                "equivalent_quantity_g": res["suggested_quantity"],
-                "equivalent_quantity_display": f"{res['suggested_quantity']:.1f}g",
-                "predominant_nutrient": group,
-                "macros": {
-                    "calories": fptr.get("energia_kcal", 0),
-                    "protein": fptr.get("proteina_g", 0),
-                    "carbs": fptr.get("carboidrato_g", 0),
-                    "fat": fptr.get("lipidios_g", 0),
-                    "fiber": fptr.get("fibra_g", 0),
-                },
-                "similarity_score": res["similarity_score"],
-                "notes": res["notes"]
-            })
-
-        return Response({
-            "original_food": {
-                "name": food_name,
-                "quantity": qty,
-                "unit": "g",
-                "macros": {
-                    "calories": food_data.get("energia_kcal", 0),
-                    "protein": food_data.get("proteina_g", 0),
-                    "carbs": food_data.get("carboidrato_g", 0),
-                    "fat": food_data.get("lipidios_g", 0),
+            formatted_results.append(
+                {
+                    "substitute_food_id": str(fptr.get("id", "")),
+                    "substitute_food_name": fptr.get("nome", ""),
+                    "substitute_source": fptr.get("source", "AUTO"),
+                    "equivalent_quantity_g": res["suggested_quantity"],
+                    "equivalent_quantity_display": f"{res['suggested_quantity']:.1f}g",
+                    "predominant_nutrient": group,
+                    "macros": {
+                        "calories": fptr.get("energia_kcal", 0),
+                        "protein": fptr.get("proteina_g", 0),
+                        "carbs": fptr.get("carboidrato_g", 0),
+                        "fat": fptr.get("lipidios_g", 0),
+                        "fiber": fptr.get("fibra_g", 0),
+                    },
+                    "similarity_score": res["similarity_score"],
+                    "notes": res["notes"],
                 }
-            },
-            "substitutions": formatted_results
-        })
+            )
+
+        return Response(
+            {
+                "original_food": {
+                    "name": food_name,
+                    "quantity": qty,
+                    "unit": "g",
+                    "macros": {
+                        "calories": food_data.get("energia_kcal", 0),
+                        "protein": food_data.get("proteina_g", 0),
+                        "carbs": food_data.get("carboidrato_g", 0),
+                        "fat": food_data.get("lipidios_g", 0),
+                    },
+                },
+                "substitutions": formatted_results,
+            }
+        )
 
     def _map_model_to_unified(self, item, source, fav_keys):
         """Helper para padronizar saída de modelos oficiais"""
@@ -888,9 +931,11 @@ class DietViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # Otimização de Performance: N+1 Selects
-        queryset = Diet.objects.filter(patient__nutritionist=self.request.user)\
-            .select_related('patient', 'patient__user')\
-            .prefetch_related('meals_rel', 'meals_rel__items')
+        queryset = (
+            Diet.objects.filter(patient__nutritionist=self.request.user)
+            .select_related("patient", "patient__user")
+            .prefetch_related("meals_rel", "meals_rel__items")
+        )
 
         patient_id = self.request.query_params.get("patient")
         if patient_id:
@@ -961,7 +1006,7 @@ class FoodItemViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = FoodItem.objects.filter(
             meal__diet__patient__nutritionist=self.request.user
-        ).select_related('meal__diet__patient')
+        ).select_related("meal__diet__patient")
 
         meal_id = self.request.query_params.get("meal")
         if meal_id:
@@ -1045,15 +1090,17 @@ class FoodSubstitutionRuleViewSet(viewsets.ModelViewSet):
         food_id = request.query_params.get("food_id")
         food_name = request.query_params.get("food_name")
         food_source = request.query_params.get("food_source", "TACO")
-        
+
         if not food_name:
             return Response({"error": "food_name é obrigatório"}, status=400)
-            
+
         try:
             # Parse dos parâmetros
-            original_quantity = float(request.query_params.get("quantity", 100))
+            original_quantity = safe_float(
+                request.query_params.get("quantity", 100), default=100
+            )
             diet_type = request.query_params.get("diet_type", "normocalorica")
-            
+
             # Target macros (opcional)
             t_ptn = request.query_params.get("orig_ptn")
             t_cho = request.query_params.get("orig_cho")
@@ -1061,40 +1108,70 @@ class FoodSubstitutionRuleViewSet(viewsets.ModelViewSet):
 
             # Importação Lazy para evitar problema de import circular na inicialização
             from .services import calculate_suggestion_service
-            
+
             # Chamada ao Serviço
             results, group_name, status_code = calculate_suggestion_service(
-                food_id, food_name, food_source, original_quantity,
-                diet_type, t_ptn, t_cho, t_fat
+                food_id,
+                food_name,
+                food_source,
+                original_quantity,
+                diet_type,
+                t_ptn,
+                t_cho,
+                t_fat,
             )
-            
+
             if status_code != 200:
-                pass # Erros do serviço (ex: 404) serão tratados no retorno abaixo se results for None
-                
+                pass  # Erros do serviço (ex: 404) serão tratados no retorno abaixo se results for None
+
             if results is None:
                 return Response({"error": group_name}, status=status_code)
 
-            return Response({"substitutions": results, "predominant": group_name or "mixed"})
+            # Formatar para o formato esperado pelo frontend
+            substitutions_list = []
+            for sub in results.get("substitutions", []):
+                food_data = sub.get("food", {})
+                suggested_qty = sub.get("suggested_quantity", 0)
+                substitutions_list.append(
+                    {
+                        "id": sub.get("id", ""),
+                        "food": {
+                            "nome": food_data.get("nome", ""),
+                            "proteina_g": food_data.get("proteina_g", 0),
+                            "carboidrato_g": food_data.get("carboidrato_g", 0),
+                            "lipidios_g": food_data.get("lipidios_g", 0),
+                            "energia_kcal": food_data.get("energia_kcal", 0),
+                            "fibra_g": food_data.get("fibra_g", 0),
+                        },
+                        "suggested_quantity": suggested_qty,
+                        "similarity_score": sub.get("similarity_score", 0),
+                        "is_favorite": False,
+                        "is_selected": False,
+                        "priority": 0,
+                        "notes": sub.get("notes", ""),
+                    }
+                )
+
+            return Response(
+                {
+                    "substitutions": substitutions_list,
+                    "predominant": group_name or "mixed",
+                }
+            )
 
         except Exception as e:
             # Log detalhado no servidor usando o logger padrão
             logger.error(f"[SUGGEST ERROR] {str(e)}", exc_info=True)
             # Retorno genérico para o cliente (Security Best Practice)
             return Response(
-                {"error": "Ocorreu um erro interno ao processar sua solicitação."}, 
-                status=500
+                {"error": "Ocorreu um erro interno ao processar sua solicitação."},
+                status=500,
             )
-
-
 
     # Deprecated methods removed — logic centralized in nutritional_substitution.py
     # _identify_predominant_nutrient, _get_professional_group,
     # _is_same_food_family, _calculate_nutritional_equivalence
     # were all removed as part of the 2026 cleanup.
-
-
-
-
 
     @action(detail=False, methods=["POST"])
     def toggle_favorite(self, request):
@@ -1297,23 +1374,41 @@ class FoodSubstitutionsViewSet(viewsets.ViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        # Obter food_id e source do alimento original
+        original_food_id = None
+        original_source = None
+
+        if food_item.taco_food:
+            original_food_id = f"TACO_{food_item.taco_food_id}"
+            original_source = "TACO"
+        elif food_item.tbca_food:
+            original_food_id = f"TBCA_{food_item.tbca_food_id}"
+            original_source = "TBCA"
+        elif food_item.usda_food:
+            original_food_id = f"USDA_{food_item.usda_food_id}"
+            original_source = "USDA"
+        else:
+            # Fallback: usar o nome
+            original_food_id = food_item.food_name
+            original_source = "AUTO"
+
         # Usar o serviço de substituição inteligente 2026
         results_raw, group_name, code = calculate_suggestion_service(
             food_id=original_food_id,
             food_name=food_item.food_name,
             food_source=original_source,
             original_quantity=float(food_item.quantity),
-            diet_type="normocalorica", # TODO: Get from diet
+            diet_type="normocalorica",
             t_ptn=food_item.protein,
             t_cho=food_item.carbs,
-            t_fat=food_item.fats
+            t_fat=food_item.fats,
         )
 
         if code != 200:
             return Response({"error": group_name}, status=code)
 
         results = []
-        for res in results_raw:
+        for res in results_raw.get("substitutions", []):
             fptr = res["food"]
             results.append(
                 {
@@ -1322,7 +1417,7 @@ class FoodSubstitutionsViewSet(viewsets.ViewSet):
                     "substitute_source": fptr.get("source", "AUTO"),
                     "equivalent_quantity_g": round(res["suggested_quantity"], 1),
                     "equivalent_quantity_display": f"{res['suggested_quantity']:.1f}g",
-                    "predominant_nutrient": predominant,
+                    "predominant_nutrient": group_name,
                     "macros": {
                         "calories": round(fptr.get("energia_kcal", 0), 1),
                         "protein": round(fptr.get("proteina_g", 0), 1),
@@ -1337,7 +1432,7 @@ class FoodSubstitutionsViewSet(viewsets.ViewSet):
                         "fat": float(food_item.fats),
                     },
                     "similarity_score": res.get("similarity_score", 0),
-                    "notes": res.get("notes", "")
+                    "notes": res.get("notes", ""),
                 }
             )
 

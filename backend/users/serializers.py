@@ -181,19 +181,22 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    email = serializers.EmailField()
+    email = serializers.EmailField(required=False)
     password = serializers.CharField(write_only=True)
     username = serializers.CharField(required=False, allow_blank=True)
 
     def validate(self, attrs):
-        # Se email foi enviado, usar ele como username (já que USERNAME_FIELD = 'email')
+        # Aceita tanto email quanto username
         email = attrs.get("email")
+        username = attrs.get("username")
+
+        # Se email foi enviado, usar ele como username
         if email:
             attrs["username"] = email
+        elif username:
+            attrs["username"] = username
 
-        # Remove campos extras antes de passar para o serializer pai
-        attrs.pop("email", None)
-
+        # Não remover campos, apenas deixar o serializer pai lidar com isso
         data = super().validate(attrs)
         return data
 

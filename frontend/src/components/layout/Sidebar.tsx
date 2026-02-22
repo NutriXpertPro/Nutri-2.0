@@ -146,13 +146,13 @@ export function Sidebar({ className, collapsed, onToggle }: SidebarProps) {
             badgeVariant: "default",
         },
         {
-            icon: <MessageSquare className="h-5 w-5 text-emerald-500" />,
+            icon: <MessageSquare className="h-5 w-5" style={{ color: "#0D9488" }} />,
             label: (
-                <span className="flex items-baseline group/lbl">
-                    <span className="text-emerald-500 font-bold group-hover/lbl:drop-shadow-[0_0_8px_rgba(16,185,129,0.4)] transition-all drop-shadow-[0_1px_2px_rgba(16,185,129,0.2)]">
-                        <span className="text-lg">X</span>pert
+                <span className="flex items-baseline group/lbl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: "14px", letterSpacing: "-0.01em" }}>
+                    <span style={{ color: "#0D9488", transition: "all 0.2s ease" }} className="group-hover/lbl:opacity-80">
+                        Xpert
                     </span>
-                    <span className="ml-1 text-black font-bold dark:text-white">Messenger</span>
+                    <span style={{ color: "#1A2E2C", marginLeft: "2px" }}>Messenger</span>
                 </span>
             ),
             href: "/messages",
@@ -229,32 +229,24 @@ export function Sidebar({ className, collapsed, onToggle }: SidebarProps) {
                 {/* Logo */}
                 <div className={cn(
                     "flex items-center border-b h-20",
-                    isCollapsed ? "justify-center px-2" : "justify-center"
+                    isCollapsed ? "justify-center" : "justify-start px-4"
                 )}>
-                    <Link href="/dashboard" className="flex items-center group">
-                        <div className="relative w-28 h-28 flex-shrink-0">
-                            <img
-                                src={logoImg.src}
-                                alt="Logo"
-                                className="w-full h-full object-contain group-hover:scale-110 transition-transform"
-                                style={{ filter: 'contrast(110%) brightness(105%)' }}
-                            />
-                        </div>
+                    <Link href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <img
+                            src="/imagem/logo_final.svg"
+                            alt="Logo"
+                            style={{ height: "65px", width: "auto", transform: "scale(1.2)", transition: "transform 0.2s" }}
+                        />
                         {!isCollapsed && (
-                            <div
-                                className="text-lg font-bold tracking-tighter transition-colors ml-[-15px] text-foreground flex items-center"
-                                suppressHydrationWarning
-                            >
-                                <span className="mr-1 text-foreground drop-shadow-sm">
-                                    <span className="text-2xl font-bold">N</span>utri
+                            <>
+                                <style>
+                                    {`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&display=swap');`}
+                                </style>
+                                <div style={{ width: 1, height: 34, background: "#ddd" }} />
+                                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: "22px", color: "#1A2E2C", letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>
+                                    Nutri <span style={{ color: "#0D9488" }}>Xpert</span> Pro
                                 </span>
-                                <span className="text-emerald-500 drop-shadow-[0_1px_2px_rgba(16,185,129,0.2)]">
-                                    <span className="text-3xl font-black">X</span>pert
-                                </span>
-                                <span className="ml-1 text-foreground drop-shadow-sm">
-                                    <span className="text-2xl font-bold">P</span>ro
-                                </span>
-                            </div>
+                            </>
                         )}
                     </Link>
                 </div>

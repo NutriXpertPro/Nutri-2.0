@@ -1,0 +1,34 @@
+# Qwen Agent Configuration
+# This file defines global behavior for the Qwen Code agent.
+# All workflows and agents respect these settings.
+
+agent:
+  name: "Qwen Code Agent"
+  version: "1.0.0"
+  language: "en"  # default output language; override per session if needed
+
+execution:
+  # Always pause before destructive actions (commit, deploy, delete)
+  require_approval_before:
+    - "git commit"
+    - "git push"
+    - "deploy"
+    - "rm -rf"
+    - "overwrite_file"
+
+  # Timeout for shell commands (ms)
+  default_timeout_ms: 120000
+
+logging:
+  level: "info"  # debug, info, warn, error
+  show_diff_on_edit: true
+
+# Project-specific overrides can go here (e.g., lint command, test runner)
+project:
+  lint_command: "npm run lint"  # fallback; will be auto-detected if present
+  test_command: "npm test"
+  build_command: "npm run build"
+
+# Safety guard: never auto-commit unless explicitly allowed
+auto_commit: false
+auto_deploy: false

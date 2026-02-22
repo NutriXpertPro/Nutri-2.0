@@ -50,11 +50,14 @@ const XpertMessengerContent: React.FC = () => {
       {/* Conversations List - Left Panel */}
       <div className="w-1/3 border-r bg-background flex flex-col" style={{ height: '100%', maxHeight: '100%', overflow: 'hidden' }}>
         <div className="p-4 border-b flex-shrink-0">
-          <h1 className="text-xl font-normal text-foreground mb-2">
-            <span className="text-emerald-500 font-bold drop-shadow-[0_1px_4px_rgba(16,185,129,0.2)]">
-              <span className="text-3xl font-black">X</span>pert
+          <style>
+            {`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&display=swap');`}
+          </style>
+          <h1 className="text-xl mb-2 flex items-baseline" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>
+            <span style={{ color: "#0D9488" }}>
+              Xpert
             </span>
-            <span className="ml-1 text-[#000000] font-bold">Messenger</span>
+            <span style={{ color: "#1A2E2C", marginLeft: "4px" }}>Messenger</span>
           </h1>
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-emerald-500" />
@@ -87,11 +90,11 @@ const XpertMessengerContent: React.FC = () => {
                 glow
                 className="mx-auto mb-4 ring-4 ring-background border border-white/10 dark:border-white/20 shadow-lg"
               />
-              <h2 className="text-xl font-semibold text-foreground mb-2">
-                <span className="text-emerald-500 font-bold drop-shadow-[0_1px_4px_rgba(16,185,129,0.2)]">
-                  <span className="text-3xl font-black">X</span>pert
+              <h2 className="text-xl mb-2 flex items-baseline justify-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>
+                <span style={{ color: "#0D9488" }}>
+                  Xpert
                 </span>
-                <span className="ml-1 text-[#000000] font-bold">Messenger</span>
+                <span style={{ color: "#1A2E2C", marginLeft: "4px" }}>Messenger</span>
               </h2>
               <div className="text-muted-foreground max-w-md">
                 Selecione uma conversa para começar a conversar com seu paciente.

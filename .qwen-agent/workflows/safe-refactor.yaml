@@ -1,0 +1,77 @@
+# safe-refactor.yaml
+# Workflow for safely refactoring code with human-in-the-loop approval
+
+name: "Safe Refactor"
+description: "Refactor a file, generate tests, lint, and wait for approval before commit."
+
+steps:
+  - id: analyze
+    action: "read_file"
+    params:
+      path: "{{ target_file }}"
+    description: "Read target file to understand current structure"
+
+  - id: refactor
+    action: "suggest_edit"
+    params:
+      file_path: "{{ target_file }}"
+      context_lines: 5
+    description: |-
+      Suggest refactoring based on best practices.
+      User must approve edit before applying.
+
+  - id: apply_refactor
+    action: "edit"
+    params:
+      file_path: "{{ target_file }}"
+      # Will be filled at runtime by orchestrator after user approval
+    description: "Apply approved refactor"
+    requires_approval: true
+
+  - id: generate_tests
+    action: "generate_test"
+    params:
+      target_file: "{{ target_file }}"
+      output_path: "{{ target_file }}.test.ts"
+    description: "Generate unit tests for the refactored file"
+
+  - id: lint
+    action: "run_shell_command"
+    params:
+      command: "{{ config.project.lint_command }}"
+      description: "Run linter"
+    condition: "file_exists(config.project.lint_command)"
+
+  - id: test
+    action: "run_shell_command"
+    params:
+      command: "{{ config.project.test_command }}"
+      description: "Run tests"
+    condition: "file_exists(config.project.test_command)"
+
+  - id: show_diff
+    action: "run_shell_command"
+    params:
+      command: "git diff --no-index {{ target_file }} {{ target_file }}.bak || echo 'No changes'"
+      description: "Show diff of changes (backup made before edit)"
+    requires_approval: true
+
+  - id: commit
+    action: "run_shell_command"
+    params:
+      command: |
+        git add {{ target_file }} {{ target_file }}.test.ts &&
+        git commit -F .qwen-agent/templates/commit.j2
+      description: "Commit changes"
+    requires_approval: true
+    condition: "config.execution.auto_commit == false"
+
+# Runtime variables (filled by orchestrator)
+variables:
+  target_file: ""
+  config: "{{ load_config('.qwen-agent/config.yaml') }}"
+
+# Safety: no auto-commit, no auto-deploy
+safety:
+  auto_commit: false
+  require_explicit_approval: true

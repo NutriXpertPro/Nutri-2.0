@@ -73,7 +73,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 MIDDLEWARE = [
-    "utils.debug_middleware.Debug400Middleware",
+    # "utils.debug_middleware.Debug400Middleware",  # Desabilitado temporariamente - causava problemas com proxy
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

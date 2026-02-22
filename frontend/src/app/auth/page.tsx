@@ -10,8 +10,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { useTheme } from "next-themes"
 import { useColor } from "@/components/color-provider"
-import { Moon, Sun, Eye, EyeOff, Loader2 } from "lucide-react"
+import { Moon, Sun, Eye, EyeOff, Loader2, Palette, Check } from "lucide-react"
 import { FcGoogle } from "react-icons/fc"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { motion } from "framer-motion"
+import { cn } from "@/lib/utils"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/contexts/auth-context"
 import { getBaseURL } from "@/services/api"
@@ -21,10 +24,17 @@ export default function AuthPage() {
     const { theme, setTheme } = useTheme()
     const { color, setColor } = useColor()
     const [mounted, setMounted] = useState(false)
+    const [animateTrigger, setAnimateTrigger] = useState(0)
 
     useEffect(() => {
         setMounted(true)
     }, [])
+
+    useEffect(() => {
+        if (mounted) {
+            setAnimateTrigger(prev => prev + 1)
+        }
+    }, [color, mounted])
 
     // Login states
     const { login } = useAuth()
@@ -61,7 +71,7 @@ export default function AuthPage() {
             console.log('[Login] Starting login process...')
             const url = `${getBaseURL()}auth/login/`
             console.log('[Login] URL:', url)
-            
+
             const response = await fetch(url, {
                 method: "POST",
                 credentials: "include",
@@ -160,67 +170,105 @@ export default function AuthPage() {
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
             {/* Theme Controls (canto superior direito) */}
             <div className="fixed top-4 right-4 flex items-center gap-4">
-                {/* Dark/Light Toggle */}
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="rounded-full"
-                >
-                    {mounted ? (
-                        theme === "dark" ? (
-                            <Sun className="h-5 w-5" />
-                        ) : (
-                            <Moon className="h-5 w-5" />
-                        )
-                    ) : (
-                        <Sun className="h-5 w-5" />
-                    )}
-                </Button>
+                {/* Theme Toggle */}
+                {mounted && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                        className="rounded-full"
+                    >
+                        <motion.div
+                            key={`theme-icon-${animateTrigger}`}
+                            initial={{ scale: 1 }}
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ duration: 0.4 }}
+                        >
+                            {theme === "dark" ? (
+                                <Sun className="h-4 w-4" />
+                            ) : (
+                                <Moon className="h-4 w-4" />
+                            )}
+                        </motion.div>
+                    </Button>
+                )}
 
-                {/* Color Selector */}
-                <div className="flex gap-1">
-                    <button
-                        onClick={() => setColor("monochrome")}
-                        className={`w-5 h-5 rounded-full bg-zinc-500 border-2 transition-all ${color === "monochrome" ? "ring-2 ring-offset-2 ring-zinc-500 border-foreground" : "border-transparent"
-                            }`}
-                    />
-                    <button
-                        onClick={() => setColor("teal")}
-                        className={`w-5 h-5 rounded-full bg-teal-400 border-2 transition-all ${color === "teal" ? "ring-2 ring-offset-2 ring-teal-400 border-foreground" : "border-transparent"
-                            }`}
-                    />
-                    <button
-                        onClick={() => setColor("blue")}
-                        className={`w-5 h-5 rounded-full bg-blue-400 border-2 transition-all ${color === "blue" ? "ring-2 ring-offset-2 ring-blue-400 border-foreground" : "border-transparent"
-                            }`}
-                    />
-                    <button
-                        onClick={() => setColor("violet")}
-                        className={`w-5 h-5 rounded-full bg-violet-400 border-2 transition-all ${color === "violet" ? "ring-2 ring-offset-2 ring-violet-400 border-foreground" : "border-transparent"
-                            }`}
-                    />
-                    <button
-                        onClick={() => setColor("pink")}
-                        className={`w-5 h-5 rounded-full bg-pink-400 border-2 transition-all ${color === "pink" ? "ring-2 ring-offset-2 ring-pink-400 border-foreground" : "border-transparent"
-                            }`}
-                    />
-                </div>
+                {/* Premium Color Selector */}
+                {mounted && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full hover:bg-primary/10 hover:text-primary transition-all duration-300"
+                                title="Personalizar Cores"
+                            >
+                                <motion.div
+                                    key={`palette-icon-${animateTrigger}`}
+                                    initial={{ scale: 1 }}
+                                    animate={{ scale: [1, 1.2, 1] }}
+                                    transition={{ duration: 0.4 }}
+                                >
+                                    <Palette className="h-4 w-4" />
+                                </motion.div>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            align="end"
+                            className="w-64 p-2 bg-background/80 backdrop-blur-xl border-border/40 shadow-2xl rounded-2xl overflow-hidden"
+                        >
+                            <DropdownMenuLabel className="px-3 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground opacity-70">
+                                Temas Profissionais
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-border/10" />
+                            <div className="grid grid-cols-1 gap-1 pt-1">
+                                {([
+                                    { id: "monochrome", label: "Studio Minimal", color: "bg-zinc-500", desc: "Foco total no conteúdo" },
+                                    { id: "teal", label: "Oceanic Zen", color: "bg-[#0D9488]", desc: "Calma e equilíbrio" },
+                                    { id: "blue", label: "Executive Blue", color: "bg-blue-400", desc: "Confiança e autoridade" },
+                                    { id: "violet", label: "Royal Focus", color: "bg-violet-400", desc: "Criatividade e prestígio" },
+                                    { id: "pink", label: "Vital Energy", color: "bg-pink-400", desc: "Vigor e proximidade" },
+                                    { id: "amber", label: "Sunset Gold", color: "bg-amber-400", desc: "Calor e otimismo" },
+                                    { id: "emerald", label: "Forest Zen", color: "bg-emerald-400", desc: "Saúde e vitalidade" }
+                                ] as const).map((c) => (
+                                    <DropdownMenuItem
+                                        key={c.id}
+                                        onClick={() => setColor(c.id)}
+                                        className={cn(
+                                            "flex items-center gap-3 p-2.5 cursor-pointer rounded-xl transition-all duration-200",
+                                            color === c.id ? "bg-primary/10 text-primary" : "hover:bg-muted/50"
+                                        )}
+                                    >
+                                        <div className={cn("w-6 h-6 rounded-full border-2 border-white/20 shadow-sm flex items-center justify-center transition-transform", c.color, color === c.id && "scale-110")}>
+                                            {color === c.id && <Check className="w-3 h-3 text-white" />}
+                                        </div>
+                                        <div className="flex flex-col min-w-0">
+                                            <span className="text-xs font-semibold truncate">{c.label}</span>
+                                            <span className="text-[10px] text-muted-foreground truncate opacity-70">{c.desc}</span>
+                                        </div>
+                                    </DropdownMenuItem>
+                                ))}
+                            </div>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
 
             {/* Auth Card */}
             <Card className="w-full max-w-md shadow-xl border border-border">
                 <CardHeader className="text-center space-y-4">
                     <div>
-                        <CardTitle className="text-2xl font-bold tracking-tighter flex items-center justify-center">
-                            <span className="mr-1" style={{ textShadow: '1px 1px 2px rgba(255,255,255,0.1)' }}>
-                                <span style={{ fontSize: '1.3em', textShadow: '1px 1px 2px rgba(255,255,255,0.2)' }}>N</span>utri
-                            </span>
-                            <span className="text-emerald-500" style={{ textShadow: '1px 1px 2px rgba(255,255,255,0.1)' }}>
-                                <span className="text-[1.3em]" style={{ textShadow: '1px 1px 2px rgba(255,255,255,0.2)' }}>X</span>pert
-                            </span>
-                            <span className="ml-1" style={{ textShadow: '1px 1px 2px rgba(255,255,255,0.1)' }}>
-                                <span className="text-[1.3em]" style={{ textShadow: '1px 1px 2px rgba(255,255,255,0.2)' }}>P</span>ro
+                        <CardTitle className="text-2xl tracking-tighter flex items-center justify-center gap-3">
+                            <img
+                                src="/imagem/logo_final.svg"
+                                alt="Logo"
+                                style={{ height: "65px", width: "auto", transform: "scale(1.2)" }}
+                            />
+                            <style>
+                                {`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&display=swap');`}
+                            </style>
+                            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: "28px", color: "#1A2E2C", letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>
+                                Nutri <span style={{ color: "#0D9488" }}>Xpert</span> Pro
                             </span>
                         </CardTitle>
                         <CardDescription className="mt-2">

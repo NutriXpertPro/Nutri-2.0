@@ -81,12 +81,15 @@ export default function CalendarPage() {
     useEffect(() => {
         const fetchAppointments = async () => {
             try {
-                const response = await api.get('/appointments/');
-                const appointmentsData = response.data.map((app: any) => ({
+                const response = await api.get('appointments/');
+                // O DRF retorna um objeto com 'results' quando paginado, ou array puro se não
+                const data = Array.isArray(response.data) ? response.data : (response.data.results || []);
+
+                const appointmentsData = data.map((app: any) => ({
                     id: app.id,
-                    patientId: app.patient.id,
-                    patientName: app.patient.name,
-                    patientEmail: app.patient.email,
+                    patientId: app.patient?.id || app.patient,
+                    patientName: app.patient?.name || app.patient_name || 'Paciente',
+                    patientEmail: app.patient?.email || app.patient_email || '',
                     date: app.date,
                     duration: app.duration || 60,
                     type: app.type || 'presencial',
@@ -164,16 +167,18 @@ export default function CalendarPage() {
         const fetchPendingRequests = async () => {
             try {
                 // Buscar compromissos com status 'agendada' que ainda não ocorreram
-                const response = await api.get('/appointments/');
+                const response = await api.get('appointments/');
+                const data = Array.isArray(response.data) ? response.data : (response.data.results || []);
+
                 const now = new Date();
-                const pendingAppointments = response.data.filter((app: any) => {
+                const pendingAppointments = data.filter((app: any) => {
                     const appointmentDate = new Date(app.date);
                     return app.status === 'agendada' && appointmentDate > now;
                 });
 
                 const pendingRequestsData = pendingAppointments.map((app: any) => ({
                     id: app.id,
-                    patientName: app.patient.name,
+                    patientName: app.patient?.name || app.patient_name || 'Paciente',
                     date: app.date,
                     time: format(new Date(app.date), 'HH:mm'),
                     reason: app.type || 'Consulta'
@@ -191,8 +196,10 @@ export default function CalendarPage() {
         // Carregar pacientes reais da API
         const fetchPatients = async () => {
             try {
-                const response = await api.get('/patients/');
-                const patientsData = response.data
+                const response = await api.get('patients/');
+                const data = Array.isArray(response.data) ? response.data : (response.data.results || []);
+
+                const patientsData = data
                     .filter((pat: any) => pat && (pat.user?.name || pat.name)) // Filtrar pacientes válidos
                     .map((pat: any) => ({
                         id: pat.id,

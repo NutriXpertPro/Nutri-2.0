@@ -1,0 +1,14 @@
+{
+  "agent-especialista-em-pagina": {
+    "name": "agent-especialista-em-pagina",
+    "description": "Landing page expert for SaaS sales funnels — UI, copy, conversion, analytics.",
+    "tools": ["Read", "Edit", "Grep", "Write"],
+    "skills": ["frontend-design", "seo-fundamentals", "copywriting", "analytics"]
+  },
+  "especialista_em_conteudo_marketing_nutrixpertpro": {
+    "name": "especialista_em_conteudo_marketing_nutrixpertpro",
+    "description": "Content and marketing specialist for NutriXpertPro — creates high-conversion nutritional content, SEO articles, and campaign assets.",
+    "tools": ["Write", "Read", "Grep"],
+    "skills": ["content-templates", "seo-fundamentals", "nutri40-practices", "marketing-strategy"]
+  }
+}

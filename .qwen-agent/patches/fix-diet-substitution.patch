@@ -1,0 +1,40 @@
+--- a/frontend/src/components/diet-editor/meal-builder/DietMealCard.tsx
++++ b/frontend/src/components/diet-editor/meal-builder/DietMealCard.tsx
+@@ -101,15 +101,22 @@
+     const handleReplaceFood = (oldFoodId: number, newFood: Food) => {
+         const updatedFoods: WorkspaceMealFood[] = meal.foods.map(f => {
+             if (f.id === oldFoodId) {
++                // 🔒 Correção: preservar qty ou calcular com base na unidade caseira
++                let newQty: number;
++                if (typeof f.qty === 'number') {
++                    newQty = f.qty;
++                } else if (newFood.peso_unidade_caseira_g) {
++                    newQty = (newFood.peso_unidade_caseira_g / 100) * 100; // escala para 100g padrão
++                } else {
++                    newQty = 1; // fallback seguro: 1 unidade
++                }
+                 return {
+                     ...f,
+-                    id: Date.now(),
+-                    name: newFood.nome,
+-                    qty: '' as const, // ❌ ERRO: string vazia causa NaN nos cálculos
++                    id: Date.now(),
++                    name: newFood.nome,
++                    qty: newQty, // ✅ número garantido
+                     ptn: newFood.proteina_g,
+                     cho: newFood.carboidrato_g,
+                     fat: newFood.lipidios_g,
+@@ -118,7 +125,7 @@
+                     medidas: newFood.medidas,
+                     originalId: newFood.id,
+                     source: newFood.source,
+                     prep: '',
+-                    measure: 'g', // ❌ hard-coded
+-                    unit: 'g',   // ❌ ignora unidade_caseira
++                    measure: newFood.unidade_caseira ?? 'g', // ✅ respeita unidade original
++                    unit: newFood.unidade_caseira ?? 'g',   // ✅
+                     preferred: false
+                 }
+             }
+             return f
+         })
