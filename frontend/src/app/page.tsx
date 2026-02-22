@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { MousePointer2, CheckCircle2, LineChart, Activity, Sparkles, Smartphone, Volume2, VolumeX } from "lucide-react";
+import { MousePointer2, CheckCircle2, LineChart, Activity, Sparkles, Smartphone } from "lucide-react";
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const C = {
@@ -72,6 +72,13 @@ const GlobalStyles = () => (
       .hero-image { width: 100% !important; height: auto !important; min-height: 300px !important; max-height: 50vh !important; border-radius: 20px !important; }
       .responsive-grid { grid-template-columns: 1fr !important; }
       .hide-mobile { display: none !important; }
+      .mobile-logo { height: 55px !important; }
+      .mobile-name { font-size: 18px !important; }
+      .mobile-btn-teste { padding: 10px 20px !important; font-size: 12px !important; }
+      .mobile-subtitle { textAlign: justify !important; textJustify: inter-word !important; padding: 0 10px !important; }
+      .mobile-btn-centered { display: flex !important; justifyContent: center !important; width: 100% !important; }
+      .mobile-justified { textAlign: justify !important; textJustify: inter-word !important; }
+      .mobile-stats-grid { gridTemplateColumns: 1fr 1fr !important; gap: 16px !important; }
     }
   `}</style>
 );
@@ -109,10 +116,9 @@ function Navbar() {
       transition: "all 0.3s ease"
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        {/* LOGO E NOME - VISIVEL EM MOBILE E DESKTOP */}
-        <Image src="/imagem/logo_final.svg" alt="Logo" width={240} height={65} style={{ height: "50px", width: "auto" }} priority />
+        <Image src="/imagem/logo_final.svg" alt="Logo" width={240} height={65} style={{ height: "50px", width: "auto" }} className="mobile-logo" priority />
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-          <span style={{ fontWeight: 800, fontSize: "clamp(14px, 3vw, 20px)", color: C.text, letterSpacing: "-0.02em", lineHeight: 1 }}>
+          <span style={{ fontWeight: 800, fontSize: "clamp(16px, 4vw, 20px)", color: C.text, letterSpacing: "-0.02em", lineHeight: 1 }} className="mobile-name">
             Nutri <span style={{ color: C.teal }}>Xpert</span> Pro
           </span>
         </div>
@@ -126,7 +132,7 @@ function Navbar() {
 
       <div style={{ display: "flex", gap: 12 }}>
         <Link href="/login" style={{ textDecoration: "none", color: C.text, fontSize: "14px", fontWeight: 700, padding: "10px 20px" }} className="hide-mobile">Login</Link>
-        <Link href="/register" className="btn-magnetic" style={{
+        <Link href="/register" className="btn-magnetic mobile-btn-teste" style={{
           background: C.teal, color: "white", padding: "12px 28px", borderRadius: "10px",
           textDecoration: "none", fontWeight: 800, fontSize: "14px"
         }}>
@@ -140,14 +146,6 @@ function Navbar() {
 // ─── HERO (Ajustes de Texto e Foto de Nutricionista de Elite Real) ───────────
 function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMuted, setIsMuted] = useState(true);
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
-    }
-  };
 
   useEffect(() => {
     const video = videoRef.current;
@@ -192,13 +190,13 @@ function Hero() {
             </span>
           </h1>
 
-          <p style={{
+          <p className="mobile-subtitle" style={{
             fontSize: "clamp(16px, 1.2vw, 20px)", color: "#475569", lineHeight: 1.6,
             marginBottom: "44px", maxWidth: "580px", fontWeight: 500
           }}>
             Pare de perder tempo com processos manuais e softwares lentos. Domine a prática clínica com inteligência automatizada e transforme seu consultório em uma referência de elite.
           </p>
-          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
             <Link href="/register" className="btn-magnetic" style={{
               background: C.teal, color: "white", padding: "18px 36px", borderRadius: "12px",
               fontSize: "16px", fontWeight: 800, textDecoration: "none"
@@ -231,35 +229,6 @@ function Hero() {
           src="/imagem/hero-video.mp4"
         />
 
-        {/* BOTAO DE CONTROLE DE SOM */}
-        <button
-          onClick={toggleMute}
-          style={{
-            position: "absolute",
-            bottom: 20,
-            right: 20,
-            width: 48,
-            height: 48,
-            borderRadius: "50%",
-            background: "rgba(0,0,0,0.6)",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 10,
-            transition: "all 0.3s ease"
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.8)"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.6)"}
-        >
-          {isMuted ? (
-            <VolumeX style={{ width: 24, height: 24, color: "white" }} />
-          ) : (
-            <Volume2 style={{ width: 24, height: 24, color: "white" }} />
-          )}
-        </button>
-
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
           background: "linear-gradient(to right, white, transparent 15%)"
@@ -281,20 +250,21 @@ function EliteSpecs() {
   return (
     <div style={{ background: C.dark, padding: "30px 6%", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 30 }}>
       {specs.map(s => (
-        <div key={s.label} style={{ flex: 1, minWidth: "150px", textAlign: "center" }}>
+        <div key={s.label} style={{ flex: "1 1 45%", minWidth: "120px", textAlign: "center" }}>
           <div style={{ fontSize: "24px", marginBottom: "8px" }}>{s.icon}</div>
-          <div style={{ color: C.teal, fontWeight: 800, fontSize: "22px" }}>{s.val}</div>
-          <div style={{ color: "white", fontSize: "12px", opacity: 0.6, textTransform: "uppercase", letterSpacing: "1px" }}>{s.label}</div>
+          <div style={{ color: C.teal, fontWeight: 800, fontSize: "clamp(18px, 4vw, 22px)" }}>{s.val}</div>
+          <div style={{ color: "white", fontSize: "11px", opacity: 0.6, textTransform: "uppercase", letterSpacing: "1px" }}>{s.label}</div>
         </div>
       ))}
       <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.1)", margin: "20px 0" }} />
       <div style={{
-        maxWidth: "900px", margin: "0 auto", padding: "20px 30px", borderRadius: "20px",
+        width: "100%",
+        padding: "20px 30px", borderRadius: "20px",
         background: `linear-gradient(90deg, transparent, ${C.teal}15, transparent)`,
         border: `1px solid ${C.teal}20`,
         boxShadow: `0 0 30px ${C.teal}05`
       }}>
-        <p style={{ color: "white", fontSize: "16px", textAlign: "center", fontWeight: 500, lineHeight: 1.6 }}>
+        <p className="mobile-justified" style={{ color: "white", fontSize: "clamp(14px, 3vw, 16px)", textAlign: "center", fontWeight: 500, lineHeight: 1.6 }}>
           Acesse o banco de dados mais completo do mercado. <span style={{ color: C.teal, fontWeight: 700 }}>Presets infinitos</span>, automação de lembretes (24h e Follow-up) e o <strong>Xpert Messenger</strong> para total privacidade do seu número.
         </p>
       </div>
@@ -598,11 +568,11 @@ function Stats() {
   const stats = [{ val: "80%", label: "Economia de Tempo" }, { val: "3×", label: "Criação Rápida" }, { val: "99%", label: "Precisão" }, { val: "+60%", label: "Produtividade" }];
   return (
     <section style={{ background: "#0f172a", padding: "80px 6%" }}>
-      <div className="responsive-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32, maxWidth: 1200, margin: "0 auto" }}>
+      <div className="mobile-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32, maxWidth: 1200, margin: "0 auto" }}>
         {stats.map((s, i) => (
           <div key={i} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "48px", fontWeight: 800, color: C.lime }}>{s.val}</div>
-            <div style={{ fontSize: "14px", fontWeight: 700, color: "white", marginTop: "12px", textTransform: "uppercase" }}>{s.label}</div>
+            <div style={{ fontSize: "clamp(32px, 6vw, 48px)", fontWeight: 800, color: C.lime }}>{s.val}</div>
+            <div style={{ fontSize: "clamp(11px, 2.5vw, 14px)", fontWeight: 700, color: "white", marginTop: "12px", textTransform: "uppercase" }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -843,7 +813,7 @@ function ProfessionalBrand() {
         <div>
           <span className="tag" style={{ background: `${C.teal}10`, color: C.teal, marginBottom: "20px" }}>Identidade Profissional</span>
           <h2 style={{ fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 800, marginBottom: "24px", lineHeight: 1.1 }}>Sua Marca, <span style={{ color: C.teal }}>Sua Autoridade.</span></h2>
-          <p style={{ color: "#64748b", fontSize: "18px", lineHeight: 1.6, marginBottom: "32px" }}>
+          <p className="mobile-justified" style={{ color: "#64748b", fontSize: "clamp(14px, 3vw, 18px)", lineHeight: 1.6, marginBottom: "32px" }}>
             Configure seu consultório com sua própria logo, assinatura digital para receitas, título profissional e endereço. Escolha entre <strong>Modo Claro ou Escuro</strong> para sua melhor experiência.
           </p>
 
