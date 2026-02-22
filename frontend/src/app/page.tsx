@@ -67,9 +67,9 @@ const GlobalStyles = () => (
     }
     
     @media (max-width: 991px) {
-      .hero-split { flex-direction: column !important; text-align: center; padding-top: 120px !important; }
+      .hero-split { flex-direction: column !important; text-align: center; padding-top: 140px !important; }
       .hero-text { padding-right: 0 !important; margin-bottom: 40px; }
-      .hero-image { width: 100% !important; height: 450px !important; border-radius: 20px !important; }
+      .hero-image { width: 100% !important; height: auto !important; min-height: 300px !important; max-height: 50vh !important; border-radius: 20px !important; }
       .responsive-grid { grid-template-columns: 1fr !important; }
       .hide-mobile { display: none !important; }
     }
@@ -108,13 +108,14 @@ function Navbar() {
       borderBottom: scrolled ? "1px solid #eee" : "none",
       transition: "all 0.3s ease"
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        {/* LOGO AUMENTADA E NOME FORMATADO */}
-        <Image src="/imagem/logo_final.svg" alt="Logo" width={240} height={65} style={{ height: "55px", width: "auto" }} priority />
-        <div style={{ width: 1, height: 30, background: "#ddd" }} className="hide-mobile" />
-        <span style={{ fontWeight: 800, fontSize: "20px", color: C.text, letterSpacing: "-0.02em" }} className="hide-mobile">
-          Nutri <span style={{ color: C.teal }}>Xpert</span> Pro
-        </span>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        {/* LOGO E NOME - VISIVEL EM MOBILE E DESKTOP */}
+        <Image src="/imagem/logo_final.svg" alt="Logo" width={240} height={65} style={{ height: "50px", width: "auto" }} priority />
+        <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          <span style={{ fontWeight: 800, fontSize: "clamp(14px, 3vw, 20px)", color: C.text, letterSpacing: "-0.02em", lineHeight: 1 }}>
+            Nutri <span style={{ color: C.teal }}>Xpert</span> Pro
+          </span>
+        </div>
       </div>
 
       <div className="hide-mobile" style={{ display: "flex", gap: 32 }}>
@@ -213,12 +214,12 @@ function Hero() {
         background: "#f8fafc", borderRadius: "30px 0 0 30px", overflow: "hidden",
         display: "flex"
       }}>
-        {/* VÍDEO DE ALTA CONVERSÃO (RESPONSIVO E COM PROPORÇÕES REAIS) */}
+        {/* VIDEO DE ALTA CONVERSAO - AUTOPLAY FUNCIONA COM MUTED EM MOBILE */}
         <video
           ref={videoRef}
           autoPlay
+          muted
           loop
-          controls
           playsInline
           style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
           src="/imagem/hero-video.mp4"
