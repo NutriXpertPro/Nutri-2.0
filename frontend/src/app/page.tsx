@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { MousePointer2, CheckCircle2, LineChart, Activity, Sparkles, Smartphone } from "lucide-react";
+import { MousePointer2, CheckCircle2, LineChart, Activity, Sparkles, Smartphone, Volume2, VolumeX } from "lucide-react";
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const C = {
@@ -140,6 +140,14 @@ function Navbar() {
 // ─── HERO (Ajustes de Texto e Foto de Nutricionista de Elite Real) ───────────
 function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
 
   useEffect(() => {
     const video = videoRef.current;
@@ -148,14 +156,12 @@ function Hero() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // O vídeo está visível. Tenta dar play (pode cair no catch se o navegador bloquear autoplay com som)
           video.play().catch(() => console.log("Autoplay bloqueado pelo navegador"));
         } else {
-          // O vídeo saiu da tela. Pausa o vídeo para não continuar o áudio.
           video.pause();
         }
       },
-      { threshold: 0.1 } // Reage quando 10% do vídeo aparecer ou sumir
+      { threshold: 0.1 }
     );
 
     observer.observe(video);
@@ -224,6 +230,35 @@ function Hero() {
           style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
           src="/imagem/hero-video.mp4"
         />
+
+        {/* BOTAO DE CONTROLE DE SOM */}
+        <button
+          onClick={toggleMute}
+          style={{
+            position: "absolute",
+            bottom: 20,
+            right: 20,
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            background: "rgba(0,0,0,0.6)",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 10,
+            transition: "all 0.3s ease"
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.8)"}
+          onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.6)"}
+        >
+          {isMuted ? (
+            <VolumeX style={{ width: 24, height: 24, color: "white" }} />
+          ) : (
+            <Volume2 style={{ width: 24, height: 24, color: "white" }} />
+          )}
+        </button>
 
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
