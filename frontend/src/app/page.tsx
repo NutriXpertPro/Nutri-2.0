@@ -116,7 +116,7 @@ function Navbar() {
       transition: "all 0.3s ease"
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <Image src="/imagem/logo_final.svg" alt="Logo" width={240} height={65} style={{ height: "50px", width: "auto" }} className="mobile-logo" priority />
+        <Image src="/imagem/logo_final.svg" alt="Logo" width={175} height={50} style={{ height: "50px", width: "auto" }} className="mobile-logo" priority />
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           <span style={{ fontWeight: 800, fontSize: "clamp(16px, 4vw, 20px)", color: C.text, letterSpacing: "-0.02em", lineHeight: 1 }} className="mobile-name">
             Nutri <span style={{ color: C.teal }}>Xpert</span> Pro
